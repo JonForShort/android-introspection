@@ -12,6 +12,14 @@ main() {
     fi
 
     download_dir=${ROOT_DIR}/${frida_version}
+
+    if [ -d ${download_dir} ]; then
+	echo ""
+	echo "frida already exists; ${download_dir}"
+	echo ""
+	exit 1;
+    fi
+
     rm -rf ${download_dir}
     mkdir -p ${download_dir}
 
@@ -26,7 +34,7 @@ main() {
 	wget ${frida_url} -O ${temp_file} --quiet
 	
 	mkdir -p ${dest_dir}
-	tar xvfJ ${temp_file} -C ${dest_dir}
+	tar xfJ ${temp_file} -C ${dest_dir}
 
 	mkdir -p ${dest_dir}/include
 	mv ${dest_dir}/*.h ${dest_dir}/include
@@ -37,6 +45,12 @@ main() {
 	mkdir -p ${dest_dir}/example
 	mv ${dest_dir}/*.c ${dest_dir}/example
     done
+
+    echo ""
+    echo "downloaded frida successfully; ${download_dir}"
+    echo ""
+
+    exit 0
 }
 
 main "$@"
