@@ -8,6 +8,8 @@ add_library (native-lib SHARED native-lib.cpp)
 
 find_library (log-lib log)
 
+add_dependencies (native-lib frida)
+
 target_link_libraries (native-lib ${v8-lib}/libv8-7.0.a)
 
 target_link_libraries (native-lib ${log-lib})

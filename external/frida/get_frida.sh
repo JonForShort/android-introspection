@@ -6,18 +6,21 @@ FRIDA_VERSION_TAG=_VERSION_
 FRIDA_ARCH_TAG=_ARCH_
 
 main() {
-    frida_version=12.4.5
+    frida_version=12.4.7
     if [ -n "$1" ]; then
 	frida_version=$1
     fi
 
     download_dir=${ROOT_DIR}/${frida_version}
+    if [ -n "$2" ]; then
+	download_dir=$2
+    fi
 
     if [ -d ${download_dir} ]; then
 	echo ""
 	echo "frida already exists; ${download_dir}"
 	echo ""
-	exit 1;
+	exit 0;
     fi
 
     rm -rf ${download_dir}
