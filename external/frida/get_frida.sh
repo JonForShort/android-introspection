@@ -8,45 +8,53 @@ FRIDA_ARCH_TAG=_ARCH_
 main() {
     frida_version=12.4.7
     if [ -n "$1" ]; then
-	frida_version=$1
+        frida_version=$1
     fi
 
     download_dir=${ROOT_DIR}/${frida_version}
     if [ -n "$2" ]; then
-	download_dir=$2
+        download_dir=$2
     fi
 
     if [ -d ${download_dir} ]; then
-	echo ""
-	echo "frida already exists; ${download_dir}"
-	echo ""
-	exit 0;
+        echo ""
+        echo "frida already exists; ${download_dir}"
+        echo ""
+        exit 0;
     fi
 
     rm -rf ${download_dir}
     mkdir -p ${download_dir}
 
-    for arch in x86 x86_64 arm arm64; do
-	temp_dir=$(mktemp -d)
-	temp_file=${temp_dir}/${arch}.tar.xz
-	dest_dir=${download_dir}/${arch}
-	
-	frida_url="${FRIDA_BASE_URL//$FRIDA_VERSION_TAG/$frida_version}"
-	frida_url="${frida_url//$FRIDA_ARCH_TAG/$arch}"
+    declare -A abis
+    abis['x86']='x86'
+    abis['x86_64']='x86_64'
+    abis['arm']='armeabi-v7a'
+    abis['arm64']='arm64-v8a'
 
-	wget ${frida_url} -O ${temp_file} --quiet
-	
-	mkdir -p ${dest_dir}
-	tar xfJ ${temp_file} -C ${dest_dir}
+    for frida_abi in "${!abis[@]}"; do
+        android_abi=${abis["${frida_abi}"]}
 
-	mkdir -p ${dest_dir}/include
-	mv ${dest_dir}/*.h ${dest_dir}/include
+        temp_dir=$(mktemp -d)
+        temp_file=${temp_dir}/${frida_abi}.tar.xz
+        dest_dir=${download_dir}/${android_abi}
+        
+        frida_url="${FRIDA_BASE_URL//$FRIDA_VERSION_TAG/$frida_version}"
+        frida_url="${frida_url//$FRIDA_ARCH_TAG/$frida_abi}"
 
-	mkdir -p ${dest_dir}/lib
-	mv ${dest_dir}/*.a ${dest_dir}/lib
+        wget ${frida_url} -O ${temp_file} --quiet
+        
+        mkdir -p ${dest_dir}
+        tar xfJ ${temp_file} -C ${dest_dir}
 
-	mkdir -p ${dest_dir}/example
-	mv ${dest_dir}/*.c ${dest_dir}/example
+        mkdir -p ${dest_dir}/include
+        mv ${dest_dir}/*.h ${dest_dir}/include
+
+        mkdir -p ${dest_dir}/lib
+        mv ${dest_dir}/*.a ${dest_dir}/lib
+
+        mkdir -p ${dest_dir}/example
+        mv ${dest_dir}/*.c ${dest_dir}/example
     done
 
     echo ""
