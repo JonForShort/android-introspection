@@ -5,10 +5,10 @@ cmake_minimum_required (VERSION 3.10.2)
 set (v8-include  ${DIR_ROOT_EXTERNAL}/v8/${ANDROID_ABI}/include/v8)
 set (v8-lib      ${DIR_ROOT_EXTERNAL}/v8/${ANDROID_ABI}/lib)
 
-# frida
+# frida-gumjs
 
-set (frida-include  ${DIR_ROOT_EXTERNAL}/frida/out/${ANDROID_ABI}/include)
-set (frida-lib      ${DIR_ROOT_EXTERNAL}/frida/out/${ANDROID_ABI}/lib)
+set (frida-include  ${DIR_ROOT_EXTERNAL}/frida/frida-gumjs/${ANDROID_ABI}/include)
+set (frida-lib      ${DIR_ROOT_EXTERNAL}/frida/frida-gumjs/${ANDROID_ABI}/lib)
 
 add_library (native-lib SHARED native-lib.cpp)
 
