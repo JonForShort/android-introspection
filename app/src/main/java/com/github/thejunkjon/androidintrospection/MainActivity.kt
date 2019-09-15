@@ -5,11 +5,12 @@ import android.content.pm.ResolveInfo
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -38,15 +39,18 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            val i: ImageView
-            if (convertView == null) {
-                i = ImageView(this@MainActivity)
+            val imageView = if (convertView == null) {
+                ImageView(this@MainActivity).apply {
+                    layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
+                    setPadding(10, 10, 10, 10);
+                    scaleType = ImageView.ScaleType.CENTER_CROP;
+                }
             } else {
-                i = convertView as ImageView
+                convertView as ImageView
             }
-            val info = mInstalledApps[position]
-            i.setImageDrawable(info.activityInfo.loadIcon(packageManager))
-            return i
+            val resolveInfo = mInstalledApps[position]
+            imageView.setImageDrawable(resolveInfo.activityInfo.loadIcon(packageManager))
+            return imageView
         }
 
         override fun getItem(position: Int): Any {
