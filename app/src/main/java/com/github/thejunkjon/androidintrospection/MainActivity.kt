@@ -11,10 +11,11 @@ import android.widget.BaseAdapter
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import timber.log.Timber.d
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var mInstalledApps: List<ResolveInfo>
+    private lateinit var installedApps: List<ResolveInfo>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,20 +24,25 @@ class MainActivity : AppCompatActivity() {
         updateInstalledApps()
 
         installed_apps.adapter = AppsAdapter()
+        installed_apps.setOnItemClickListener { adapterView, view, position, l ->
+            d("item clicked $position")
+        }
     }
 
     private fun updateInstalledApps() {
         val mainIntent = Intent(Intent.ACTION_MAIN, null)
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER)
 
-        mInstalledApps = packageManager.queryIntentActivities(mainIntent, 0)
+        installedApps = packageManager.queryIntentActivities(mainIntent, 0)
     }
 
     private inner class AppsAdapter : BaseAdapter() {
 
-        override fun getCount(): Int {
-            return mInstalledApps.size
-        }
+        override fun getCount() = installedApps.size
+
+        override fun getItem(position: Int) = installedApps.get(position)
+
+        override fun getItemId(position: Int) = position.toLong()
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             val imageView = if (convertView == null) {
@@ -48,17 +54,9 @@ class MainActivity : AppCompatActivity() {
             } else {
                 convertView as ImageView
             }
-            val resolveInfo = mInstalledApps[position]
+            val resolveInfo = installedApps[position]
             imageView.setImageDrawable(resolveInfo.activityInfo.loadIcon(packageManager))
             return imageView
-        }
-
-        override fun getItem(position: Int): Any {
-            return mInstalledApps.get(position)
-        }
-
-        override fun getItemId(position: Int): Long {
-            return position.toLong()
         }
     }
 }
