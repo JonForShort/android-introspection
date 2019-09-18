@@ -25,7 +25,8 @@ class MainActivity : AppCompatActivity() {
 
         installed_apps.adapter = AppsAdapter()
         installed_apps.setOnItemClickListener { adapterView, view, position, l ->
-            d("item clicked $position")
+            val clickedItem = installedApps.get(position)
+            d("item clicked : position [$position] item [$clickedItem]")
         }
     }
 
