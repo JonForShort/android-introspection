@@ -1,12 +1,48 @@
 buildscript {
-    ext.kotlin_version = '1.3.50'
+
+    ext {
+        configuration = [
+                compileSdkVersion        : 29,
+                targetSdkVersion         : 29,
+                minSdkVersion            : 23,
+                defaultVersionCode       : 1,
+                defaultVersionName       : "1.0.0",
+                testInstrumentationRunner: "androidx.test.runner.AndroidJUnitRunner",
+
+                release                  : [
+                        minifyEnabled      : false,
+                        shrinkResources    : false,
+                        testCoverageEnabled: false
+                ],
+
+                debug                    : [
+                        minifyEnabled      : false,
+                        shrinkResources    : false,
+                        testCoverageEnabled: false,
+                ]
+        ]
+
+        libraries = [
+                kotlin           : "1.3.50",
+                kotlin_coroutines: "1.3.1"
+        ]
+
+        getScriptPathFor = { scriptFileName ->
+            return rootDir.absolutePath + File.separator + "gradle" + File.separator + "scripts" + File.separator + scriptFileName
+        }
+
+        getExternalLibPathFor = { dirName ->
+            return rootDir.absolutePath + File.separator + "external" + File.separator + dirName
+        }
+    }
+
     repositories {
         google()
         jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${libraries.kotlin}"
     }
 }
 

@@ -1,0 +1,44 @@
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+
+    compileSdkVersion configuration.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion configuration.minSdkVersion
+        targetSdkVersion configuration.targetSdkVersion
+        versionCode configuration.defaultVersionCode
+        versionName configuration.defaultVersionName
+        testInstrumentationRunner configuration.testInstrumentationRunner
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled configuration.release.minifyEnabled
+            shrinkResources configuration.release.shrinkResources
+            testCoverageEnabled configuration.release.testCoverageEnabled
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled configuration.debug.minifyEnabled
+            shrinkResources configuration.debug.shrinkResources
+            testCoverageEnabled configuration.debug.testCoverageEnabled
+        }
+    }
+}
+
+dependencies {
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${libraries.kotlin}"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${libraries.kotlin_coroutines}"
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.core:core-ktx:1.2.0-alpha04'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'com.jakewharton.timber:timber:4.7.1'
+
+    testImplementation 'junit:junit:4.12'
+
+    androidTestImplementation 'androidx.test:runner:1.3.0-alpha02'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0-alpha02'
+}
