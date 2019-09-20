@@ -7,3 +7,7 @@ android {
         applicationId "com.github.thejunkjon.androidintrospection"
     }
 }
+
+dependencies {
+    implementation project(':lib')
+}
