@@ -1,3 +1,15 @@
 cmake_minimum_required (VERSION 3.10.2)
 
-add_subdirectory (frida)
+set (EXTERNAL_PROJECTS frida zlib)
+
+foreach (EXTERNAL_PROJECT ${EXTERNAL_PROJECTS})
+
+  set (DIR_PROJECT_OUT ${DIR_ROOT_OUT}/${EXTERNAL_PROJECT})
+
+  set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${DIR_PROJECT_OUT}/lib)
+  set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${DIR_PROJECT_OUT}/lib)
+  set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${DIR_PROJECT_OUT}/bin)  
+
+  add_subdirectory (${EXTERNAL_PROJECT})
+
+endforeach ()
