@@ -48,9 +48,9 @@ class MainActivity : AppCompatActivity() {
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             val imageView = if (convertView == null) {
                 ImageView(this@MainActivity).apply {
-                    layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
-                    setPadding(10, 10, 10, 10);
-                    scaleType = ImageView.ScaleType.CENTER_CROP;
+                    layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
+                    setPadding(10, 10, 10, 10)
+                    scaleType = ImageView.ScaleType.CENTER_CROP
                 }
             } else {
                 convertView as ImageView
