@@ -6,16 +6,17 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import com.github.thejunkjon.lib.ApkProcessor
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber.d
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var installedApps: List<ResolveInfo>
+    private var appIconSize: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,8 +26,9 @@ class MainActivity : AppCompatActivity() {
 
         installed_apps.adapter = AppsAdapter()
         installed_apps.setOnItemClickListener { adapterView, view, position, l ->
-            val clickedItem = installedApps.get(position)
+            val clickedItem = installedApps[position]
             d("item clicked : position [$position] item [$clickedItem]")
+            ApkProcessor(clickedItem.activityInfo.applicationInfo.sourceDir).makeDebuggable()
         }
     }
 
@@ -35,28 +37,35 @@ class MainActivity : AppCompatActivity() {
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER)
 
         installedApps = packageManager.queryIntentActivities(mainIntent, 0)
+
+        appIconSize = 0
+        installedApps.forEach {
+            val icon = it.activityInfo.loadIcon(packageManager)
+            if (icon.intrinsicHeight >= appIconSize) {
+                appIconSize = icon.intrinsicHeight
+            }
+            if (icon.intrinsicWidth >= appIconSize) {
+                appIconSize = icon.intrinsicWidth
+            }
+        }
     }
 
     private inner class AppsAdapter : BaseAdapter() {
 
         override fun getCount() = installedApps.size
 
-        override fun getItem(position: Int) = installedApps.get(position)
+        override fun getItem(position: Int) = installedApps[position]
 
         override fun getItemId(position: Int) = position.toLong()
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            val imageView = if (convertView == null) {
+            val imageView = if (convertView == null)
                 ImageView(this@MainActivity).apply {
-                    layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
-                    setPadding(10, 10, 10, 10)
-                    scaleType = ImageView.ScaleType.CENTER_CROP
-                }
-            } else {
-                convertView as ImageView
-            }
+                    layoutParams = LayoutParams(appIconSize, appIconSize)
+                } else convertView as ImageView
             val resolveInfo = installedApps[position]
-            imageView.setImageDrawable(resolveInfo.activityInfo.loadIcon(packageManager))
+            val icon = resolveInfo.activityInfo.loadIcon(packageManager)
+            imageView.setImageDrawable(icon)
             return imageView
         }
     }
