@@ -14,8 +14,10 @@ add_dependencies (native-lib frida)
 
 target_link_libraries (native-lib ${v8-lib}/libv8-7.0.a)
 target_link_libraries (native-lib ${frida-lib}/libfrida-gumjs.a)
+target_link_libraries (native-lib apk)
 target_link_libraries (native-lib utils)
 
 target_include_directories (native-lib PRIVATE ${frida-include})
 target_include_directories (native-lib PRIVATE ${v8-include})
+target_include_directories (native-lib PRIVATE apk)
 target_include_directories (native-lib PRIVATE utils)
