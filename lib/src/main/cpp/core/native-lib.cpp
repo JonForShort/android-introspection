@@ -1,8 +1,8 @@
 #include <jni.h>
 #include <string>
 
-#include "log.h"
-#include "utils.h"
+#include "utils/log.h"
+#include "utils/utils.h"
 
 #define BEGIN_EXTERN_C extern "C" {
 #define END_EXTERN_C }
