@@ -6,7 +6,7 @@ FRIDA_VERSION_TAG=_VERSION_
 FRIDA_ARCH_TAG=_ARCH_
 
 main() {
-    frida_version=12.4.7
+    frida_version=12.7.5
     if [ -n "$1" ]; then
         frida_version=$1
     fi
