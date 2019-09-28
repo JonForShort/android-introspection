@@ -17,6 +17,6 @@ target_link_libraries(apk ${zlib-lib}/libz.a)
 target_link_libraries(apk ${zlib-lib}/libminizip.a)
 target_link_libraries(apk utils)
 
-target_include_directories(native-lib PRIVATE ${zlib-include})
-target_include_directories(native-lib PRIVATE ${minizip-include})
+target_include_directories(apk PRIVATE ${zlib-include})
+target_include_directories(apk PRIVATE ${minizip-include})
 target_include_directories(apk PRIVATE utils)
