@@ -12,10 +12,6 @@ set(source apk.cpp)
 
 add_library(apk STATIC ${source})
 
-add_dependencies(apk zlib)
-add_dependencies(apk minizip)
-add_dependencies(apk frida)
-
 target_link_libraries(apk ${zlib-lib}/libz.a)
 target_link_libraries(apk ${minizip-lib}/libminizip.a)
 target_link_libraries(apk utils)
