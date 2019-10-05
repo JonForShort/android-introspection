@@ -6,3 +6,9 @@
 	path = external/zlib/source
 	url = https://github.com/thejunkjon/external-zlib.git
 	ignore = dirty
+
+[submodule "external/minizip/source"]
+	path = external/minizip/source
+	url = https://github.com/thejunkjon/minizip.git
+	ignore = dirty
+
