@@ -35,6 +35,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.github.thejunkjon.lib.ApkProcessor
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber.d
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -51,7 +52,9 @@ class MainActivity : AppCompatActivity() {
         installed_apps.setOnItemClickListener { _, _, position, _ ->
             val clickedItem = installedApps[position]
             d("item clicked : position [$position] item [$clickedItem]")
-            ApkProcessor(clickedItem.activityInfo.applicationInfo.sourceDir).makeDebuggable()
+            val modifiedApkFile = File.createTempFile("makeDebuggable", ".apk")
+            val apkFile = File(clickedItem.activityInfo.applicationInfo.sourceDir)
+            ApkProcessor(apkFile).process(modifiedApkFile = modifiedApkFile, makeDebuggable = true)
         }
     }
 
