@@ -34,6 +34,9 @@ using namespace ai;
 
 namespace {
 
+    auto constexpr PACKED_XML_IDENTIFIER = static_cast<uint32_t>(0x00080003);
+    auto constexpr REX_XML_STRING_TABLE = static_cast<uint16_t>(0x0001);
+
     struct UnzOpenFile {
 
         UnzOpenFile(const char *szFileName) : zip_(unzOpen(szFileName)) {}
@@ -97,6 +100,23 @@ namespace {
         unzReadCurrentFile(zip.get(), &contents[0], contents.size());
         return contents;
     }
+
+    auto isCompressedAndroidManifest(std::vector<uint8_t> const &contents) -> bool {
+        auto first_four_bytes = 0;
+        memcpy(&first_four_bytes, &contents[0], 4);
+        return first_four_bytes == PACKED_XML_IDENTIFIER;
+    }
+
+    auto getStringsFromCompressedAndroidManifest(std::vector<uint8_t> const &contents) -> std::vector<std::string> {
+        std::vector<std::string> strings;
+        auto string_marker_bytes = static_cast<uint16_t>(0);
+        memcpy(&string_marker_bytes, &contents[6], 2);
+        if (string_marker_bytes != REX_XML_STRING_TABLE) {
+            LOGW("unable to get strings; missing string marker");
+            return strings;
+        }
+        return strings;
+    }
 }
 
 auto apk::make_apk_debuggable(const char *apkPath) -> bool {
@@ -106,11 +126,15 @@ auto apk::make_apk_debuggable(const char *apkPath) -> bool {
         LOGD("unable to find AndroidManifest.xml in [%s]", apkPath);
         return false;
     }
-
     auto const contents = getZipContents(apkPath, "AndroidManifest.xml");
     if (contents.empty()) {
         LOGW("unable to read AndroidManifest.xml in [%s]", apkPath);
         return false;
     }
+    if (!isCompressedAndroidManifest(contents)) {
+        LOGW("is invalid compressed android manifest in [%s]", apkPath);
+        return false;
+    }
+    auto const strings = getStringsFromCompressedAndroidManifest(contents);
     return true;
 }
