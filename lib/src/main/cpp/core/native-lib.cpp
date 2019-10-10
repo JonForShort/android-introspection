@@ -52,7 +52,7 @@ Java_com_github_thejunkjon_lib_ApkProcessor_makeDebuggableNative(
     auto const *apkPath = env->GetStringUTFChars(apkPathJni, 0);
     if (utils::fileExists(apkPath)) {
         LOGD("apk path exists");
-        apk::make_apk_debuggable(apkPath);
+        apk::makeApkDebuggable(apkPath);
     } else {
         LOGD("apk path does not exist");
         result = JNI_FALSE;

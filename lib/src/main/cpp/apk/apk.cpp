@@ -22,6 +22,8 @@
 // SOFTWARE.
 //
 #include <algorithm>
+#include <codecvt>
+#include <locale>
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -101,25 +103,67 @@ namespace {
         return contents;
     }
 
-    auto isCompressedAndroidManifest(std::vector<uint8_t> const &contents) -> bool {
-        auto first_four_bytes = 0;
-        memcpy(&first_four_bytes, &contents[0], 4);
-        return first_four_bytes == PACKED_XML_IDENTIFIER;
+    template<typename T>
+    auto readBytesFromVectorAtIndex(std::vector<uint8_t> const &data, size_t const index) {
+        T value = {0};
+        std::memcpy(&value, &data[index], sizeof(value));
+        return value;
     }
 
     auto getStringsFromCompressedAndroidManifest(std::vector<uint8_t> const &contents) -> std::vector<std::string> {
+
+        struct CompressedAndroidManifestHeader {
+            uint32_t xmlMagicNumber;
+            uint32_t reservedBytes;
+            uint16_t stringTableIdentifier;
+            uint16_t headerSize;
+            uint32_t chunkSize;
+            uint32_t numStrings;
+            uint32_t numStyles;
+            uint32_t flags;
+            uint32_t stringsOffset;
+            uint32_t stylesOffset;
+        };
+
         std::vector<std::string> strings;
-        auto string_marker_bytes = static_cast<uint16_t>(0);
-        memcpy(&string_marker_bytes, &contents[6], 2);
-        if (string_marker_bytes != REX_XML_STRING_TABLE) {
+        auto xmlHeader = reinterpret_cast<CompressedAndroidManifestHeader const *>(contents.data());
+        if (xmlHeader->xmlMagicNumber != PACKED_XML_IDENTIFIER) {
+            LOGW("unable to get strings; compressed xml is invalid");
+            return strings;
+        }
+        if (xmlHeader->stringTableIdentifier != REX_XML_STRING_TABLE) {
             LOGW("unable to get strings; missing string marker");
             return strings;
         }
+
+        auto stringOffsets = std::vector<uint32_t>();
+        for (size_t i = 0; i < xmlHeader->numStrings; i++) {
+            auto const index = sizeof(CompressedAndroidManifestHeader) + i * (sizeof(uint32_t));
+            auto const offset = readBytesFromVectorAtIndex<uint32_t>(contents, index);
+            stringOffsets.push_back(offset);
+        }
+
+        auto const isUtf8Encoded = (xmlHeader->flags & 0x100) > 0;
+        for (auto &offset : stringOffsets) {
+            if (isUtf8Encoded) {
+                auto stringLength = readBytesFromVectorAtIndex<uint8_t>(contents, xmlHeader->stringsOffset + offset);
+                auto stringOffset = reinterpret_cast<const char *>(contents.data() + xmlHeader->stringsOffset + offset + 2);
+                auto string = std::string(stringOffset, stringLength);
+                strings.push_back(string);
+            } else {
+                auto stringLength = readBytesFromVectorAtIndex<uint16_t>(contents, xmlHeader->stringsOffset + offset + 8);
+                auto stringOffset = reinterpret_cast<const char16_t *>(contents.data() + xmlHeader->stringsOffset + offset + 2 + 8);
+                auto string = std::u16string(stringOffset, stringLength);
+                std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
+                strings.push_back(converter.to_bytes(string));
+            }
+        }
+
         return strings;
     }
 }
 
-auto apk::make_apk_debuggable(const char *apkPath) -> bool {
+auto apk::makeApkDebuggable(const char *apkPath) -> bool {
     auto const fileNames = getZipFileNames(apkPath);
     auto const containsAndroidManifest = std::find(fileNames.begin(), fileNames.end(), "AndroidManifest.xml") != fileNames.end();
     if (!containsAndroidManifest) {
@@ -131,10 +175,10 @@ auto apk::make_apk_debuggable(const char *apkPath) -> bool {
         LOGW("unable to read AndroidManifest.xml in [%s]", apkPath);
         return false;
     }
-    if (!isCompressedAndroidManifest(contents)) {
-        LOGW("is invalid compressed android manifest in [%s]", apkPath);
+    auto const strings = getStringsFromCompressedAndroidManifest(contents);
+    if (strings.empty()) {
+        LOGW("unable to parse strings from AndroidManifest.xml in [%s]", apkPath);
         return false;
     }
-    auto const strings = getStringsFromCompressedAndroidManifest(contents);
     return true;
 }
