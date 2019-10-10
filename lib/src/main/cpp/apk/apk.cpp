@@ -143,16 +143,22 @@ namespace {
             stringOffsets.push_back(offset);
         }
 
+        //
+        // TODO: Figure out why we can't just use xmlheader->stringsOffset.  Using this will make us 8 bytes short of where strings really start.
+        //
+
+        auto const stringOffsetsInBytes = stringOffsets.size() * sizeof(decltype(stringOffsets)::value_type);
+        auto const startStringsOffset = sizeof(CompressedAndroidManifestHeader) + stringOffsetsInBytes;
         auto const isUtf8Encoded = (xmlHeader->flags & 0x100) > 0;
         for (auto &offset : stringOffsets) {
             if (isUtf8Encoded) {
-                auto stringLength = readBytesFromVectorAtIndex<uint8_t>(contents, xmlHeader->stringsOffset + offset);
-                auto stringOffset = reinterpret_cast<const char *>(contents.data() + xmlHeader->stringsOffset + offset + 2);
+                auto stringLength = readBytesFromVectorAtIndex<uint8_t>(contents, startStringsOffset + offset);
+                auto stringOffset = reinterpret_cast<const char *>(contents.data() + startStringsOffset + offset + 2);
                 auto string = std::string(stringOffset, stringLength);
                 strings.push_back(string);
             } else {
-                auto stringLength = readBytesFromVectorAtIndex<uint16_t>(contents, xmlHeader->stringsOffset + offset + 8);
-                auto stringOffset = reinterpret_cast<const char16_t *>(contents.data() + xmlHeader->stringsOffset + offset + 2 + 8);
+                auto stringLength = readBytesFromVectorAtIndex<uint16_t>(contents, startStringsOffset + offset);
+                auto stringOffset = reinterpret_cast<const char16_t *>(contents.data() + startStringsOffset + offset + 2);
                 auto string = std::u16string(stringOffset, stringLength);
                 std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
                 strings.push_back(converter.to_bytes(string));
