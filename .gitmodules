@@ -12,3 +12,7 @@
 	url = https://github.com/thejunkjon/minizip.git
 	ignore = dirty
 
+[submodule "external/wasm/emsdk"]
+	path = external/wasm/emsdk
+	url = https://github.com/emscripten-core/emsdk.git
+	ignore = dirty
