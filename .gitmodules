@@ -16,3 +16,8 @@
 	path = external/wasm/emsdk
 	url = https://github.com/emscripten-core/emsdk.git
 	ignore = dirty
+
+[submodule "external/wasm/emscripten"]
+	path = external/wasm/emscripten
+	url = https://github.com/emscripten-core/emscripten.git
+	ignore = dirty
