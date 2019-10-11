@@ -21,36 +21,3 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.github.thejunkjon.lib
-
-import java.io.File
-import java.lang.System.loadLibrary
-import java.nio.file.Files
-import java.nio.file.attribute.PosixFilePermissions
-
-class ApkProcessor(private val apkFile: File) {
-
-    init {
-        loadLibrary("android-lib")
-    }
-
-    fun process(modifiedApkFile: File, makeDebuggable: Boolean = true): Boolean {
-        apkFile.copyTo(modifiedApkFile, true)
-        setFilePermissionsToProcessFile(modifiedApkFile)
-        if (makeDebuggable) {
-            makeDebuggableNative(modifiedApkFile.absolutePath)
-        }
-        return true
-    }
-
-    private external fun makeDebuggableNative(pathToApk: String): Boolean
-
-    companion object {
-
-        private fun setFilePermissionsToProcessFile(modifiedApkFile: File) {
-            val allPermissions = PosixFilePermissions.fromString("rwxrwxrwx")
-            val desiredPermissions = PosixFilePermissions.asFileAttribute(allPermissions)
-            Files.setPosixFilePermissions(modifiedApkFile.toPath(), desiredPermissions.value())
-        }
-    }
-}

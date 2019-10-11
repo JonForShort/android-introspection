@@ -9,4 +9,11 @@ android {
             path "CMakeLists.txt"
         }
     }
+    defaultConfig {
+        externalNativeBuild {
+            cmake {
+                targets "android-lib"
+            }
+        }
+    }
 }
