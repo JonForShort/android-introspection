@@ -22,12 +22,8 @@ ai_build_wasm() {
 
     pushd ${BUILD_DIR}
 
-    cmake -DCMAKE_TOOLCHAIN_FILE=${ROOT_DIR}/external/wasm/emscripten/cmake/Modules/Platform/Emscripten.cmake \
-	  -DCMAKE_BUILD_TYPE=DEBUG \
-	  --target wasm-lib \
-	  --build ${ROOT_DIR}/lib
-
-    make "$@"
+    emconfigure cmake --target wasm-lib --build ${ROOT_DIR}/lib
+    emmake make "$@"
 
     popd
 }
