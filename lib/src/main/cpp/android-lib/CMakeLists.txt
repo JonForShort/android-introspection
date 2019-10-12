@@ -1,10 +1,13 @@
 cmake_minimum_required(VERSION 3.10.2)
 
-set(source android-lib.cpp)
+if (ANDROID)
 
-add_library(android-lib SHARED ${source})
+    set(source android-lib.cpp)
 
-target_link_libraries(android-lib core)
+    add_library(android-lib SHARED ${source})
 
-target_include_directories(android-lib PRIVATE core)
+    target_link_libraries(android-lib core)
 
+    target_include_directories(android-lib PRIVATE core)
+
+endif (ANDROID)
