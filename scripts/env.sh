@@ -12,19 +12,23 @@ ai_build() {
 }
 
 ai_build_android() {
-
-    ${ROOT_DIR}/gradlew clean build
+    (
+	${ROOT_DIR}/gradlew clean build
+    )
 }
 
 ai_build_wasm() {
-
-    mkdir -p ${BUILD_DIR}
-
-    pushd ${BUILD_DIR}
-
-    emconfigure cmake --build ${ROOT_DIR}/lib
-
-    emmake make "$@"
-
-    popd
+    (
+	source ${ROOT_DIR}/external/wasm/emsdk/emsdk_env.sh
+	
+	mkdir -p ${BUILD_DIR}
+	
+	pushd ${BUILD_DIR}
+	
+	emconfigure cmake --build ${ROOT_DIR}/lib
+	
+	emmake make "$@"
+	
+	popd
+    )
 }
