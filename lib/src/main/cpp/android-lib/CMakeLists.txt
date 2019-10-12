@@ -7,3 +7,4 @@ add_library(android-lib SHARED ${source})
 target_link_libraries(android-lib core)
 
 target_include_directories(android-lib PRIVATE core)
+
