@@ -24,7 +24,6 @@
 #include <algorithm>
 #include <codecvt>
 #include <locale>
-#include <stdint.h>
 #include <string>
 #include <vector>
 
@@ -39,16 +38,29 @@ namespace {
     auto constexpr PACKED_XML_IDENTIFIER = static_cast<uint32_t>(0x00080003);
     auto constexpr REX_XML_STRING_TABLE = static_cast<uint16_t>(0x0001);
 
+    struct CompressedAndroidManifestHeader {
+        uint32_t xmlMagicNumber;
+        uint32_t reservedBytes;
+        uint16_t stringTableIdentifier;
+        uint16_t headerSize;
+        uint32_t chunkSize;
+        uint32_t numStrings;
+        uint32_t numStyles;
+        uint32_t flags;
+        uint32_t stringsOffset;
+        uint32_t stylesOffset;
+    };
+
     struct UnzOpenFile {
 
-        UnzOpenFile(const char *szFileName) : zip_(unzOpen(szFileName)) {}
+        explicit UnzOpenFile(const char *szFileName) : zip_(unzOpen(szFileName)) {}
 
         ~UnzOpenFile() { unzClose(zip_); }
 
         auto get() const -> unzFile { return zip_; }
 
     private:
-        unzFile const zip_;
+        unzFile zip_;
     };
 
     auto getZipFileNames(const char *szFileName) -> std::vector<std::string> {
@@ -112,19 +124,6 @@ namespace {
 
     auto getStringsFromCompressedAndroidManifest(std::vector<uint8_t> const &contents) -> std::vector<std::string> {
 
-        struct CompressedAndroidManifestHeader {
-            uint32_t xmlMagicNumber;
-            uint32_t reservedBytes;
-            uint16_t stringTableIdentifier;
-            uint16_t headerSize;
-            uint32_t chunkSize;
-            uint32_t numStrings;
-            uint32_t numStyles;
-            uint32_t flags;
-            uint32_t stringsOffset;
-            uint32_t stylesOffset;
-        };
-
         std::vector<std::string> strings;
         auto xmlHeader = reinterpret_cast<CompressedAndroidManifestHeader const *>(contents.data());
         if (xmlHeader->xmlMagicNumber != PACKED_XML_IDENTIFIER) {
@@ -149,7 +148,7 @@ namespace {
 
         auto const stringOffsetsInBytes = stringOffsets.size() * sizeof(decltype(stringOffsets)::value_type);
         auto const startStringsOffset = sizeof(CompressedAndroidManifestHeader) + stringOffsetsInBytes;
-        auto const isUtf8Encoded = (xmlHeader->flags & 0x100) > 0;
+        auto const isUtf8Encoded = (xmlHeader->flags & 0x100U) > 0;
         for (auto &offset : stringOffsets) {
             if (isUtf8Encoded) {
                 auto stringLength = readBytesFromVectorAtIndex<uint8_t>(contents, startStringsOffset + offset);
@@ -184,6 +183,10 @@ auto apk::makeApkDebuggable(const char *apkPath) -> bool {
     auto const strings = getStringsFromCompressedAndroidManifest(contents);
     if (strings.empty()) {
         LOGW("unable to parse strings from AndroidManifest.xml in [%s]", apkPath);
+        return false;
+    }
+    if (std::find(strings.begin(), strings.end(), "application") == strings.end()) {
+        LOGW("unable to find application tag in AndroidManifest.xml in [%s]", apkPath);
         return false;
     }
     return true;
