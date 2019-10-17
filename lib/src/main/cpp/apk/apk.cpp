@@ -187,7 +187,38 @@ namespace {
 
         return strings;
     }
+
+    auto getXmlChunkOffset(std::vector<uint8_t> const &contents) -> uint32_t {
+        auto xmlHeader = reinterpret_cast<CompressedAndroidManifestHeader const *>(contents.data());
+        if (xmlHeader->xmlMagicNumber != XML_IDENTIFIER) {
+            LOGW("unable to get chunk size; compressed xml is invalid");
+            return 0;
+        }
+        if (xmlHeader->stringTableIdentifier != XML_STRING_TABLE) {
+            LOGW("unable to get chunk size; missing string marker");
+            return 0;
+        }
+        if (contents.size() <= xmlHeader->chunkSize) {
+            LOGW("unable to get chunk size; missing string marker");
+            return 0;
+        }
+        return contents.size() - (contents.size() - xmlHeader->chunkSize);
+    }
 }
+
+//
+// Structure of a binary xml file (i.e. compressed AndroidManifest.xml) is as follows.
+//
+// -----------------------------
+// [Header]
+// -----------------------------
+// [String Offsets]
+// -----------------------------
+// [Strings]
+// -----------------------------
+// [Chunk]
+// -----------------------------
+//
 
 auto apk::makeApkDebuggable(const char *apkPath) -> bool {
     auto const fileNames = getZipFileNames(apkPath);
@@ -208,6 +239,11 @@ auto apk::makeApkDebuggable(const char *apkPath) -> bool {
     }
     if (std::find(strings.begin(), strings.end(), "application") == strings.end()) {
         LOGW("unable to find application tag in AndroidManifest.xml in [%s]", apkPath);
+        return false;
+    }
+    auto const xmlChunkOffset = getXmlChunkOffset(contents);
+    if (xmlChunkOffset == 0) {
+        LOGW("unable to determine chunk offset in AndroidManifest.xml in [%s]", apkPath);
         return false;
     }
     return true;
