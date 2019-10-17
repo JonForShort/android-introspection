@@ -35,8 +35,29 @@ using namespace ai;
 
 namespace {
 
-    auto constexpr PACKED_XML_IDENTIFIER = static_cast<uint32_t>(0x00080003);
-    auto constexpr REX_XML_STRING_TABLE = static_cast<uint16_t>(0x0001);
+    auto constexpr XML_IDENTIFIER = 0x00080003;
+    auto constexpr XML_STRING_TABLE = 0x0001;
+
+    //
+    // Resource Types
+    //
+    auto constexpr RES_TYPE_NULL = 0x00;
+    auto constexpr RES_TYPE_REFERENCE = 0x01;
+    auto constexpr RES_TYPE_ATTRIBUTE = 0x02;
+    auto constexpr RES_TYPE_STRING = 0x03;
+    auto constexpr RES_TYPE_FLOAT = 0x04;
+    auto constexpr RES_TYPE_DIMENSION = 0x05;
+    auto constexpr RES_TYPE_FRACTION = 0x06;
+    auto constexpr RES_TYPE_DYNAMIC_REFERENCE = 0x07;
+    auto constexpr RES_TYPE_INT_DEC = 0x10;
+    auto constexpr RES_TYPE_INT_HEX = 0x11;
+    auto constexpr RES_TYPE_INT_BOOLEAN = 0x12;
+
+    //
+    // Resource Values
+    //
+    auto constexpr RES_VALUE_TRUE = 0xffffffff;
+    auto constexpr RES_VALUE_FALSE = 0x00000000;
 
     struct CompressedAndroidManifestHeader {
         uint32_t xmlMagicNumber;
@@ -126,11 +147,11 @@ namespace {
 
         std::vector<std::string> strings;
         auto xmlHeader = reinterpret_cast<CompressedAndroidManifestHeader const *>(contents.data());
-        if (xmlHeader->xmlMagicNumber != PACKED_XML_IDENTIFIER) {
+        if (xmlHeader->xmlMagicNumber != XML_IDENTIFIER) {
             LOGW("unable to get strings; compressed xml is invalid");
             return strings;
         }
-        if (xmlHeader->stringTableIdentifier != REX_XML_STRING_TABLE) {
+        if (xmlHeader->stringTableIdentifier != XML_STRING_TABLE) {
             LOGW("unable to get strings; missing string marker");
             return strings;
         }
