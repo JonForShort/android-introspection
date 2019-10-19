@@ -41,13 +41,13 @@ namespace {
     //
     // Control Types
     //
+    auto constexpr XML_FIRST_CHUNK_TYPE = 0x100;
     auto constexpr XML_END_DOC_TAG = 0x0101;
     auto constexpr XML_START_ELEMENT_TAG = 0x0102;
     auto constexpr XML_END_ELEMENT_TAG = 0x0103;
     auto constexpr XML_CDATA_TAG = 0x0104;
     auto constexpr XML_ATTRS_MARKER = 0x00140014;
     auto constexpr XML_RESOURCE_MAP_TYPE = 0x180;
-    auto constexpr XML_FIRST_CHUNK_TYPE = 0x100;
 
     //
     // Resource Types
@@ -147,10 +147,19 @@ namespace {
         return contents;
     }
 
-    template<typename T>
-    auto readBytesFromVectorAtIndex(std::vector<uint8_t> const &data, size_t const index) {
+    template<typename ... Args>
+    std::string formatString(const std::string &format, Args ... args) {
+        auto size = snprintf(nullptr, 0, format.c_str(), args ...) + 1;
+        std::unique_ptr<char[]> buf(new char[size]);
+        snprintf(buf.get(), size, format.c_str(), args ...);
+        return std::string(buf.get(), buf.get() + size - 1);
+    }
+
+    template<typename T, typename U>
+    auto readBytesAtIndex(std::vector<uint8_t> const &data, U &index) {
         T value = {0};
         std::memcpy(&value, &data[index], sizeof(value));
+        index += sizeof(value);
         return value;
     }
 
@@ -169,8 +178,8 @@ namespace {
 
         auto stringOffsets = std::vector<uint32_t>();
         for (size_t i = 0; i < xmlHeader->numStrings; i++) {
-            auto const index = sizeof(CompressedAndroidManifestHeader) + i * (sizeof(uint32_t));
-            auto const offset = readBytesFromVectorAtIndex<uint32_t>(contents, index);
+            auto index = sizeof(CompressedAndroidManifestHeader) + i * (sizeof(uint32_t));
+            auto const offset = readBytesAtIndex<uint32_t>(contents, index);
             stringOffsets.push_back(offset);
         }
 
@@ -183,12 +192,14 @@ namespace {
         auto const isUtf8Encoded = (xmlHeader->flags & 0x100U) > 0;
         for (auto &offset : stringOffsets) {
             if (isUtf8Encoded) {
-                auto stringLength = readBytesFromVectorAtIndex<uint8_t>(contents, startStringsOffset + offset);
+                auto stringLengthOffset = startStringsOffset + offset;
+                auto stringLength = readBytesAtIndex<uint8_t>(contents, stringLengthOffset);
                 auto stringOffset = reinterpret_cast<const char *>(contents.data() + startStringsOffset + offset + 2);
                 auto string = std::string(stringOffset, stringLength);
                 strings.push_back(string);
             } else {
-                auto stringLength = readBytesFromVectorAtIndex<uint16_t>(contents, startStringsOffset + offset);
+                auto stringLengthOffset = startStringsOffset + offset;
+                auto stringLength = readBytesAtIndex<uint16_t>(contents, stringLengthOffset);
                 auto stringOffset = reinterpret_cast<const char16_t *>(contents.data() + startStringsOffset + offset + 2);
                 auto string = std::u16string(stringOffset, stringLength);
                 std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
@@ -214,6 +225,126 @@ namespace {
             return 0;
         }
         return contents.size() - (contents.size() - xmlHeader->chunkSize);
+    }
+
+    auto handleAttributes(std::vector<uint8_t> const &contents, std::vector<std::string> const &strings, uint32_t &contentsOffset) -> void {
+        auto const attributeMarker = readBytesAtIndex<uint32_t>(contents, contentsOffset);
+        if (attributeMarker != XML_ATTRS_MARKER) {
+            LOGW("unexpected attributes marker");
+            return;
+        }
+
+        auto const attributesCount = readBytesAtIndex<uint32_t>(contents, contentsOffset);
+        readBytesAtIndex<uint32_t>(contents, contentsOffset);
+
+        for (auto i = 0U; i < attributesCount; i++) {
+            /* auto const attributeNamespaceIndex = */ readBytesAtIndex<uint32_t>(contents, contentsOffset);
+            auto const attributeNameIndex = readBytesAtIndex<uint32_t>(contents, contentsOffset);
+            auto const attributeValueIndex = readBytesAtIndex<uint32_t>(contents, contentsOffset);
+
+            readBytesAtIndex<uint16_t>(contents, contentsOffset);
+            readBytesAtIndex<uint8_t>(contents, contentsOffset);
+
+            auto const attributeValueType = readBytesAtIndex<uint8_t>(contents, contentsOffset);
+            auto const attributeResourceId = readBytesAtIndex<uint32_t>(contents, contentsOffset);
+
+            auto attributeName = strings[attributeNameIndex];
+            if (attributeName.empty()) {
+                LOGW("unexpected empty attribute name");
+                continue;
+            }
+            std::string attributeValue;
+            switch (attributeValueType) {
+                case RES_TYPE_NULL: {
+                    attributeValue = attributeResourceId == 0 ? "<undefined>" : "<empty>";
+                    break;
+                }
+                case RES_TYPE_REFERENCE: {
+                    attributeValue = formatString("@res/0x%08X", attributeResourceId);
+                    break;
+                }
+                case RES_TYPE_ATTRIBUTE: {
+                    attributeValue = formatString("@attr/0x%08X", attributeResourceId);
+                    break;
+                }
+                case RES_TYPE_STRING: {
+                    attributeValue = strings[attributeValueIndex];
+                    break;
+                }
+                case RES_TYPE_FLOAT: {
+                    break;
+                }
+                case RES_TYPE_DIMENSION: {
+                    break;
+                }
+                case RES_TYPE_FRACTION: {
+                    break;
+                }
+                case RES_TYPE_DYNAMIC_REFERENCE: {
+                    attributeValue = formatString("@dyn/0x%08X", attributeResourceId);
+                    break;
+                }
+                case RES_TYPE_INT_DEC: {
+                    attributeValue = formatString("%d", attributeResourceId);
+                    break;
+                }
+                case RES_TYPE_INT_HEX: {
+                    attributeValue = formatString("0x%08X", attributeResourceId);
+                    break;
+                }
+                case RES_TYPE_INT_BOOLEAN: {
+                    attributeValue = attributeResourceId == RES_VALUE_TRUE ? "true" :
+                                     attributeResourceId == RES_VALUE_FALSE ? "false" : "unknown";
+                    break;
+                }
+                default: {
+                    attributeValue = "unknown";
+                    break;
+                }
+            }
+            LOGD("handling attribute with value [%s]", attributeValue.c_str());
+        }
+    }
+
+    auto handleStartElementTag(std::vector<uint8_t> const &contents, std::vector<std::string> const &strings, uint32_t &contentsOffset) -> void {
+        readBytesAtIndex<uint32_t>(contents, contentsOffset);
+        readBytesAtIndex<uint32_t>(contents, contentsOffset);
+
+        auto namespaceStringIndex = readBytesAtIndex<uint32_t>(contents, contentsOffset);
+        auto namespaceString = strings[namespaceStringIndex];
+
+        auto stringIndex = readBytesAtIndex<uint32_t>(contents, contentsOffset);
+        auto string = strings[stringIndex];
+
+        handleAttributes(contents, strings, contentsOffset);
+
+        LOGD("handling start tag [%s] namespace [%s]", string.c_str(), namespaceString.c_str());
+    }
+
+    auto handleElementElementTag(std::vector<uint8_t> const &contents, std::vector<std::string> const &strings, uint32_t &contentsOffset) -> void {
+        readBytesAtIndex<uint32_t>(contents, contentsOffset);
+        readBytesAtIndex<uint32_t>(contents, contentsOffset);
+
+        auto namespaceStringIndex = readBytesAtIndex<uint32_t>(contents, contentsOffset);
+        auto namespaceString = strings[namespaceStringIndex];
+
+        auto stringIndex = readBytesAtIndex<uint32_t>(contents, contentsOffset);
+        auto string = strings[stringIndex];
+
+        LOGD("handling start tag [%s] namespace [%s]", string.c_str(), namespaceString.c_str());
+    }
+
+    auto handleCDataTag(std::vector<uint8_t> const &contents, std::vector<std::string> const &strings, uint32_t &contentsOffset) -> void {
+        readBytesAtIndex<uint32_t>(contents, contentsOffset);
+        readBytesAtIndex<uint32_t>(contents, contentsOffset);
+
+        auto stringIndex = readBytesAtIndex<uint32_t>(contents, contentsOffset);
+        auto string = strings[stringIndex];
+
+        readBytesAtIndex<uint32_t>(contents, contentsOffset);
+        readBytesAtIndex<uint32_t>(contents, contentsOffset);
+
+        LOGD("handling cdata tag [%s]", string.c_str());
     }
 }
 
@@ -259,17 +390,11 @@ auto apk::makeApkDebuggable(const char *apkPath) -> bool {
     }
 
     auto currentXmlChunkOffset = xmlChunkOffset;
-    auto tag = readBytesFromVectorAtIndex<uint16_t>(contents, currentXmlChunkOffset);
-    currentXmlChunkOffset += sizeof(uint16_t);
+    auto tag = readBytesAtIndex<uint16_t>(contents, currentXmlChunkOffset);
 
     do {
-        auto const headerSize = readBytesFromVectorAtIndex<uint16_t>(contents, currentXmlChunkOffset);
-        currentXmlChunkOffset += sizeof(uint16_t);
-	(void) headerSize;
-
-        auto const chunkSize = readBytesFromVectorAtIndex<uint32_t>(contents, currentXmlChunkOffset);
-        currentXmlChunkOffset += sizeof(uint32_t);
-
+        /* auto const headerSize = */ readBytesAtIndex<uint16_t>(contents, currentXmlChunkOffset);
+        auto const chunkSize = readBytesAtIndex<uint32_t>(contents, currentXmlChunkOffset);
         switch (tag) {
             case XML_FIRST_CHUNK_TYPE: {
                 currentXmlChunkOffset += chunkSize - 8;
@@ -280,19 +405,22 @@ auto apk::makeApkDebuggable(const char *apkPath) -> bool {
                 break;
             }
             case XML_START_ELEMENT_TAG: {
+                handleStartElementTag(contents, strings, currentXmlChunkOffset);
                 break;
             }
             case XML_END_ELEMENT_TAG: {
+                handleElementElementTag(contents, strings, currentXmlChunkOffset);
                 break;
             }
             case XML_CDATA_TAG: {
+                handleCDataTag(contents, strings, currentXmlChunkOffset);
                 break;
             }
             default: {
-
+                LOGW("skipping unknown tag [%d]", tag);
             }
         }
-
+        tag = readBytesAtIndex<uint16_t>(contents, currentXmlChunkOffset);
     } while (tag != XML_END_DOC_TAG);
 
     return true;
