@@ -39,6 +39,17 @@ namespace {
     auto constexpr XML_STRING_TABLE = 0x0001;
 
     //
+    // Control Types
+    //
+    auto constexpr XML_END_DOC_TAG = 0x0101;
+    auto constexpr XML_START_ELEMENT_TAG = 0x0102;
+    auto constexpr XML_END_ELEMENT_TAG = 0x0103;
+    auto constexpr XML_CDATA_TAG = 0x0104;
+    auto constexpr XML_ATTRS_MARKER = 0x00140014;
+    auto constexpr XML_RESOURCE_MAP_TYPE = 0x180;
+    auto constexpr XML_FIRST_CHUNK_TYPE = 0x100;
+
+    //
     // Resource Types
     //
     auto constexpr RES_TYPE_NULL = 0x00;
@@ -246,5 +257,43 @@ auto apk::makeApkDebuggable(const char *apkPath) -> bool {
         LOGW("unable to determine chunk offset in AndroidManifest.xml in [%s]", apkPath);
         return false;
     }
+
+    auto currentXmlChunkOffset = xmlChunkOffset;
+    auto tag = readBytesFromVectorAtIndex<uint16_t>(contents, currentXmlChunkOffset);
+    currentXmlChunkOffset += sizeof(uint16_t);
+
+    do {
+        auto const headerSize = readBytesFromVectorAtIndex<uint16_t>(contents, currentXmlChunkOffset);
+        currentXmlChunkOffset += sizeof(uint16_t);
+	(void) headerSize;
+
+        auto const chunkSize = readBytesFromVectorAtIndex<uint32_t>(contents, currentXmlChunkOffset);
+        currentXmlChunkOffset += sizeof(uint32_t);
+
+        switch (tag) {
+            case XML_FIRST_CHUNK_TYPE: {
+                currentXmlChunkOffset += chunkSize - 8;
+                break;
+            }
+            case XML_RESOURCE_MAP_TYPE: {
+                currentXmlChunkOffset += chunkSize - 8;
+                break;
+            }
+            case XML_START_ELEMENT_TAG: {
+                break;
+            }
+            case XML_END_ELEMENT_TAG: {
+                break;
+            }
+            case XML_CDATA_TAG: {
+                break;
+            }
+            default: {
+
+            }
+        }
+
+    } while (tag != XML_END_DOC_TAG);
+
     return true;
 }
