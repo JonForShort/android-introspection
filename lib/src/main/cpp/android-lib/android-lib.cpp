@@ -35,32 +35,28 @@ using namespace ai;
 
 BEGIN_EXTERN_C
 
-JNIEXPORT jstring JNICALL
-Java_com_github_thejunkjon_lib_HookManager_applyHooks(
-        JNIEnv *env, jobject) {
-    std::string hello = "Hello from C++";
-    return env->NewStringUTF(hello.c_str());
+JNIEXPORT jstring JNICALL Java_com_github_thejunkjon_lib_HookManager_applyHooks(JNIEnv *env, jobject) {
+  std::string hello = "Hello from C++";
+  return env->NewStringUTF(hello.c_str());
 }
 
-JNIEXPORT jboolean JNICALL
-Java_com_github_thejunkjon_lib_ApkProcessor_makeDebuggableNative(
-        JNIEnv *env, jobject, jstring apkPathJni) {
+JNIEXPORT jboolean JNICALL Java_com_github_thejunkjon_lib_ApkProcessor_makeDebuggableNative(JNIEnv *env, jobject, jstring apkPathJni) {
 
-    LOGD("makeDebuggable invoked");
+  LOGD("makeDebuggable invoked");
 
-    auto result = static_cast<jboolean>(JNI_TRUE);
-    auto const *apkPath = env->GetStringUTFChars(apkPathJni, 0);
-    if (utils::fileExists(apkPath)) {
-        LOGD("apk path exists");
-        apk::makeApkDebuggable(apkPath);
-    } else {
-        LOGD("apk path does not exist");
-        result = JNI_FALSE;
-    }
+  auto result = static_cast<jboolean>(JNI_TRUE);
+  auto const *apkPath = env->GetStringUTFChars(apkPathJni, 0);
+  if (utils::fileExists(apkPath)) {
+    LOGD("apk path exists");
+    apk::makeApkDebuggable(apkPath);
+  } else {
+    LOGD("apk path does not exist");
+    result = JNI_FALSE;
+  }
 
-    env->ReleaseStringUTFChars(apkPathJni, apkPath);
+  env->ReleaseStringUTFChars(apkPathJni, apkPath);
 
-    return result;
+  return result;
 }
 
 END_EXTERN_C
