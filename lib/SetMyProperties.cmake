@@ -1,0 +1,7 @@
+if (ANDROID)
+  set(MY_TARGET "android-${ANDROID_ABI}")
+elseif (WASM)
+  set(MY_TARGET "wasm")
+else (ANDROID)
+  set(MY_TARGET "generic")
+endif (ANDROID)

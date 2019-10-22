@@ -25,8 +25,8 @@ ai_build_wasm() {
 	
 	pushd ${BUILD_DIR}
 	
-	emconfigure cmake --build ${ROOT_DIR}/lib
-	
+	emconfigure cmake -DWASM=1 --build ${ROOT_DIR}/lib
+
 	emmake make "$@"
 	
 	popd
