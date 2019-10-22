@@ -21,3 +21,8 @@
 	path = external/wasm/emscripten
 	url = https://github.com/emscripten-core/emscripten.git
 	ignore = dirty
+
+[submodule "external/googletest/source"]
+	path = external/googletest/source
+	url = https://github.com/google/googletest.git
+	ignore = dirty
