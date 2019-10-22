@@ -12,7 +12,10 @@ android {
     defaultConfig {
         externalNativeBuild {
             cmake {
-                targets "android-lib"
+                targets = [
+                        "android-lib",
+                        "apk_test"
+                ]
             }
         }
     }
