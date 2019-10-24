@@ -4,10 +4,9 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 ROOT_DIR=${SCRIPT_DIR}/..
 
-BUILD_DIR=${ROOT_DIR}/build/wasm
+BUILD_DIR=${ROOT_DIR}/build
 
 ai_build() {
-
     ai_build_android && ai_build_wasm
 }
 
@@ -20,12 +19,14 @@ ai_build_android() {
 ai_build_wasm() {
     (
 	source ${ROOT_DIR}/external/wasm/emsdk/emsdk_env.sh
+
+	WASM_BUILD_DIR=${BUILD_DIR}/wasm
 	
-	mkdir -p ${BUILD_DIR}
+	mkdir -p ${WASM_BUILD_DIR}
+
+	pushd ${WASM_BUILD_DIR}
 	
-	pushd ${BUILD_DIR}
-	
-	emconfigure cmake -DWASM=1 --build ${ROOT_DIR}/lib
+	emconfigure cmake -DWASM=True --build ${ROOT_DIR}/lib
 
 	emmake make "$@"
 	
