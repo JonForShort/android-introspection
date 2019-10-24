@@ -1,11 +1,15 @@
 cmake_minimum_required(VERSION 3.10.2)
 
-set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")
+if (WASM)
 
-set(source wasm-lib.cpp)
+  set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")
 
-add_executable(wasm-lib ${source})
+  set(source wasm-lib.cpp)
 
-target_include_directories(wasm-lib PRIVATE ${DIR_ROOT_EXTERNAL}/wasm/emscripten/system/include)
+  add_executable(wasm-lib ${source})
 
-set_target_properties(wasm-lib PROPERTIES LINK_FLAGS "-s WASM=1")
+  target_include_directories(wasm-lib PRIVATE ${DIR_ROOT_EXTERNAL}/wasm/emscripten/system/include)
+
+  set_target_properties(wasm-lib PROPERTIES LINK_FLAGS "-s WASM=1")
+
+endif()

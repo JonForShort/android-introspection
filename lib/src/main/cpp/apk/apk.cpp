@@ -144,7 +144,7 @@ template <typename... Args> std::string formatString(const std::string &format, 
 
 template <typename T, typename U> auto readBytesAtIndex(std::vector<uint8_t> const &data, U &index) {
   T value = {0};
-  std::memcpy(&value, &data[index], sizeof(value));
+  memcpy(&value, &data[index], sizeof(value));
   index += sizeof(value);
   return value;
 }
