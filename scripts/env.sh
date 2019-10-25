@@ -7,7 +7,7 @@ ROOT_DIR=${SCRIPT_DIR}/..
 BUILD_DIR=${ROOT_DIR}/build
 
 ai_build() {
-    ai_build_android && ai_build_wasm
+    ai_build_android && ai_build_wasm && ai_build_host
 }
 
 ai_build_android()
@@ -45,7 +45,7 @@ ai_build_host()
 
 	cmake -DHOST=True -DCMAKE_BUILD_TYPE=Debug --build ${ROOT_DIR}/lib
 
-	make "$@"
+	make "$@" && make test
 
 	popd
     )

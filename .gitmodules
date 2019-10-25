@@ -26,3 +26,8 @@
 	path = external/googletest/source
 	url = https://github.com/google/googletest.git
 	ignore = dirty
+
+[submodule "external/openssl/source"]
+	path = external/openssl/source
+	url = https://github.com/thejunkjon/openssl.git
+	ignore = dirty
