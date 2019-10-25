@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10.2)
 
-set(EXTERNAL_PROJECTS frida minizip googletest)
+set(EXTERNAL_PROJECTS frida minizip googletest openssl)
 
 foreach (EXTERNAL_PROJECT ${EXTERNAL_PROJECTS})
 

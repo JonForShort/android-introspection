@@ -11,10 +11,12 @@ target_link_libraries(apk utils)
 target_include_directories(apk PRIVATE minizip)
 target_include_directories(apk PRIVATE gtest)
 target_include_directories(apk PRIVATE utils)
+target_include_directories(apk PRIVATE openssl)
 
 target_include_directories(apk PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 target_include_directories(apk PRIVATE ${DIR_ROOT_EXTERNAL}/minizip/source)
+target_include_directories(apk PRIVATE ${DIR_ROOT_EXTERNAL}/openssl/source)
 
 #
 # tests
