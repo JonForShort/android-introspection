@@ -13,7 +13,7 @@ ai_build() {
 ai_build_android()
 {
     (
-	${ROOT_DIR}/gradlew clean build
+	${ROOT_DIR}/android/gradlew clean build
     )
 }
 
@@ -28,7 +28,7 @@ ai_build_wasm()
 	
 	pushd ${WASM_BUILD_DIR}
 	
-	emconfigure cmake -DWASM=True --build ${ROOT_DIR}/lib
+	emconfigure cmake -DWASM=True --build ${ROOT_DIR}/android/lib
 	
 	emmake make "$@"
 	
@@ -43,7 +43,7 @@ ai_build_host()
 
 	pushd ${BUILD_DIR}
 
-	cmake -DHOST=True -DCMAKE_BUILD_TYPE=Debug --build ${ROOT_DIR}/lib
+	cmake -DHOST=True -DCMAKE_BUILD_TYPE=Debug --build ${ROOT_DIR}/android/lib
 
 	make "$@" && make test
 
