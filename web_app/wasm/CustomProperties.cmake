@@ -1,0 +1,5 @@
+if (WASM)
+  set(MY_TARGET "wasm")
+else ()
+  set(MY_TARGET "host")
+endif ()
