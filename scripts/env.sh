@@ -29,7 +29,7 @@ ai_build_web_app()
 	emconfigure cmake -DWASM=True --build ${ROOT_DIR}/web_app/wasm
 
 	emmake make "$@"
-	
+
 	popd
     )
 }
