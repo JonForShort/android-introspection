@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10.2)
 
 include (ExternalProject)
 
-set (OPENSSL_FLAGS linux-generic64)
+set (OPENSSL_FLAGS linux-generic64 -static)
 set (OPENSSL_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/source)
 
 ExternalProject_Add (
