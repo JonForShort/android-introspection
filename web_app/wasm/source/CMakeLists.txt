@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10.2)
 
-set(LIB_PROJECTS wasm-lib core apk utils)
+set(LIB_PROJECTS wasm core apk utils)
 
 foreach (LIB_PROJECT ${LIB_PROJECTS})
 
