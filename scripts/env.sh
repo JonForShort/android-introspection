@@ -50,3 +50,5 @@ ai_build_web_app_host()
 	popd
     )
 }
+
+"$@"
