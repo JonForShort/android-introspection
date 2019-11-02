@@ -21,9 +21,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
+#ifdef WASM
+
 #include "emscripten.h"
 
 EMSCRIPTEN_KEEPALIVE
-void test() {
+auto main() {
 
 }
+
+#else
+
+auto main(int argc, char *argv[]) -> int {
+    (void) argc;
+    (void) argv;
+}
+
+#endif

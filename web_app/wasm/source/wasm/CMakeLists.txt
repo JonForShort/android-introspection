@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.10.2)
 
+set(source main.cpp)
+
+add_executable(wasm ${source})
+
 if (WASM)
 
   set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")
-
-  set(source main.cpp)
-
-  add_executable(wasm ${source})
 
   target_include_directories(wasm PRIVATE ${DIR_ROOT_EXTERNAL}/wasm/emscripten/system/include)
 
