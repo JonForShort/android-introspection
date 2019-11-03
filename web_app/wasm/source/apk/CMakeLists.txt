@@ -24,3 +24,5 @@ add_executable(apk_test apk_test.cpp)
 target_link_libraries(apk_test gtest_main)
 
 add_test(NAME apk_test COMMAND apk_test)
+
+add_dependencies(apk_test android-sdk)
