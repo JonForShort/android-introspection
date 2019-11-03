@@ -3,4 +3,6 @@
 /build
 /wasm/out
 
-
+# qt creator
+/build-wasm-*-*/
+/wasm/CMakeLists.txt.user
