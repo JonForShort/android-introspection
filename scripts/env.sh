@@ -4,6 +4,21 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 ROOT_DIR=${SCRIPT_DIR}/..
 
+ai_setup_environment()
+{
+    if [[ -z "${AI_ANDROID_HOME}" ]]; then
+	if [[ -z "${ANDROID_HOME}" ]]; then
+	    export AI_ANDROID_HOME=${ROOT_DIR}/external/android/sdk
+	else
+	    export AI_ANDROID_HOME=${ANDROID_HOME}
+	fi
+    fi
+
+    if [[ -z "${AI_TESTS_DIR}" ]]; then
+	export AI_TESTS_DIR=${ROOT_DIR}/web_app/wasm/test
+    fi
+}
+
 ai_build() {
     ai_build_android && ai_build_wasm && ai_build_host
 }
@@ -50,5 +65,7 @@ ai_build_web_app_host()
 	popd
     )
 }
+
+ai_setup_environment
 
 "$@"
