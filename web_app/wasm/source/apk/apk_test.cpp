@@ -25,17 +25,18 @@
 
 #include <string>
 
-using std::string;
+#include "apk/apk.h"
 
-const char *actualValTrue = "hello gtest";
-const char *actualValFalse = "hello world";
-const char *expectVal = "hello gtest";
+namespace {
 
-TEST(StrCompare, CStrEqual) { EXPECT_STREQ(expectVal, actualValTrue); }
+auto checkIfEnvironmentIsSetup() {}
 
-TEST(StrCompare, CStrNotEqual) { EXPECT_STREQ(expectVal, actualValFalse); }
+} // namespace
+
+TEST(MakeDebuggable, ReleaseApkIsDebuggable) {}
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
+  checkIfEnvironmentIsSetup();
   return RUN_ALL_TESTS();
 }
