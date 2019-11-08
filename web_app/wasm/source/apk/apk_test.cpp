@@ -29,7 +29,17 @@
 
 namespace {
 
-auto checkIfEnvironmentIsSetup() {}
+auto isEnvironmentReady() -> bool {
+  auto const androidHome = std::getenv("AI_ANDROID_HOME");
+  if (androidHome == nullptr) {
+    return false;
+  }
+  auto const testsDir = std::getenv("AI_TESTS_DIR");
+  if (testsDir == nullptr) {
+    return false;
+  }
+  return true;
+}
 
 } // namespace
 
@@ -37,6 +47,10 @@ TEST(MakeDebuggable, ReleaseApkIsDebuggable) {}
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
-  checkIfEnvironmentIsSetup();
-  return RUN_ALL_TESTS();
+
+  if (isEnvironmentReady()) {
+    return RUN_ALL_TESTS();
+  } else {
+    return -1;
+  }
 }
