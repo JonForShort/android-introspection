@@ -23,13 +23,21 @@
 //
 #include <gtest/gtest.h>
 
+#include <memory>
 #include <string>
 
 #include "apk/apk.h"
 
 namespace {
 
-auto isEnvironmentReady() -> bool {
+struct TestEnvironment {
+  std::string androidHomeDir;
+  std::string testsDir;
+};
+
+std::unique_ptr<TestEnvironment> gTestEnvironment;
+
+auto setEnvironmentIfReady() -> bool {
   auto const androidHome = std::getenv("AI_ANDROID_HOME");
   if (androidHome == nullptr) {
     return false;
@@ -38,6 +46,11 @@ auto isEnvironmentReady() -> bool {
   if (testsDir == nullptr) {
     return false;
   }
+
+  gTestEnvironment = std::make_unique<TestEnvironment>();
+  gTestEnvironment->androidHomeDir = androidHome;
+  gTestEnvironment->testsDir = testsDir;
+
   return true;
 }
 
@@ -48,7 +61,7 @@ TEST(MakeDebuggable, ReleaseApkIsDebuggable) {}
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
 
-  if (isEnvironmentReady()) {
+  if (setEnvironmentIfReady()) {
     return RUN_ALL_TESTS();
   } else {
     return -1;
