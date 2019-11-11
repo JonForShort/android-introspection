@@ -288,7 +288,7 @@ auto handleAttributes(std::vector<uint8_t> const &contents, std::vector<std::str
       break;
     }
     }
-    LOGD("handling attribute with value [%s]", attributeValue.c_str());
+    LOGI("  attribute value [{}]", attributeValue.c_str());
   }
 }
 
@@ -304,10 +304,10 @@ auto handleStartElementTag(std::vector<uint8_t> const &contents, std::vector<std
 
   handleAttributes(contents, strings, contentsOffset);
 
-  LOGD("handling start tag [%s] namespace [%s]", string.c_str(), namespaceString.c_str());
+  LOGI("start tag [{}] namespace [{}]", string.c_str(), namespaceString.c_str());
 }
 
-auto handleElementElementTag(std::vector<uint8_t> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
+auto handleEndElementTag(std::vector<uint8_t> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
   readBytesAtIndex<uint32_t>(contents, contentsOffset);
   readBytesAtIndex<uint32_t>(contents, contentsOffset);
 
@@ -317,7 +317,7 @@ auto handleElementElementTag(std::vector<uint8_t> const &contents, std::vector<s
   auto const stringIndex = readBytesAtIndex<int32_t>(contents, contentsOffset);
   auto const string = stringIndex >= 0 ? strings[stringIndex] : "";
 
-  LOGD("handling start tag [%s] namespace [%s]", string.c_str(), namespaceString.c_str());
+  LOGI("end tag [{}] namespace [{}]", string.c_str(), namespaceString.c_str());
 }
 
 auto handleCDataTag(std::vector<uint8_t> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
@@ -332,6 +332,7 @@ auto handleCDataTag(std::vector<uint8_t> const &contents, std::vector<std::strin
 
   LOGD("handling cdata tag [%s]", string.c_str());
 }
+
 } // namespace
 
 auto apk::makeApkDebuggable(const char *apkPath) -> bool {
@@ -368,7 +369,9 @@ auto apk::makeApkDebuggable(const char *apkPath) -> bool {
     auto const headerSize = readBytesAtIndex<uint16_t>(contents, currentXmlChunkOffset);
     auto const chunkSize = readBytesAtIndex<uint32_t>(contents, currentXmlChunkOffset);
 
-    LOGD("makeApkDebuggable: tag = [%d], headerSize = [%d], chunkSize = [%d]", tag, headerSize, chunkSize);
+    LOGV("makeApkDebuggable: tag = [{:d}], headerSize = [{:d}], chunkSize = [{:d}]", tag, headerSize, chunkSize);
+
+    (void)headerSize;
 
     switch (tag) {
     case RES_XML_START_NAMESPACE_TYPE: {
@@ -384,7 +387,7 @@ auto apk::makeApkDebuggable(const char *apkPath) -> bool {
       break;
     }
     case RES_XML_END_ELEMENT_TYPE: {
-      handleElementElementTag(contents, strings, currentXmlChunkOffset);
+      handleEndElementTag(contents, strings, currentXmlChunkOffset);
       break;
     }
     case RES_XML_CDATA_TYPE: {

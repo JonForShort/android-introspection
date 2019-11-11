@@ -76,15 +76,30 @@ auto checkIfDebuggable(char const *apkPath) -> bool {
   return exitStatus == 0 && bufferString == "true";
 }
 
+struct ScopedFileDeleter {
+  ScopedFileDeleter(char const *path) : path_(path) {}
+  ~ScopedFileDeleter() { fs::remove(path_); }
+
+private:
+  char const *path_;
+};
+
 } // namespace
 
 TEST(MakeDebuggable, ReleaseApkIsDebuggable) {
-  auto testApk = fs::path(gTestEnvironment->testsDir) / "apks" / "test_release.apk";
-  auto isSuccessful = ai::apk::makeApkDebuggable(testApk.c_str());
-  EXPECT_TRUE(isSuccessful);
+  auto originalTestApk = fs::path(gTestEnvironment->testsDir) / "apks" / "test_release.apk";
+  auto copiedTestApk = fs::temp_directory_path() / originalTestApk.filename();
+  auto isCopiedSuccessfully = fs::copy_file(originalTestApk, copiedTestApk, fs::copy_options::overwrite_existing);
+  EXPECT_TRUE(isCopiedSuccessfully);
+  {
+    auto scopedFileDeleter = ScopedFileDeleter(copiedTestApk.c_str());
 
-  auto isDebuggable = checkIfDebuggable(testApk.c_str());
-  EXPECT_TRUE(isDebuggable);
+    auto isSuccessful = ai::apk::makeApkDebuggable(copiedTestApk.c_str());
+    EXPECT_TRUE(isSuccessful);
+
+    auto isDebuggable = checkIfDebuggable(copiedTestApk.c_str());
+    EXPECT_TRUE(isDebuggable);
+  }
 }
 
 int main(int argc, char **argv) {

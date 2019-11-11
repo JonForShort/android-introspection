@@ -9,3 +9,5 @@ else ()
 endif ()
 
 target_compile_definitions(utils PUBLIC LOG_LEVEL=${log-level})
+
+message("setting log level to " ${log-level})
