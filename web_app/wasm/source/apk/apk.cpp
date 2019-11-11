@@ -131,14 +131,14 @@ auto getZipContents(const char *szFileName, const char *szZipFileName) -> std::v
     return contents;
   }
   contents.resize(zipFileInfo.uncompressed_size);
-  unzReadCurrentFile(zip.get(), &contents[0], contents.size());
+  unzReadCurrentFile(zip.get(), &contents[0], static_cast<uint32_t>(contents.size()));
   return contents;
 }
 
-template <typename... Args> std::string formatString(const std::string &format, Args... args) {
-  auto size = snprintf(nullptr, 0, format.c_str(), args...) + 1;
+template <typename... Args> std::string formatString(const char *format, Args... args) {
+  auto size = static_cast<uint64_t>(snprintf(nullptr, 0, format, args...) + 1);
   std::unique_ptr<char[]> buf(new char[size]);
-  snprintf(buf.get(), size, format.c_str(), args...);
+  snprintf(buf.get(), size, format, args...);
   return std::string(buf.get(), buf.get() + size - 1);
 }
 
@@ -197,7 +197,7 @@ auto getStringsFromCompressedAndroidManifest(std::vector<uint8_t> const &content
   return strings;
 }
 
-auto getXmlChunkOffset(std::vector<uint8_t> const &contents) -> uint32_t {
+auto getXmlChunkOffset(std::vector<uint8_t> const &contents) -> uint64_t {
   auto xmlHeader = reinterpret_cast<CompressedAndroidManifestHeader const *>(contents.data());
   if (xmlHeader->xmlMagicNumber != XML_IDENTIFIER) {
     LOGW("unable to get chunk size; compressed xml is invalid");
@@ -214,7 +214,7 @@ auto getXmlChunkOffset(std::vector<uint8_t> const &contents) -> uint32_t {
   return contents.size() - (contents.size() - xmlHeader->chunkSize);
 }
 
-auto handleAttributes(std::vector<uint8_t> const &contents, std::vector<std::string> const &strings, uint32_t &contentsOffset) -> void {
+auto handleAttributes(std::vector<uint8_t> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
   auto const attributeMarker = readBytesAtIndex<uint32_t>(contents, contentsOffset);
   if (attributeMarker != XML_ATTRS_MARKER) {
     LOGW("unexpected attributes marker");
@@ -292,35 +292,35 @@ auto handleAttributes(std::vector<uint8_t> const &contents, std::vector<std::str
   }
 }
 
-auto handleStartElementTag(std::vector<uint8_t> const &contents, std::vector<std::string> const &strings, uint32_t &contentsOffset) -> void {
+auto handleStartElementTag(std::vector<uint8_t> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
   readBytesAtIndex<uint32_t>(contents, contentsOffset);
   readBytesAtIndex<uint32_t>(contents, contentsOffset);
 
-  auto namespaceStringIndex = readBytesAtIndex<uint32_t>(contents, contentsOffset);
-  auto namespaceString = strings[namespaceStringIndex];
+  auto const namespaceStringIndex = readBytesAtIndex<int32_t>(contents, contentsOffset);
+  auto const namespaceString = namespaceStringIndex >= 0 ? strings[namespaceStringIndex] : "";
 
-  auto stringIndex = readBytesAtIndex<uint32_t>(contents, contentsOffset);
-  auto string = strings[stringIndex];
+  auto const stringIndex = readBytesAtIndex<int32_t>(contents, contentsOffset);
+  auto const string = stringIndex >= 0 ? strings[stringIndex] : "";
 
   handleAttributes(contents, strings, contentsOffset);
 
   LOGD("handling start tag [%s] namespace [%s]", string.c_str(), namespaceString.c_str());
 }
 
-auto handleElementElementTag(std::vector<uint8_t> const &contents, std::vector<std::string> const &strings, uint32_t &contentsOffset) -> void {
+auto handleElementElementTag(std::vector<uint8_t> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
   readBytesAtIndex<uint32_t>(contents, contentsOffset);
   readBytesAtIndex<uint32_t>(contents, contentsOffset);
 
-  auto namespaceStringIndex = readBytesAtIndex<uint32_t>(contents, contentsOffset);
-  auto namespaceString = strings[namespaceStringIndex];
+  auto const namespaceStringIndex = readBytesAtIndex<int32_t>(contents, contentsOffset);
+  auto const namespaceString = namespaceStringIndex >= 0 ? strings[namespaceStringIndex] : "";
 
-  auto stringIndex = readBytesAtIndex<uint32_t>(contents, contentsOffset);
-  auto string = strings[stringIndex];
+  auto const stringIndex = readBytesAtIndex<int32_t>(contents, contentsOffset);
+  auto const string = stringIndex >= 0 ? strings[stringIndex] : "";
 
   LOGD("handling start tag [%s] namespace [%s]", string.c_str(), namespaceString.c_str());
 }
 
-auto handleCDataTag(std::vector<uint8_t> const &contents, std::vector<std::string> const &strings, uint32_t &contentsOffset) -> void {
+auto handleCDataTag(std::vector<uint8_t> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
   readBytesAtIndex<uint32_t>(contents, contentsOffset);
   readBytesAtIndex<uint32_t>(contents, contentsOffset);
 
@@ -365,8 +365,11 @@ auto apk::makeApkDebuggable(const char *apkPath) -> bool {
   auto tag = readBytesAtIndex<uint16_t>(contents, currentXmlChunkOffset);
 
   do {
-    /* auto const headerSize = */ readBytesAtIndex<uint16_t>(contents, currentXmlChunkOffset);
+    auto const headerSize = readBytesAtIndex<uint16_t>(contents, currentXmlChunkOffset);
     auto const chunkSize = readBytesAtIndex<uint32_t>(contents, currentXmlChunkOffset);
+
+    LOGD("makeApkDebuggable: tag = [%d], headerSize = [%d], chunkSize = [%d]\n", tag, headerSize, chunkSize);
+
     switch (tag) {
     case RES_XML_START_NAMESPACE_TYPE: {
       currentXmlChunkOffset += chunkSize - 8;
@@ -389,7 +392,7 @@ auto apk::makeApkDebuggable(const char *apkPath) -> bool {
       break;
     }
     default: {
-      LOGW("skipping unknown tag [%d]", tag);
+      LOGW("skipping unknown tag [%d]\n", tag);
     }
     }
     tag = readBytesAtIndex<uint16_t>(contents, currentXmlChunkOffset);
