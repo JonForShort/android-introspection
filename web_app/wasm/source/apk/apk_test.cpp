@@ -89,7 +89,6 @@ TEST(MakeDebuggable, ReleaseApkIsDebuggable) {
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
-
   if (setEnvironmentIfReady()) {
     return RUN_ALL_TESTS();
   } else {

@@ -368,7 +368,7 @@ auto apk::makeApkDebuggable(const char *apkPath) -> bool {
     auto const headerSize = readBytesAtIndex<uint16_t>(contents, currentXmlChunkOffset);
     auto const chunkSize = readBytesAtIndex<uint32_t>(contents, currentXmlChunkOffset);
 
-    LOGD("makeApkDebuggable: tag = [%d], headerSize = [%d], chunkSize = [%d]\n", tag, headerSize, chunkSize);
+    LOGD("makeApkDebuggable: tag = [%d], headerSize = [%d], chunkSize = [%d]", tag, headerSize, chunkSize);
 
     switch (tag) {
     case RES_XML_START_NAMESPACE_TYPE: {
@@ -392,7 +392,7 @@ auto apk::makeApkDebuggable(const char *apkPath) -> bool {
       break;
     }
     default: {
-      LOGW("skipping unknown tag [%d]\n", tag);
+      LOGW("skipping unknown tag [%d]", tag);
     }
     }
     tag = readBytesAtIndex<uint16_t>(contents, currentXmlChunkOffset);
