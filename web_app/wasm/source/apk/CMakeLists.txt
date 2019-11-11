@@ -16,14 +16,18 @@ target_include_directories(apk PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 target_include_directories(apk PRIVATE ${DIR_ROOT_EXTERNAL}/minizip/source)
 
-#
-# tests
-#
-add_executable(apk_test apk_test.cpp)
+if (NOT WASM)
 
-target_link_libraries(apk_test apk)
-target_link_libraries(apk_test gtest_main)
+  #
+  # tests
+  #
+  add_executable(apk_test apk_test.cpp)
 
-add_test(NAME apk_test COMMAND apk_test)
+  target_link_libraries(apk_test apk)
+  target_link_libraries(apk_test gtest_main)
 
-add_dependencies(apk_test android-sdk)
+  add_test(NAME apk_test COMMAND apk_test)
+
+  add_dependencies(apk_test android-sdk)
+
+endif()

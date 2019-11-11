@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10.2)
 
-set(EXTERNAL_PROJECTS android frida googletest minizip openssl)
+set(EXTERNAL_PROJECTS android frida googletest minizip openssl spdlog)
 
 foreach (EXTERNAL_PROJECT ${EXTERNAL_PROJECTS})
 
