@@ -31,3 +31,8 @@
 	path = external/openssl/source
 	url = https://github.com/thejunkjon/openssl.git
 	ignore = dirty
+
+[submodule "external/spdlog/source"]
+	path = external/spdlog/source
+	url = https://github.com/gabime/spdlog.git
+	ignore = dirty
