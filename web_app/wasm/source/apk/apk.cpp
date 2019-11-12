@@ -27,11 +27,13 @@
 #include <locale>
 #include <string>
 #include <vector>
+#include <zip.h>
+
+#include "utils/log.h"
 
 #include "apk/apk.h"
+#include "apk_parser.h"
 #include "resource_types.h"
-#include "utils/log.h"
-#include "zip.h"
 
 using namespace ai;
 
