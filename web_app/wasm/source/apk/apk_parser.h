@@ -21,3 +21,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
+#include <string>
+#include <vector>
+
+namespace ai {
+
+class ApkParser {
+
+public:
+  using strings = std::vector<std::string>;
+  using bytes = std::vector<uint8_t>;
+
+  ApkParser(char const *pathToApk) : pathToApk_(pathToApk) {}
+
+  auto getFileNames() const -> strings;
+
+  auto getFileContents(char const *fileName) const -> bytes;
+
+  auto setFileContents(char const *fileName, bytes const &content) const -> void;
+
+private:
+  std::string const pathToApk_;
+};
+
+} // namespace ai
