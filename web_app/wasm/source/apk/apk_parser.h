@@ -21,6 +21,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
+#ifndef ANDROID_INTROSPECTION_APK_APK_PARSER_H_
+#define ANDROID_INTROSPECTION_APK_APK_PARSER_H_
+
 #include <string>
 #include <vector>
 
@@ -29,19 +32,18 @@ namespace ai {
 class ApkParser {
 
 public:
-  using strings = std::vector<std::string>;
-  using bytes = std::vector<uint8_t>;
-
   ApkParser(char const *pathToApk) : pathToApk_(pathToApk) {}
 
-  auto getFileNames() const -> strings;
+  auto getFileNames() const -> std::vector<std::string>;
 
-  auto getFileContents(char const *fileName) const -> bytes;
+  auto getFileContents(char const *fileName) const -> std::vector<uint8_t>;
 
-  auto setFileContents(char const *fileName, bytes const &content) const -> void;
+  auto setFileContents(char const *fileName, std::vector<uint8_t> const &content) const -> void;
 
 private:
   std::string const pathToApk_;
 };
 
 } // namespace ai
+
+#endif /* ANDROID_INTROSPECTION_APK_APK_PARSER_H_ */

@@ -21,3 +21,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
+#ifndef ANDROID_INTROSPECTION_APK_BINARY_XML_H_
+#define ANDROID_INTROSPECTION_APK_BINARY_XML_H_
+
+#include <cstdint>
+#include <vector>
+
+namespace ai {
+
+class BinaryXml {
+
+public:
+  BinaryXml(std::vector<uint8_t> const &content) : content_(content) {}
+
+private:
+  std::vector<uint8_t> const content_;
+};
+
+} // namespace ai
+
+#endif /* ANDROID_INTROSPECTION_APK_APK_PARSER_H_ */
