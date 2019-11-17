@@ -26,4 +26,5 @@ set (DIR_ROOT_SOURCE   ${CMAKE_CURRENT_SOURCE_DIR}/source)
 set (DIR_ROOT_EXTERNAL ${CMAKE_CURRENT_SOURCE_DIR}/../../external)
 
 add_subdirectory(${DIR_ROOT_EXTERNAL} ${DIR_ROOT_OUT}/external)
-add_subdirectory(${DIR_ROOT_SOURCE} ${DIR_ROOT_OUT}/source)
+add_subdirectory(${DIR_ROOT_TEST}     ${DIR_ROOT_OUT}/test)
+add_subdirectory(${DIR_ROOT_SOURCE}   ${DIR_ROOT_OUT}/source)

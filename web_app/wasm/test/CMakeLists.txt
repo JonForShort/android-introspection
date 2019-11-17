@@ -1,0 +1,15 @@
+cmake_minimum_required(VERSION 3.10.2)
+
+set(LIB_PROJECTS apk_analyzer)
+
+foreach (LIB_PROJECT ${LIB_PROJECTS})
+
+    set(DIR_PROJECT_OUT ${DIR_ROOT_OUT}/test/${LIB_PROJECT})
+
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${DIR_PROJECT_OUT}/lib)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${DIR_PROJECT_OUT}/lib)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${DIR_PROJECT_OUT}/bin)
+
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/source/${LIB_PROJECT})
+
+endforeach ()

@@ -4,6 +4,11 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 ROOT_DIR=${SCRIPT_DIR}/..
 
+ai_root_dir()
+{
+    pushd ${ROOT_DIR}
+}
+
 ai_setup_environment()
 {
     if [[ -z "${AI_ANDROID_HOME}" ]]; then

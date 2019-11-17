@@ -29,6 +29,8 @@
 
 #include "apk/apk.h"
 
+#include "apk_parser.h"
+
 namespace fs = std::filesystem;
 
 namespace {
@@ -84,10 +86,12 @@ private:
   char const *path_;
 };
 
+fs::path getTestApkPath(char const *fileName) { return fs::path(gTestEnvironment->testsDir) / "resources" / "apks" / fileName; }
+
 } // namespace
 
-TEST(MakeDebuggable, ReleaseApkIsDebuggable) {
-  auto originalTestApk = fs::path(gTestEnvironment->testsDir) / "apks" / "test_release.apk";
+TEST(MakeDebuggable, MakeReleaseApkIsDebuggable_ApkIsMadeDebuggableSuccessfully) {
+  auto originalTestApk = getTestApkPath("test_release.apk");
   auto copiedTestApk = fs::temp_directory_path() / originalTestApk.filename();
   auto isCopiedSuccessfully = fs::copy_file(originalTestApk, copiedTestApk, fs::copy_options::overwrite_existing);
   EXPECT_TRUE(isCopiedSuccessfully);
@@ -100,6 +104,28 @@ TEST(MakeDebuggable, ReleaseApkIsDebuggable) {
     auto isDebuggable = checkIfDebuggable(copiedTestApk.c_str());
     EXPECT_TRUE(isDebuggable);
   }
+}
+
+TEST(ApkParser, ReleaseApkContainsAndroidManifest_AndroidManifestFoundSuccessfully) {
+  auto pathToApk = getTestApkPath("test_release.apk");
+  auto apkParser = ai::ApkParser(pathToApk.string().c_str());
+
+  auto fileNames = apkParser.getFileNames();
+  EXPECT_TRUE(!fileNames.empty());
+
+  auto maybeAndroidManifest = std::find(fileNames.begin(), fileNames.end(), "AndroidManifest.xml");
+  EXPECT_TRUE(maybeAndroidManifest != fileNames.end());
+}
+
+TEST(ApkParser, ReleaseApkContainsNonExistantFile_FileNotFoundError) {
+  auto pathToApk = getTestApkPath("test_release.apk");
+  auto apkParser = ai::ApkParser(pathToApk.string().c_str());
+
+  auto fileNames = apkParser.getFileNames();
+  EXPECT_TRUE(!fileNames.empty());
+
+  auto maybeNonExistingFile = std::find(fileNames.begin(), fileNames.end(), "NonExistingFile.xml");
+  EXPECT_TRUE(maybeNonExistingFile == fileNames.end());
 }
 
 int main(int argc, char **argv) {
