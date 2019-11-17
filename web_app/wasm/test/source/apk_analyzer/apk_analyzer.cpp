@@ -21,3 +21,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
+#include <string>
+
+#include "apk_analyzer/apk_analyzer.h"
+
+using namespace ai;
+
+auto ApkAnalyzer::isApkDebuggable(char const *pathToApk) const -> bool {
+  auto command = std::string(pathToApkAnalyzer_) + " manifest debuggable " + pathToApk;
+  auto handle = popen(command.c_str(), "r");
+  if (handle == nullptr) {
+    return false;
+  }
+
+  std::string bufferString;
+  static constexpr auto bufferSize = 80;
+  char bufferBytes[bufferSize] = {0};
+  while (fgets(bufferBytes, bufferSize, handle)) {
+    bufferString += bufferBytes;
+  }
+
+  auto exitStatus = WEXITSTATUS(pclose(handle));
+  return exitStatus == 0 && bufferString == "true";
+}

@@ -24,7 +24,10 @@ if (NOT WASM)
   add_executable(apk_test apk_test.cpp)
 
   target_link_libraries(apk_test apk)
+  target_link_libraries(apk_test test_apk_analyzer)
   target_link_libraries(apk_test gtest_main)
+
+  target_include_directories(apk PRIVATE test_apk_analyzer)
 
   add_test(NAME apk_test COMMAND apk_test)
 

@@ -21,13 +21,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#include <gtest/gtest.h>
-
 #include <filesystem>
+#include <gtest/gtest.h>
 #include <memory>
 #include <string>
 
 #include "apk/apk.h"
+#include "apk_analyzer/apk_analyzer.h"
 
 #include "apk_parser.h"
 
@@ -59,25 +59,6 @@ auto setEnvironmentIfReady() -> bool {
   return true;
 }
 
-auto checkIfDebuggable(char const *apkPath) -> bool {
-  auto apkAnalyzer = fs::path(gTestEnvironment->androidHomeDir) / "tools" / "bin" / "apkanalyzer";
-  auto command = apkAnalyzer.string() + " manifest debuggable " + apkPath;
-  auto handle = popen(command.c_str(), "r");
-  if (handle == nullptr) {
-    return false;
-  }
-
-  std::string bufferString;
-  static constexpr auto bufferSize = 80;
-  char bufferBytes[bufferSize] = {0};
-  while (fgets(bufferBytes, bufferSize, handle)) {
-    bufferString += bufferBytes;
-  }
-
-  auto exitStatus = WEXITSTATUS(pclose(handle));
-  return exitStatus == 0 && bufferString == "true";
-}
-
 struct ScopedFileDeleter {
   ScopedFileDeleter(char const *path) : path_(path) {}
   ~ScopedFileDeleter() { fs::remove(path_); }
@@ -101,7 +82,9 @@ TEST(MakeDebuggable, MakeReleaseApkIsDebuggable_ApkIsMadeDebuggableSuccessfully)
     auto isSuccessful = ai::apk::makeApkDebuggable(copiedTestApk.c_str());
     EXPECT_TRUE(isSuccessful);
 
-    auto isDebuggable = checkIfDebuggable(copiedTestApk.c_str());
+    auto pathToApkAnalyzer = fs::path(gTestEnvironment->androidHomeDir) / "tools" / "bin" / "apkanalyzer";
+    auto apkAnalyzer = ai::ApkAnalyzer(pathToApkAnalyzer.string().c_str());
+    auto isDebuggable = apkAnalyzer.isApkDebuggable(copiedTestApk.c_str());
     EXPECT_TRUE(isDebuggable);
   }
 }

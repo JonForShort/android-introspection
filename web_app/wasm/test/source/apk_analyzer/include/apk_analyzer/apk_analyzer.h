@@ -21,3 +21,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
+#ifndef ANDROID_INTROSPECTION_TEST_APK_ANALYZER_APK_ANALYZER_H_
+#define ANDROID_INTROSPECTION_TEST_APK_ANALYZER_APK_ANALYZER_H_
+
+namespace ai {
+
+class ApkAnalyzer {
+public:
+  ApkAnalyzer(char const *pathToApkAnalyzer) : pathToApkAnalyzer_(pathToApkAnalyzer) {}
+
+  auto isApkDebuggable(char const *pathToApk) const -> bool;
+
+private:
+  char const *pathToApkAnalyzer_;
+};
+
+} // namespace ai
+
+#endif /* ANDROID_INTROSPECTION_TEST_APK_ANALYZER_APK_ANALYZER_H_ */
