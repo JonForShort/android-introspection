@@ -58,6 +58,7 @@ struct UnzOpenCurrentFile {
 
 private:
   unzFile const zipFile_;
+
   int const result_;
 };
 
@@ -65,29 +66,29 @@ private:
 
 auto ApkParser::getFileNames() const -> std::vector<std::string> {
   std::vector<std::string> fileNames;
-  auto szFileName = pathToApk_.c_str();
-  auto const zipFile = UnzOpenFile(szFileName);
-  if (zipFile.get() == nullptr) {
-    LOGW("unable to open zip file [%s]", szFileName);
+  auto szPathToApk = pathToApk_.c_str();
+  auto const openedZipFile = UnzOpenFile(szPathToApk);
+  if (openedZipFile.get() == nullptr) {
+    LOGW("openedZipFile.get(), result=nullptr szPathToApk [%s]", szPathToApk);
     return fileNames;
   }
-  if (auto result = unzGoToFirstFile(zipFile.get()); result != UNZ_OK) {
-    LOGW("unzGoToFirstFile, result=[%d] szFileName=[%s]", result, szFileName);
+  if (auto result = unzGoToFirstFile(openedZipFile.get()); result != UNZ_OK) {
+    LOGW("unzGoToFirstFile, result=[%d] szPathToApk=[%s]", result, szPathToApk);
     return fileNames;
   }
   do {
     unz_file_info zipFileInfo;
     char szFilename[BUFSIZ] = {0};
-    if (unzGetCurrentFileInfo(zipFile.get(), &zipFileInfo, szFilename, sizeof(szFilename), nullptr, 0, nullptr, 0) == UNZ_OK) {
+    if (unzGetCurrentFileInfo(openedZipFile.get(), &zipFileInfo, szFilename, sizeof(szFilename), nullptr, 0, nullptr, 0) == UNZ_OK) {
       auto const fileName = std::string(szFilename);
       fileNames.emplace_back(fileName);
     }
-  } while (unzGoToNextFile(zipFile.get()) == UNZ_OK);
+  } while (unzGoToNextFile(openedZipFile.get()) == UNZ_OK);
   return fileNames;
 }
 
-auto ApkParser::getFileContents(char const *szZipFileName) const -> std::vector<uint8_t> {
-  auto contents = std::vector<uint8_t>();
+auto ApkParser::getFileContents(char const *szZipFileName) const -> std::vector<std::byte> {
+  auto contents = std::vector<std::byte>();
   auto const szFileName = pathToApk_.c_str();
   auto const zipFile = UnzOpenFile(szFileName);
   if (zipFile.get() == nullptr) {
@@ -114,7 +115,7 @@ auto ApkParser::getFileContents(char const *szZipFileName) const -> std::vector<
   return contents;
 }
 
-auto ApkParser::setFileContents(char const *fileName, std::vector<uint8_t> const &content) const -> void {
+auto ApkParser::setFileContents(char const *fileName, std::vector<std::byte> const &content) const -> void {
   (void)fileName;
   (void)content;
 }

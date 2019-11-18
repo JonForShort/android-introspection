@@ -36,9 +36,9 @@ public:
 
   auto getFileNames() const -> std::vector<std::string>;
 
-  auto getFileContents(char const *fileName) const -> std::vector<uint8_t>;
+  auto getFileContents(char const *fileName) const -> std::vector<std::byte>;
 
-  auto setFileContents(char const *fileName, std::vector<uint8_t> const &content) const -> void;
+  auto setFileContents(char const *fileName, std::vector<std::byte> const &content) const -> void;
 
 private:
   std::string const pathToApk_;

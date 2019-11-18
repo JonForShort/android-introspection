@@ -28,6 +28,7 @@
 
 #include "apk/apk.h"
 #include "apk_analyzer/apk_analyzer.h"
+#include "utils/log.h"
 
 #include "apk_parser.h"
 
@@ -45,10 +46,12 @@ std::unique_ptr<TestEnvironment> gTestEnvironment;
 auto setEnvironmentIfReady() -> bool {
   auto const androidHome = std::getenv("AI_ANDROID_HOME");
   if (androidHome == nullptr) {
+    LOGE("android home is not defined");
     return false;
   }
   auto const testsDir = std::getenv("AI_TESTS_DIR");
   if (testsDir == nullptr) {
+    LOGE("tests directory is not defined");
     return false;
   }
 
@@ -61,6 +64,7 @@ auto setEnvironmentIfReady() -> bool {
 
 struct ScopedFileDeleter {
   ScopedFileDeleter(char const *path) : path_(path) {}
+
   ~ScopedFileDeleter() { fs::remove(path_); }
 
 private:
