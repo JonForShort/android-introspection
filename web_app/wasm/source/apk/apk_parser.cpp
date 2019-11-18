@@ -22,6 +22,10 @@
 // SOFTWARE.
 //
 #include <cstdint>
+#include <mz.h>
+#include <mz_strm.h>
+#include <mz_zip.h>
+#include <mz_zip_rw.h>
 #include <zip.h>
 
 #include "utils/log.h"
@@ -32,11 +36,11 @@ using namespace ai;
 
 namespace {
 
-struct UnzOpenFile {
+struct ScopedUnzOpenFile {
 
-  explicit UnzOpenFile(const char *szFileName) : zip_(unzOpen(szFileName)) {}
+  explicit ScopedUnzOpenFile(const char *szFileName) : zip_(unzOpen(szFileName)) {}
 
-  ~UnzOpenFile() { unzClose(zip_); }
+  ~ScopedUnzOpenFile() { unzClose(zip_); }
 
   auto get() const -> unzFile { return zip_; }
 
@@ -44,11 +48,11 @@ private:
   unzFile zip_;
 };
 
-struct UnzOpenCurrentFile {
+struct ScopedUnzOpenCurrentFile {
 
-  explicit UnzOpenCurrentFile(unzFile const zipFile) : zipFile_(zipFile), result_(unzOpenCurrentFile(zipFile)) {}
+  explicit ScopedUnzOpenCurrentFile(unzFile const zipFile) : zipFile_(zipFile), result_(unzOpenCurrentFile(zipFile)) {}
 
-  ~UnzOpenCurrentFile() {
+  ~ScopedUnzOpenCurrentFile() {
     if (result_ == MZ_OK) {
       unzCloseCurrentFile(zipFile_);
     }
@@ -62,12 +66,32 @@ private:
   int const result_;
 };
 
+struct ScopedMzZipWriterDelete {
+
+  explicit ScopedMzZipWriterDelete(void *handle) : handle_(handle) {}
+
+  ~ScopedMzZipWriterDelete() { mz_zip_writer_delete(&handle_); }
+
+private:
+  void *handle_;
+};
+
+struct ScopedMzZipEntryClose {
+
+  explicit ScopedMzZipEntryClose(void *handle) : handle_(handle) {}
+
+  ~ScopedMzZipEntryClose() { mz_zip_entry_close(&handle_); }
+
+private:
+  void *handle_;
+};
+
 } // namespace
 
 auto ApkParser::getFileNames() const -> std::vector<std::string> {
   std::vector<std::string> fileNames;
   auto szPathToApk = pathToApk_.c_str();
-  auto const openedZipFile = UnzOpenFile(szPathToApk);
+  auto const openedZipFile = ScopedUnzOpenFile(szPathToApk);
   if (openedZipFile.get() == nullptr) {
     LOGW("openedZipFile.get(), result=nullptr szPathToApk [%s]", szPathToApk);
     return fileNames;
@@ -89,24 +113,28 @@ auto ApkParser::getFileNames() const -> std::vector<std::string> {
 
 auto ApkParser::getFileContents(char const *szZipFileName) const -> std::vector<std::byte> {
   auto contents = std::vector<std::byte>();
-  auto const szFileName = pathToApk_.c_str();
-  auto const zipFile = UnzOpenFile(szFileName);
+  if (szZipFileName == nullptr) {
+    LOGE("szZipFileName is null");
+    return contents;
+  }
+  auto const szPathToApk = pathToApk_.c_str();
+  auto const zipFile = ScopedUnzOpenFile(szPathToApk);
   if (zipFile.get() == nullptr) {
-    LOGW("zipFile.get(), szFileName=[%s]", szFileName);
+    LOGW("zipFile.get(), szPathToApk=[%s]", szPathToApk);
     return contents;
   }
   if (auto result = unzLocateFile(zipFile.get(), szZipFileName, nullptr); result != MZ_OK) {
-    LOGW("unzLocateFile, result=[%d] szFileName=[%s] szZipFileName=[%s]", result, szFileName, szZipFileName);
+    LOGW("unzLocateFile, result=[%d] szPathToApk=[%s] szZipFileName=[%s]", result, szPathToApk, szZipFileName);
     return contents;
   }
-  auto const openedZipFile = UnzOpenCurrentFile(zipFile.get());
+  auto const openedZipFile = ScopedUnzOpenCurrentFile(zipFile.get());
   if (auto result = openedZipFile.result(); result != MZ_OK) {
-    LOGW("unzOpenCurrentFile, result=[%d] szFileName=[%s] szZipFileName=[%s]", result, szFileName, szZipFileName);
+    LOGW("unzOpenCurrentFile, result=[%d] szPathToApk=[%s] szZipFileName=[%s]", result, szPathToApk, szZipFileName);
     return contents;
   }
   unz_file_info zipFileInfo;
   if (auto result = unzGetCurrentFileInfo(zipFile.get(), &zipFileInfo, nullptr, 0, nullptr, 0, nullptr, 0); result != UNZ_OK) {
-    LOGW("unzGetCurrentFileInfo, result=[%d] szFileName=[%s] szZipFileName=[%s]", result, szFileName, szZipFileName);
+    LOGW("unzGetCurrentFileInfo, result=[%d] szPathToApk=[%s] szZipFileName=[%s]", result, szPathToApk, szZipFileName);
     return contents;
   }
   auto const compressedContentsSizeInBytes = zipFileInfo.uncompressed_size;
@@ -115,7 +143,36 @@ auto ApkParser::getFileContents(char const *szZipFileName) const -> std::vector<
   return contents;
 }
 
-auto ApkParser::setFileContents(char const *fileName, std::vector<std::byte> const &content) const -> void {
-  (void)fileName;
-  (void)content;
+auto ApkParser::setFileContents(char const *szFileName, std::vector<std::byte> const &content) const -> void {
+  if (szFileName == nullptr) {
+    LOGE("szFileName is null");
+    return;
+  }
+  if (content.empty()) {
+    LOGE("content is empty");
+    return;
+  }
+  auto const szPathToApk = pathToApk_.c_str();
+  void *zipWriter = nullptr;
+  if (auto result = mz_zip_writer_create(&zipWriter); result == nullptr) {
+    LOGW("mz_zip_writer_create, result=nullptr szPathToApk=[%s] szFileName=[%s]", result, szPathToApk, szFileName);
+    return;
+  }
+  ScopedMzZipWriterDelete scopedZipWriterDelete(zipWriter);
+  if (auto result = mz_zip_writer_open_file(zipWriter, szPathToApk, 0, 0); result != MZ_OK) {
+    LOGW("mz_zip_writer_open_file, result=[%d] szPathToApk=[%s] szFileName=[%s]", result, szPathToApk, szFileName);
+    return;
+  }
+  mz_zip_file zipFile;
+  zipFile.filename = szFileName;
+
+  if (auto result = mz_zip_writer_entry_open(zipWriter, &zipFile); result != MZ_OK) {
+    LOGW("mz_zip_writer_entry_open, result=[%d] szPathToApk=[%s] szFileName=[%s]", result, szPathToApk, szFileName);
+    return;
+  }
+  ScopedMzZipEntryClose scopedZipEntryClose(zipWriter);
+  if (auto result = mz_zip_entry_write(zipWriter, &content[0], static_cast<int32_t>(content.size())); result != MZ_OK) {
+    LOGW("mz_zip_entry_write, result=[%d] szPathToApk=[%s] szFileName=[%s]", result, szPathToApk, szFileName);
+    return;
+  }
 }

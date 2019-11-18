@@ -115,6 +115,22 @@ TEST(ApkParser, ReleaseApkContainsNonExistantFile_FileNotFoundError) {
   EXPECT_TRUE(maybeNonExistingFile == fileNames.end());
 }
 
+TEST(ApkParser, AddFileToApk_FileIsAddedSuccessfully) {
+  auto pathToOriginalApk = getTestApkPath("test_release.apk");
+  auto pathToCopiedApk = fs::temp_directory_path() / pathToOriginalApk.filename();
+  auto isCopiedSuccessfully = fs::copy_file(pathToOriginalApk, pathToCopiedApk, fs::copy_options::overwrite_existing);
+  EXPECT_TRUE(isCopiedSuccessfully);
+
+  auto apkParser = ai::ApkParser(pathToCopiedApk.string().c_str());
+  auto contents = std::vector<std::byte>();
+  contents.push_back(std::byte(0x1));
+  apkParser.setFileContents("test_file", contents);
+
+  auto fileNames = apkParser.getFileNames();
+  auto maybeTestFile = std::find(fileNames.begin(), fileNames.end(), "test_file");
+  EXPECT_TRUE(maybeTestFile != fileNames.end());
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   if (setEnvironmentIfReady()) {
