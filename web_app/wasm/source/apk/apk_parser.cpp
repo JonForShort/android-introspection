@@ -163,10 +163,16 @@ auto ApkParser::setFileContents(char const *szFileName, std::vector<std::byte> c
     LOGW("mz_zip_writer_open_file, result=[%d] szPathToApk=[%s] szFileName=[%s]", result, szPathToApk, szFileName);
     return;
   }
-  mz_zip_file zipFile;
-  zipFile.filename = szFileName;
-
-  if (auto result = mz_zip_writer_entry_open(zipWriter, &zipFile); result != MZ_OK) {
+  if (auto result = mz_zip_locate_entry(zipWriter, szFileName, 0); result != MZ_OK) {
+    LOGW("mz_zip_locate_entry, result=[%d] szPathToApk=[%s] szFileName=[%s]", result, szPathToApk, szFileName);
+    return;
+  }
+  mz_zip_file *zipFile;
+  if (auto result = mz_zip_entry_get_info(zipWriter, &zipFile); result != MZ_OK) {
+    LOGW("mz_zip_entry_get_info, result=[%d] szPathToApk=[%s] szFileName=[%s]", result, szPathToApk, szFileName);
+    return;
+  }
+  if (auto result = mz_zip_writer_entry_open(zipWriter, zipFile); result != MZ_OK) {
     LOGW("mz_zip_writer_entry_open, result=[%d] szPathToApk=[%s] szFileName=[%s]", result, szPathToApk, szFileName);
     return;
   }
