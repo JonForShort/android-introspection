@@ -73,70 +73,6 @@ struct CompressedAndroidManifestHeader {
   uint32_t stylesOffset;
 };
 
-struct UnzOpenFile {
-
-  explicit UnzOpenFile(const char *szFileName) : zip_(unzOpen(szFileName)) {}
-
-  ~UnzOpenFile() { unzClose(zip_); }
-
-  auto get() const -> unzFile { return zip_; }
-
-private:
-  unzFile zip_;
-};
-
-auto getZipFileNames(const char *szFileName) -> std::vector<std::string> {
-  std::vector<std::string> fileNames;
-  auto const zip = UnzOpenFile(szFileName);
-  if (zip.get() == nullptr) {
-    LOGW("unable to open zip file [%s]", szFileName);
-    return fileNames;
-  }
-  unz_global_info info;
-  if (unzGetGlobalInfo(zip.get(), &info) != MZ_OK) {
-    LOGW("unable to get global zip info [%s]", szFileName);
-    return fileNames;
-  }
-  if (unzGoToFirstFile(zip.get()) != UNZ_OK) {
-    LOGW("unable to get first zip file in archive [%s]", szFileName);
-    return fileNames;
-  }
-  do {
-    unz_file_info zipFileInfo;
-    char szFilename[BUFSIZ] = {0};
-    if (UNZ_OK == unzGetCurrentFileInfo(zip.get(), &zipFileInfo, szFilename, sizeof(szFilename), nullptr, 0, nullptr, 0)) {
-      auto fileName = std::string(szFilename);
-      fileNames.emplace_back(fileName);
-    }
-  } while (UNZ_OK == unzGoToNextFile(zip.get()));
-  return fileNames;
-}
-
-auto getZipContents(const char *szFileName, const char *szZipFileName) -> std::vector<uint8_t> {
-  auto contents = std::vector<uint8_t>();
-  auto const zip = UnzOpenFile(szFileName);
-  if (zip.get() == nullptr) {
-    LOGW("unable to open zip file [%s]", szFileName);
-    return contents;
-  }
-  if (unzLocateFile(zip.get(), szZipFileName, nullptr) != MZ_OK) {
-    LOGW("unable to locate zip file [%s] [%s]", szFileName, szZipFileName);
-    return contents;
-  }
-  unz_file_info zipFileInfo;
-  if (unzGetCurrentFileInfo(zip.get(), &zipFileInfo, nullptr, 0, nullptr, 0, nullptr, 0) != UNZ_OK) {
-    LOGW("unable to get current file info [%s] [%s]", szFileName, szZipFileName);
-    return contents;
-  }
-  if (unzOpenCurrentFile(zip.get()) != MZ_OK) {
-    LOGW("unable to open current file [%s] [%s]", szFileName, szZipFileName);
-    return contents;
-  }
-  contents.resize(zipFileInfo.uncompressed_size);
-  unzReadCurrentFile(zip.get(), &contents[0], static_cast<uint32_t>(contents.size()));
-  return contents;
-}
-
 template <typename... Args> std::string formatString(const char *format, Args... args) {
   auto size = static_cast<uint64_t>(snprintf(nullptr, 0, format, args...) + 1);
   std::unique_ptr<char[]> buf(new char[size]);
@@ -144,14 +80,14 @@ template <typename... Args> std::string formatString(const char *format, Args...
   return std::string(buf.get(), buf.get() + size - 1);
 }
 
-template <typename T, typename U> auto readBytesAtIndex(std::vector<uint8_t> const &data, U &index) {
+template <typename T, typename U> auto readBytesAtIndex(std::vector<std::byte> const &data, U &index) {
   T value = {0};
   memcpy(&value, &data[index], sizeof(value));
   index += sizeof(value);
   return value;
 }
 
-auto getStringsFromCompressedAndroidManifest(std::vector<uint8_t> const &contents) -> std::vector<std::string> {
+auto getStringsFromCompressedAndroidManifest(std::vector<std::byte> const &contents) -> std::vector<std::string> {
 
   std::vector<std::string> strings;
   auto xmlHeader = reinterpret_cast<CompressedAndroidManifestHeader const *>(contents.data());
@@ -199,7 +135,7 @@ auto getStringsFromCompressedAndroidManifest(std::vector<uint8_t> const &content
   return strings;
 }
 
-auto getXmlChunkOffset(std::vector<uint8_t> const &contents) -> uint64_t {
+auto getXmlChunkOffset(std::vector<std::byte> const &contents) -> uint64_t {
   auto xmlHeader = reinterpret_cast<CompressedAndroidManifestHeader const *>(contents.data());
   if (xmlHeader->xmlMagicNumber != XML_IDENTIFIER) {
     LOGW("unable to get chunk size; compressed xml is invalid");
@@ -216,7 +152,7 @@ auto getXmlChunkOffset(std::vector<uint8_t> const &contents) -> uint64_t {
   return contents.size() - (contents.size() - xmlHeader->chunkSize);
 }
 
-auto handleAttributes(std::vector<uint8_t> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
+auto handleAttributes(std::vector<std::byte> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
   auto const attributeMarker = readBytesAtIndex<uint32_t>(contents, contentsOffset);
   if (attributeMarker != XML_ATTRS_MARKER) {
     LOGW("unexpected attributes marker");
@@ -294,35 +230,35 @@ auto handleAttributes(std::vector<uint8_t> const &contents, std::vector<std::str
   }
 }
 
-auto handleStartElementTag(std::vector<uint8_t> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
+auto handleStartElementTag(std::vector<std::byte> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
   readBytesAtIndex<uint32_t>(contents, contentsOffset);
   readBytesAtIndex<uint32_t>(contents, contentsOffset);
 
   auto const namespaceStringIndex = readBytesAtIndex<int32_t>(contents, contentsOffset);
-  auto const namespaceString = namespaceStringIndex >= 0 ? strings[namespaceStringIndex] : "";
+  auto const namespaceString = namespaceStringIndex >= 0 ? strings[static_cast<uint32_t>(namespaceStringIndex)] : "";
 
   auto const stringIndex = readBytesAtIndex<int32_t>(contents, contentsOffset);
-  auto const string = stringIndex >= 0 ? strings[stringIndex] : "";
+  auto const string = stringIndex >= 0 ? strings[static_cast<uint32_t>(stringIndex)] : "";
 
   handleAttributes(contents, strings, contentsOffset);
 
   LOGI("start tag [{}] namespace [{}]", string.c_str(), namespaceString.c_str());
 }
 
-auto handleEndElementTag(std::vector<uint8_t> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
+auto handleEndElementTag(std::vector<std::byte> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
   readBytesAtIndex<uint32_t>(contents, contentsOffset);
   readBytesAtIndex<uint32_t>(contents, contentsOffset);
 
   auto const namespaceStringIndex = readBytesAtIndex<int32_t>(contents, contentsOffset);
-  auto const namespaceString = namespaceStringIndex >= 0 ? strings[namespaceStringIndex] : "";
+  auto const namespaceString = namespaceStringIndex >= 0 ? strings[static_cast<uint32_t>(namespaceStringIndex)] : "";
 
   auto const stringIndex = readBytesAtIndex<int32_t>(contents, contentsOffset);
-  auto const string = stringIndex >= 0 ? strings[stringIndex] : "";
+  auto const string = stringIndex >= 0 ? strings[static_cast<uint32_t>(stringIndex)] : "";
 
   LOGI("end tag [{}] namespace [{}]", string.c_str(), namespaceString.c_str());
 }
 
-auto handleCDataTag(std::vector<uint8_t> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
+auto handleCDataTag(std::vector<std::byte> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
   readBytesAtIndex<uint32_t>(contents, contentsOffset);
   readBytesAtIndex<uint32_t>(contents, contentsOffset);
 
@@ -338,13 +274,14 @@ auto handleCDataTag(std::vector<uint8_t> const &contents, std::vector<std::strin
 } // namespace
 
 auto apk::makeApkDebuggable(const char *apkPath) -> bool {
-  auto const fileNames = getZipFileNames(apkPath);
+  auto const apkParser = ai::ApkParser(apkPath);
+  auto const fileNames = apkParser.getFileNames();
   auto const containsAndroidManifest = std::find(fileNames.begin(), fileNames.end(), "AndroidManifest.xml") != fileNames.end();
   if (!containsAndroidManifest) {
     LOGD("unable to find AndroidManifest.xml in [%s]", apkPath);
     return false;
   }
-  auto const contents = getZipContents(apkPath, "AndroidManifest.xml");
+  auto const contents = apkParser.getFileContents("AndroidManifest.xml");
   if (contents.empty()) {
     LOGW("unable to read AndroidManifest.xml in [%s]", apkPath);
     return false;
