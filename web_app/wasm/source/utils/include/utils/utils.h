@@ -24,16 +24,27 @@
 #ifndef ANDROID_INTROSPECTION_UTILS_H_
 #define ANDROID_INTROSPECTION_UTILS_H_
 
+#include <cstdint>
 #include <fstream>
+#include <memory>
+#include <string>
 
 using namespace std;
 
 namespace ai::utils {
 
-    auto fileExists(const char *path) -> bool {
-        ifstream infile(path);
-        return infile.good();
-    }
+auto fileExists(const char *path) -> bool {
+  ifstream infile(path);
+  return infile.good();
 }
+
+template <typename... Args> std::string formatString(const char *format, Args... args) {
+  auto size = static_cast<uint64_t>(snprintf(nullptr, 0, format, args...) + 1);
+  std::unique_ptr<char[]> buf(new char[size]);
+  snprintf(buf.get(), size, format, args...);
+  return std::string(buf.get(), buf.get() + size - 1);
+}
+
+} // namespace ai::utils
 
 #endif /* ANDROID_INTROSPECTION_UTILS_H_ */

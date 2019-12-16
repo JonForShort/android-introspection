@@ -25,17 +25,19 @@
 #define ANDROID_INTROSPECTION_APK_BINARY_XML_H_
 
 #include <cstdint>
+#include <string>
 #include <vector>
 
 namespace ai {
 
 class BinaryXml {
 
-public:
-  BinaryXml(std::vector<uint8_t> const &content) : content_(content) {}
+  std::vector<std::byte> const content_;
 
-private:
-  std::vector<uint8_t> const content_;
+public:
+  BinaryXml(std::vector<std::byte> const &content) : content_(content) {}
+
+  auto readStrings() -> std::vector<std::string>;
 };
 
 } // namespace ai

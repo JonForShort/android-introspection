@@ -30,12 +30,15 @@
 #include <zip.h>
 
 #include "utils/log.h"
+#include "utils/utils.h"
 
 #include "apk/apk.h"
 #include "apk_parser.h"
 #include "resource_types.h"
 
 using namespace ai;
+
+using ai::utils::formatString;
 
 //
 // Implementation used the following resources.
@@ -72,13 +75,6 @@ struct CompressedAndroidManifestHeader {
   uint32_t stringsOffset;
   uint32_t stylesOffset;
 };
-
-template <typename... Args> std::string formatString(const char *format, Args... args) {
-  auto size = static_cast<uint64_t>(snprintf(nullptr, 0, format, args...) + 1);
-  std::unique_ptr<char[]> buf(new char[size]);
-  snprintf(buf.get(), size, format, args...);
-  return std::string(buf.get(), buf.get() + size - 1);
-}
 
 template <typename T, typename U> auto readBytesAtIndex(std::vector<std::byte> const &data, U &index) {
   T value = {0};
