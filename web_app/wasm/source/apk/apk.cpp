@@ -34,6 +34,7 @@
 
 #include "apk/apk.h"
 #include "apk_parser.h"
+#include "binary_xml.h"
 #include "resource_types.h"
 
 using namespace ai;
@@ -81,54 +82,6 @@ template <typename T, typename U> auto readBytesAtIndex(std::vector<std::byte> c
   memcpy(&value, &data[index], sizeof(value));
   index += sizeof(value);
   return value;
-}
-
-auto getStringsFromCompressedAndroidManifest(std::vector<std::byte> const &contents) -> std::vector<std::string> {
-
-  std::vector<std::string> strings;
-  auto xmlHeader = reinterpret_cast<CompressedAndroidManifestHeader const *>(contents.data());
-  if (xmlHeader->xmlMagicNumber != XML_IDENTIFIER) {
-    LOGW("unable to get strings; compressed xml is invalid");
-    return strings;
-  }
-  if (xmlHeader->stringTableIdentifier != XML_STRING_TABLE) {
-    LOGW("unable to get strings; missing string marker");
-    return strings;
-  }
-
-  auto stringOffsets = std::vector<uint32_t>();
-  for (size_t i = 0; i < xmlHeader->numStrings; i++) {
-    auto index = sizeof(CompressedAndroidManifestHeader) + i * (sizeof(uint32_t));
-    auto const offset = readBytesAtIndex<uint32_t>(contents, index);
-    stringOffsets.push_back(offset);
-  }
-
-  //
-  // TODO: Figure out why we can't just use xmlheader->stringsOffset.  Using
-  // this will make us 8 bytes short of where strings really start.
-  //
-
-  auto const stringOffsetsInBytes = stringOffsets.size() * sizeof(decltype(stringOffsets)::value_type);
-  auto const startStringsOffset = sizeof(CompressedAndroidManifestHeader) + stringOffsetsInBytes;
-  auto const isUtf8Encoded = (xmlHeader->flags & RES_FLAG_UTF8) == RES_FLAG_UTF8;
-  for (auto &offset : stringOffsets) {
-    if (isUtf8Encoded) {
-      auto stringLengthOffset = startStringsOffset + offset;
-      auto stringLength = readBytesAtIndex<uint8_t>(contents, stringLengthOffset);
-      auto stringOffset = reinterpret_cast<const char *>(contents.data() + startStringsOffset + offset + 2);
-      auto string = std::string(stringOffset, stringLength);
-      strings.push_back(string);
-    } else {
-      auto stringLengthOffset = startStringsOffset + offset;
-      auto stringLength = readBytesAtIndex<uint16_t>(contents, stringLengthOffset);
-      auto stringOffset = reinterpret_cast<const char16_t *>(contents.data() + startStringsOffset + offset + 2);
-      auto string = std::u16string(stringOffset, stringLength);
-      std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
-      strings.push_back(converter.to_bytes(string));
-    }
-  }
-
-  return strings;
 }
 
 auto getXmlChunkOffset(std::vector<std::byte> const &contents) -> uint64_t {
@@ -282,7 +235,8 @@ auto apk::makeApkDebuggable(const char *apkPath) -> bool {
     LOGW("unable to read AndroidManifest.xml in [%s]", apkPath);
     return false;
   }
-  auto const strings = getStringsFromCompressedAndroidManifest(contents);
+  auto binaryXml = BinaryXml(contents);
+  auto const strings = binaryXml.readStrings();
   if (strings.empty()) {
     LOGW("unable to parse strings from AndroidManifest.xml in [%s]", apkPath);
     return false;
