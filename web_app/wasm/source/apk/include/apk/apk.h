@@ -25,7 +25,22 @@
 #define ANDROID_INTROSPECTION_APK_APK_H_
 
 namespace ai::apk {
-    auto makeApkDebuggable(const char *apkPath) -> bool;
+auto makeApkDebuggable(const char *apkPath) -> bool;
 }
+
+namespace ai {
+
+class Apk {
+  char const *const apkPath_;
+
+public:
+  Apk(char const *const apkPath) : apkPath_(apkPath) {}
+
+  auto makeDebuggable() -> void;
+
+  auto isDebuggable() -> bool;
+};
+
+} // namespace ai
 
 #endif /* ANDROID_INTROSPECTION_APK_APK_H_ */
