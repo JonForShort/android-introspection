@@ -83,8 +83,11 @@ TEST(MakeDebuggable, MakeReleaseApkIsDebuggable_ApkIsMadeDebuggableSuccessfully)
   {
     auto scopedFileDeleter = ScopedFileDeleter(copiedTestApk.c_str());
 
-    auto isSuccessful = ai::apk::makeApkDebuggable(copiedTestApk.c_str());
-    EXPECT_TRUE(isSuccessful);
+    auto apk = ai::Apk(copiedTestApk.c_str());
+    EXPECT_FALSE(apk.isDebuggable());
+
+    EXPECT_NO_THROW(apk.makeDebuggable());
+    EXPECT_TRUE(apk.isDebuggable());
 
     auto pathToApkAnalyzer = fs::path(gTestEnvironment->androidHomeDir) / "tools" / "bin" / "apkanalyzer";
     auto apkAnalyzer = ai::ApkAnalyzer(pathToApkAnalyzer.string().c_str());

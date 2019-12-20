@@ -33,6 +33,7 @@
 #include "utils/utils.h"
 
 #include "apk/apk.h"
+#include "apk/apk_exception.h"
 #include "apk_parser.h"
 #include "binary_xml.h"
 #include "resource_types.h"
@@ -222,33 +223,33 @@ auto handleCDataTag(std::vector<std::byte> const &contents, std::vector<std::str
 
 } // namespace
 
-auto apk::makeApkDebuggable(const char *apkPath) -> bool {
-  auto const apkParser = ai::ApkParser(apkPath);
+auto Apk::makeDebuggable() -> void {
+  auto const apkParser = ai::ApkParser(apkPath_);
   auto const fileNames = apkParser.getFileNames();
   auto const containsAndroidManifest = std::find(fileNames.begin(), fileNames.end(), "AndroidManifest.xml") != fileNames.end();
   if (!containsAndroidManifest) {
-    LOGD("unable to find AndroidManifest.xml in [%s]", apkPath);
-    return false;
+    LOGD("unable to find AndroidManifest.xml in [%s]", apkPath_);
+    throw MissingAndroidManifestException(apkPath_);
   }
   auto const contents = apkParser.getFileContents("AndroidManifest.xml");
   if (contents.empty()) {
-    LOGW("unable to read AndroidManifest.xml in [%s]", apkPath);
-    return false;
+    LOGW("unable to read AndroidManifest.xml in [%s]", apkPath_);
+    throw MissingAndroidManifestException(apkPath_);
   }
   auto binaryXml = BinaryXml(contents);
   auto const strings = binaryXml.readStrings();
   if (strings.empty()) {
-    LOGW("unable to parse strings from AndroidManifest.xml in [%s]", apkPath);
-    return false;
+    LOGW("unable to parse strings from AndroidManifest.xml in [%s]", apkPath_);
+    throw MalformedAndroidManifestException(apkPath_);
   }
   if (std::find(strings.begin(), strings.end(), "application") == strings.end()) {
-    LOGW("unable to find application tag in AndroidManifest.xml in [%s]", apkPath);
-    return false;
+    LOGW("unable to find application tag in AndroidManifest.xml in [%s]", apkPath_);
+    throw MalformedAndroidManifestException(apkPath_);
   }
   auto const xmlChunkOffset = getXmlChunkOffset(contents);
   if (xmlChunkOffset == 0) {
-    LOGW("unable to determine chunk offset in AndroidManifest.xml in [%s]", apkPath);
-    return false;
+    LOGW("unable to determine chunk offset in AndroidManifest.xml in [%s]", apkPath_);
+    throw MalformedAndroidManifestException(apkPath_);
   }
 
   auto currentXmlChunkOffset = xmlChunkOffset;
@@ -289,6 +290,6 @@ auto apk::makeApkDebuggable(const char *apkPath) -> bool {
     }
     tag = readBytesAtIndex<uint16_t>(contents, currentXmlChunkOffset);
   } while (tag != RES_XML_END_NAMESPACE_TYPE);
-
-  return true;
 }
+
+auto Apk::isDebuggable() -> bool { return false; }

@@ -21,22 +21,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#ifndef ANDROID_INTROSPECTION_APK_APK_H_
-#define ANDROID_INTROSPECTION_APK_APK_H_
+#ifndef ANDROID_INTROSPECTION_APK_APK_EXCEPTION_H_
+#define ANDROID_INTROSPECTION_APK_APK_EXCEPTION_H_
+
+#include <exception>
+#include <string>
 
 namespace ai {
 
-class Apk {
-  char const *const apkPath_;
+class MissingAndroidManifestException : public std::exception {
+  std::string const apkPath_;
 
 public:
-  Apk(char const *const apkPath) : apkPath_(apkPath) {}
+  MissingAndroidManifestException(std::string const &apkPath) : apkPath_(apkPath) {}
+};
 
-  auto makeDebuggable() -> void;
+class MalformedAndroidManifestException : public std::exception {
+  std::string const apkPath_;
 
-  auto isDebuggable() -> bool;
+public:
+  MalformedAndroidManifestException(std::string const &apkPath) : apkPath_(apkPath) {}
 };
 
 } // namespace ai
 
-#endif /* ANDROID_INTROSPECTION_APK_APK_H_ */
+#endif /* ANDROID_INTROSPECTION_APK_APK_EXCEPTION_H_ */
