@@ -100,3 +100,20 @@ auto BinaryXml::readStrings() -> std::vector<std::string> {
   }
   return strings;
 }
+
+auto BinaryXml::getXmlChunkOffset() const -> uint64_t {
+  auto xmlHeader = reinterpret_cast<BinaryXmlHeader const *>(content_.data());
+  if (xmlHeader->xmlMagicNumber != XML_IDENTIFIER) {
+    LOGW("unable to get chunk size; compressed xml is invalid");
+    return 0;
+  }
+  if (xmlHeader->stringTableIdentifier != XML_STRING_TABLE) {
+    LOGW("unable to get chunk size; missing string marker");
+    return 0;
+  }
+  if (content_.size() <= xmlHeader->chunkSize) {
+    LOGW("unable to get chunk size; missing string marker");
+    return 0;
+  }
+  return content_.size() - (content_.size() - xmlHeader->chunkSize);
+}

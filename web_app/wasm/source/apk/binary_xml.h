@@ -38,6 +38,8 @@ public:
   BinaryXml(std::vector<std::byte> const &content) : content_(content) {}
 
   auto readStrings() -> std::vector<std::string>;
+
+  auto getXmlChunkOffset() const -> uint64_t;
 };
 
 } // namespace ai

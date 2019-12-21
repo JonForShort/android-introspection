@@ -65,41 +65,11 @@ using ai::utils::formatString;
 
 namespace {
 
-struct CompressedAndroidManifestHeader {
-  uint32_t xmlMagicNumber;
-  uint32_t reservedBytes;
-  uint16_t stringTableIdentifier;
-  uint16_t headerSize;
-  uint32_t chunkSize;
-  uint32_t numStrings;
-  uint32_t numStyles;
-  uint32_t flags;
-  uint32_t stringsOffset;
-  uint32_t stylesOffset;
-};
-
 template <typename T, typename U> auto readBytesAtIndex(std::vector<std::byte> const &data, U &index) {
   T value = {0};
   memcpy(&value, &data[index], sizeof(value));
   index += sizeof(value);
   return value;
-}
-
-auto getXmlChunkOffset(std::vector<std::byte> const &contents) -> uint64_t {
-  auto xmlHeader = reinterpret_cast<CompressedAndroidManifestHeader const *>(contents.data());
-  if (xmlHeader->xmlMagicNumber != XML_IDENTIFIER) {
-    LOGW("unable to get chunk size; compressed xml is invalid");
-    return 0;
-  }
-  if (xmlHeader->stringTableIdentifier != XML_STRING_TABLE) {
-    LOGW("unable to get chunk size; missing string marker");
-    return 0;
-  }
-  if (contents.size() <= xmlHeader->chunkSize) {
-    LOGW("unable to get chunk size; missing string marker");
-    return 0;
-  }
-  return contents.size() - (contents.size() - xmlHeader->chunkSize);
 }
 
 auto handleAttributes(std::vector<std::byte> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
@@ -246,7 +216,7 @@ auto Apk::makeDebuggable() -> void {
     LOGW("unable to find application tag in AndroidManifest.xml in [%s]", apkPath_);
     throw MalformedAndroidManifestException(apkPath_);
   }
-  auto const xmlChunkOffset = getXmlChunkOffset(contents);
+  auto const xmlChunkOffset = binaryXml.getXmlChunkOffset();
   if (xmlChunkOffset == 0) {
     LOGW("unable to determine chunk offset in AndroidManifest.xml in [%s]", apkPath_);
     throw MalformedAndroidManifestException(apkPath_);
