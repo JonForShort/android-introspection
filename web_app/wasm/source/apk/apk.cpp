@@ -42,27 +42,6 @@ using namespace ai;
 
 using ai::utils::formatString;
 
-//
-// Implementation used the following resources.
-//
-// https://android.googlesource.com/platform/frameworks/base/+/master/libs/androidfw/include/androidfw/ResourceTypes.h
-// https://android.googlesource.com/platform/frameworks/base/+/master/libs/androidfw/ResourceTypes.cpp
-// https://github.com/google/android-classyshark/blob/master/ClassySharkWS/src/com/google/classyshark/silverghost/translator/xml/XmlDecompressor.java
-//
-// Structure of a binary xml file (i.e. compressed AndroidManifest.xml) is as
-// follows.
-//
-// -----------------------------
-// [Header]
-// -----------------------------
-// [String Offsets]
-// -----------------------------
-// [Strings]
-// -----------------------------
-// [Chunk]
-// -----------------------------
-//
-
 namespace {
 
 template <typename T, typename U> auto readBytesAtIndex(std::vector<std::byte> const &data, U &index) {
@@ -212,7 +191,7 @@ auto Apk::makeDebuggable() -> void {
     LOGW("unable to parse strings from AndroidManifest.xml in [%s]", apkPath_);
     throw MalformedAndroidManifestException(apkPath_);
   }
-  if (std::find(strings.begin(), strings.end(), "application") == strings.end()) {
+  if (std::find(strings.cbegin(), strings.cend(), "application") == strings.end()) {
     LOGW("unable to find application tag in AndroidManifest.xml in [%s]", apkPath_);
     throw MalformedAndroidManifestException(apkPath_);
   }

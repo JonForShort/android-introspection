@@ -30,6 +30,27 @@
 
 using namespace ai;
 
+//
+// Implementation used the following resources.
+//
+// https://android.googlesource.com/platform/frameworks/base/+/master/libs/androidfw/include/androidfw/ResourceTypes.h
+// https://android.googlesource.com/platform/frameworks/base/+/master/libs/androidfw/ResourceTypes.cpp
+// https://github.com/google/android-classyshark/blob/master/ClassySharkWS/src/com/google/classyshark/silverghost/translator/xml/XmlDecompressor.java
+//
+// Structure of a binary xml file (i.e. compressed AndroidManifest.xml) is as
+// follows.
+//
+// -----------------------------
+// [Header]
+// -----------------------------
+// [String Offsets]
+// -----------------------------
+// [Strings]
+// -----------------------------
+// [Chunk]
+// -----------------------------
+//
+
 namespace {
 
 struct BinaryXmlHeader {
@@ -117,3 +138,5 @@ auto BinaryXml::getXmlChunkOffset() const -> uint64_t {
   }
   return content_.size() - (content_.size() - xmlHeader->chunkSize);
 }
+
+auto BinaryXml::traverseXml(BinaryXmlVisitor const &visitor) const -> void { (void)visitor; }
