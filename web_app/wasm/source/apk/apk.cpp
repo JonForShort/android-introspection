@@ -21,224 +21,78 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#include <algorithm>
-#include <codecvt>
-#include <cstdint>
-#include <locale>
 #include <string>
-#include <vector>
-#include <zip.h>
-
-#include "utils/log.h"
-#include "utils/utils.h"
 
 #include "apk/apk.h"
-#include "apk/apk_exception.h"
 #include "apk_parser.h"
 #include "binary_xml.h"
-#include "resource_types.h"
+#include "utils/log.h"
 
 using namespace ai;
 
-using ai::utils::formatString;
-
 namespace {
 
-template <typename T, typename U> auto readBytesAtIndex(std::vector<std::byte> const &data, U &index) {
-  T value = {0};
-  memcpy(&value, &data[index], sizeof(value));
-  index += sizeof(value);
-  return value;
+static constexpr char const *const ANDROID_MANIFEST = "AndroidManifest.xml";
+
 }
-
-auto handleAttributes(std::vector<std::byte> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
-  auto const attributeMarker = readBytesAtIndex<uint32_t>(contents, contentsOffset);
-  if (attributeMarker != XML_ATTRS_MARKER) {
-    LOGW("unexpected attributes marker");
-    return;
-  }
-
-  auto const attributesCount = readBytesAtIndex<uint32_t>(contents, contentsOffset);
-  readBytesAtIndex<uint32_t>(contents, contentsOffset);
-
-  for (auto i = 0U; i < attributesCount; i++) {
-    /* auto const attributeNamespaceIndex = */ readBytesAtIndex<uint32_t>(contents, contentsOffset);
-    auto const attributeNameIndex = readBytesAtIndex<uint32_t>(contents, contentsOffset);
-    auto const attributeValueIndex = readBytesAtIndex<uint32_t>(contents, contentsOffset);
-
-    readBytesAtIndex<uint16_t>(contents, contentsOffset);
-    readBytesAtIndex<uint8_t>(contents, contentsOffset);
-
-    auto const attributeValueType = readBytesAtIndex<uint8_t>(contents, contentsOffset);
-    auto const attributeResourceId = readBytesAtIndex<uint32_t>(contents, contentsOffset);
-
-    auto attributeName = strings[attributeNameIndex];
-    if (attributeName.empty()) {
-      LOGW("unexpected empty attribute name");
-      continue;
-    }
-    std::string attributeValue;
-    switch (attributeValueType) {
-    case TYPE_NULL: {
-      attributeValue = attributeResourceId == 0 ? "<undefined>" : "<empty>";
-      break;
-    }
-    case TYPE_REFERENCE: {
-      attributeValue = formatString("@res/0x%08X", attributeResourceId);
-      break;
-    }
-    case TYPE_ATTRIBUTE: {
-      attributeValue = formatString("@attr/0x%08X", attributeResourceId);
-      break;
-    }
-    case TYPE_STRING: {
-      attributeValue = strings[attributeValueIndex];
-      break;
-    }
-    case TYPE_FLOAT: {
-      break;
-    }
-    case TYPE_DIMENSION: {
-      break;
-    }
-    case TYPE_FRACTION: {
-      break;
-    }
-    case TYPE_DYNAMIC_REFERENCE: {
-      attributeValue = formatString("@dyn/0x%08X", attributeResourceId);
-      break;
-    }
-    case TYPE_INT_DEC: {
-      attributeValue = formatString("%d", attributeResourceId);
-      break;
-    }
-    case TYPE_INT_HEX: {
-      attributeValue = formatString("0x%08X", attributeResourceId);
-      break;
-    }
-    case TYPE_INT_BOOLEAN: {
-      attributeValue = attributeResourceId == RES_VALUE_TRUE ? "true" : attributeResourceId == RES_VALUE_FALSE ? "false" : "unknown";
-      break;
-    }
-    default: {
-      attributeValue = "unknown";
-      break;
-    }
-    }
-    LOGI("  attribute value [{}]", attributeValue.c_str());
-  }
-}
-
-auto handleStartElementTag(std::vector<std::byte> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
-  readBytesAtIndex<uint32_t>(contents, contentsOffset);
-  readBytesAtIndex<uint32_t>(contents, contentsOffset);
-
-  auto const namespaceStringIndex = readBytesAtIndex<int32_t>(contents, contentsOffset);
-  auto const namespaceString = namespaceStringIndex >= 0 ? strings[static_cast<uint32_t>(namespaceStringIndex)] : "";
-
-  auto const stringIndex = readBytesAtIndex<int32_t>(contents, contentsOffset);
-  auto const string = stringIndex >= 0 ? strings[static_cast<uint32_t>(stringIndex)] : "";
-
-  handleAttributes(contents, strings, contentsOffset);
-
-  LOGI("start tag [{}] namespace [{}]", string.c_str(), namespaceString.c_str());
-}
-
-auto handleEndElementTag(std::vector<std::byte> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
-  readBytesAtIndex<uint32_t>(contents, contentsOffset);
-  readBytesAtIndex<uint32_t>(contents, contentsOffset);
-
-  auto const namespaceStringIndex = readBytesAtIndex<int32_t>(contents, contentsOffset);
-  auto const namespaceString = namespaceStringIndex >= 0 ? strings[static_cast<uint32_t>(namespaceStringIndex)] : "";
-
-  auto const stringIndex = readBytesAtIndex<int32_t>(contents, contentsOffset);
-  auto const string = stringIndex >= 0 ? strings[static_cast<uint32_t>(stringIndex)] : "";
-
-  LOGI("end tag [{}] namespace [{}]", string.c_str(), namespaceString.c_str());
-}
-
-auto handleCDataTag(std::vector<std::byte> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
-  readBytesAtIndex<uint32_t>(contents, contentsOffset);
-  readBytesAtIndex<uint32_t>(contents, contentsOffset);
-
-  auto stringIndex = readBytesAtIndex<uint32_t>(contents, contentsOffset);
-  auto string = strings[stringIndex];
-
-  readBytesAtIndex<uint32_t>(contents, contentsOffset);
-  readBytesAtIndex<uint32_t>(contents, contentsOffset);
-
-  LOGD("handling cdata tag [%s]", string.c_str());
-}
-
-} // namespace
 
 auto Apk::makeDebuggable() -> void {
   auto const apkParser = ai::ApkParser(apkPath_);
   auto const fileNames = apkParser.getFileNames();
-  auto const containsAndroidManifest = std::find(fileNames.begin(), fileNames.end(), "AndroidManifest.xml") != fileNames.end();
-  if (!containsAndroidManifest) {
-    LOGD("unable to find AndroidManifest.xml in [%s]", apkPath_);
+  auto const missingAndroidManifest = std::find(fileNames.cbegin(), fileNames.cend(), ANDROID_MANIFEST) == fileNames.end();
+  if (!missingAndroidManifest) {
+    LOGD("unable to find manifest in [%s]", apkPath_);
     throw MissingAndroidManifestException(apkPath_);
   }
+
   auto const contents = apkParser.getFileContents("AndroidManifest.xml");
   if (contents.empty()) {
-    LOGW("unable to read AndroidManifest.xml in [%s]", apkPath_);
+    LOGW("unable to read [%s]", apkPath_);
     throw MissingAndroidManifestException(apkPath_);
   }
-  auto binaryXml = BinaryXml(contents);
+
+  auto const binaryXml = BinaryXml(contents);
   auto const strings = binaryXml.readStrings();
   if (strings.empty()) {
-    LOGW("unable to parse strings from AndroidManifest.xml in [%s]", apkPath_);
-    throw MalformedAndroidManifestException(apkPath_);
-  }
-  if (std::find(strings.cbegin(), strings.cend(), "application") == strings.end()) {
-    LOGW("unable to find application tag in AndroidManifest.xml in [%s]", apkPath_);
-    throw MalformedAndroidManifestException(apkPath_);
-  }
-  auto const xmlChunkOffset = binaryXml.getXmlChunkOffset();
-  if (xmlChunkOffset == 0) {
-    LOGW("unable to determine chunk offset in AndroidManifest.xml in [%s]", apkPath_);
+    LOGW("unable to parse strings in [%s]", apkPath_);
     throw MalformedAndroidManifestException(apkPath_);
   }
 
-  auto currentXmlChunkOffset = xmlChunkOffset;
-  auto tag = readBytesAtIndex<uint16_t>(contents, currentXmlChunkOffset);
+  auto const missingApplicationTag = std::find(strings.cbegin(), strings.cend(), "application") == strings.end();
+  if (missingApplicationTag) {
+    LOGW("unable to find application tag in [%s]", apkPath_);
+    throw MalformedAndroidManifestException(apkPath_);
+  }
 
-  do {
-    auto const headerSize = readBytesAtIndex<uint16_t>(contents, currentXmlChunkOffset);
-    auto const chunkSize = readBytesAtIndex<uint32_t>(contents, currentXmlChunkOffset);
+  struct MyBinaryXmlVisitor final : public BinaryXmlVisitor {
+    char const *const apkPath_;
 
-    LOGV("makeApkDebuggable: tag = [{:d}], headerSize = [{:d}], chunkSize = [{:d}]", tag, headerSize, chunkSize);
+    MyBinaryXmlVisitor(char const *const apkPath) noexcept : apkPath_(apkPath) {}
 
-    (void)headerSize;
+    auto visit(StartXmlTagElement const &element) const -> void override {
+      auto const tag = element.tag();
+      LOGD("traverse start tag element [%s]", tag);
+      if (tag == "application") {
+        LOGD("found application tag");
+      }
+    }
 
-    switch (tag) {
-    case RES_XML_START_NAMESPACE_TYPE: {
-      currentXmlChunkOffset += chunkSize - 8;
-      break;
+    auto visit(EndXmlTagElement const &element) const -> void override {
+      auto const tag = element.tag();
+      LOGD("traverse end tag element [%s]", tag);
+      if (tag == "application") {
+        LOGD("found application tag");
+      }
     }
-    case RES_XML_RESOURCE_MAP_TYPE: {
-      currentXmlChunkOffset += chunkSize - 8;
-      break;
+
+    auto visit(InvalidXmlTagElement const &element) const -> void override {
+      LOGW("traverse invalid element [%s]", element.error());
+      throw MalformedAndroidManifestException(apkPath_);
     }
-    case RES_XML_START_ELEMENT_TYPE: {
-      handleStartElementTag(contents, strings, currentXmlChunkOffset);
-      break;
-    }
-    case RES_XML_END_ELEMENT_TYPE: {
-      handleEndElementTag(contents, strings, currentXmlChunkOffset);
-      break;
-    }
-    case RES_XML_CDATA_TYPE: {
-      handleCDataTag(contents, strings, currentXmlChunkOffset);
-      break;
-    }
-    default: {
-      LOGW("skipping unknown tag [%d]", tag);
-    }
-    }
-    tag = readBytesAtIndex<uint16_t>(contents, currentXmlChunkOffset);
-  } while (tag != RES_XML_END_NAMESPACE_TYPE);
+
+  } visitor(apkPath_);
+
+  binaryXml.traverseXml(visitor);
 }
 
 auto Apk::isDebuggable() -> bool { return false; }

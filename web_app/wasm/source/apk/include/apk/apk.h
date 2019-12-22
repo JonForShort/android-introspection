@@ -24,6 +24,8 @@
 #ifndef ANDROID_INTROSPECTION_APK_APK_H_
 #define ANDROID_INTROSPECTION_APK_APK_H_
 
+#include "apk_exception.h"
+
 namespace ai {
 
 class Apk {

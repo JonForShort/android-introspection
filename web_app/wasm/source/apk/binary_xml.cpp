@@ -25,10 +25,14 @@
 #include <locale>
 
 #include "binary_xml.h"
+#include "binary_xml_visitor.h"
 #include "resource_types.h"
 #include "utils/log.h"
+#include "utils/utils.h"
 
 using namespace ai;
+
+using ai::utils::formatString;
 
 //
 // Implementation used the following resources.
@@ -73,9 +77,128 @@ template <typename T, typename U> auto readBytesAtIndex(std::vector<std::byte> c
   return value;
 }
 
+auto handleAttributes(std::vector<std::byte> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
+  auto const attributeMarker = readBytesAtIndex<uint32_t>(contents, contentsOffset);
+  if (attributeMarker != XML_ATTRS_MARKER) {
+    LOGW("unexpected attributes marker");
+    return;
+  }
+
+  auto const attributesCount = readBytesAtIndex<uint32_t>(contents, contentsOffset);
+  readBytesAtIndex<uint32_t>(contents, contentsOffset);
+
+  for (auto i = 0U; i < attributesCount; i++) {
+    /* auto const attributeNamespaceIndex = */ readBytesAtIndex<uint32_t>(contents, contentsOffset);
+    auto const attributeNameIndex = readBytesAtIndex<uint32_t>(contents, contentsOffset);
+    auto const attributeValueIndex = readBytesAtIndex<uint32_t>(contents, contentsOffset);
+
+    readBytesAtIndex<uint16_t>(contents, contentsOffset);
+    readBytesAtIndex<uint8_t>(contents, contentsOffset);
+
+    auto const attributeValueType = readBytesAtIndex<uint8_t>(contents, contentsOffset);
+    auto const attributeResourceId = readBytesAtIndex<uint32_t>(contents, contentsOffset);
+
+    auto attributeName = strings[attributeNameIndex];
+    if (attributeName.empty()) {
+      LOGW("unexpected empty attribute name");
+      continue;
+    }
+    std::string attributeValue;
+    switch (attributeValueType) {
+    case TYPE_NULL: {
+      attributeValue = attributeResourceId == 0 ? "<undefined>" : "<empty>";
+      break;
+    }
+    case TYPE_REFERENCE: {
+      attributeValue = formatString("@res/0x%08X", attributeResourceId);
+      break;
+    }
+    case TYPE_ATTRIBUTE: {
+      attributeValue = formatString("@attr/0x%08X", attributeResourceId);
+      break;
+    }
+    case TYPE_STRING: {
+      attributeValue = strings[attributeValueIndex];
+      break;
+    }
+    case TYPE_FLOAT: {
+      break;
+    }
+    case TYPE_DIMENSION: {
+      break;
+    }
+    case TYPE_FRACTION: {
+      break;
+    }
+    case TYPE_DYNAMIC_REFERENCE: {
+      attributeValue = formatString("@dyn/0x%08X", attributeResourceId);
+      break;
+    }
+    case TYPE_INT_DEC: {
+      attributeValue = formatString("%d", attributeResourceId);
+      break;
+    }
+    case TYPE_INT_HEX: {
+      attributeValue = formatString("0x%08X", attributeResourceId);
+      break;
+    }
+    case TYPE_INT_BOOLEAN: {
+      attributeValue = attributeResourceId == RES_VALUE_TRUE ? "true" : attributeResourceId == RES_VALUE_FALSE ? "false" : "unknown";
+      break;
+    }
+    default: {
+      attributeValue = "unknown";
+      break;
+    }
+    }
+    LOGI("  attribute value [{}]", attributeValue.c_str());
+  }
+}
+
+auto handleStartElementTag(std::vector<std::byte> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
+  readBytesAtIndex<uint32_t>(contents, contentsOffset);
+  readBytesAtIndex<uint32_t>(contents, contentsOffset);
+
+  auto const namespaceStringIndex = readBytesAtIndex<int32_t>(contents, contentsOffset);
+  auto const namespaceString = namespaceStringIndex >= 0 ? strings[static_cast<uint32_t>(namespaceStringIndex)] : "";
+
+  auto const stringIndex = readBytesAtIndex<int32_t>(contents, contentsOffset);
+  auto const string = stringIndex >= 0 ? strings[static_cast<uint32_t>(stringIndex)] : "";
+
+  handleAttributes(contents, strings, contentsOffset);
+
+  LOGI("start tag [{}] namespace [{}]", string.c_str(), namespaceString.c_str());
+}
+
+auto handleEndElementTag(std::vector<std::byte> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
+  readBytesAtIndex<uint32_t>(contents, contentsOffset);
+  readBytesAtIndex<uint32_t>(contents, contentsOffset);
+
+  auto const namespaceStringIndex = readBytesAtIndex<int32_t>(contents, contentsOffset);
+  auto const namespaceString = namespaceStringIndex >= 0 ? strings[static_cast<uint32_t>(namespaceStringIndex)] : "";
+
+  auto const stringIndex = readBytesAtIndex<int32_t>(contents, contentsOffset);
+  auto const string = stringIndex >= 0 ? strings[static_cast<uint32_t>(stringIndex)] : "";
+
+  LOGI("end tag [{}] namespace [{}]", string.c_str(), namespaceString.c_str());
+}
+
+auto handleCDataTag(std::vector<std::byte> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
+  readBytesAtIndex<uint32_t>(contents, contentsOffset);
+  readBytesAtIndex<uint32_t>(contents, contentsOffset);
+
+  auto stringIndex = readBytesAtIndex<uint32_t>(contents, contentsOffset);
+  auto string = strings[stringIndex];
+
+  readBytesAtIndex<uint32_t>(contents, contentsOffset);
+  readBytesAtIndex<uint32_t>(contents, contentsOffset);
+
+  LOGD("handling cdata tag [%s]", string.c_str());
+}
+
 } // namespace
 
-auto BinaryXml::readStrings() -> std::vector<std::string> {
+auto BinaryXml::readStrings() const -> std::vector<std::string> {
 
   std::vector<std::string> strings;
   auto xmlHeader = reinterpret_cast<BinaryXmlHeader const *>(content_.data());
@@ -139,4 +262,50 @@ auto BinaryXml::getXmlChunkOffset() const -> uint64_t {
   return content_.size() - (content_.size() - xmlHeader->chunkSize);
 }
 
-auto BinaryXml::traverseXml(BinaryXmlVisitor const &visitor) const -> void { (void)visitor; }
+auto BinaryXml::traverseXml(BinaryXmlVisitor const &visitor) const -> void {
+  auto const xmlChunkOffset = getXmlChunkOffset();
+  if (xmlChunkOffset == 0) {
+    visitor.visit(InvalidXmlTagElement());
+    return;
+  }
+
+  auto currentXmlChunkOffset = xmlChunkOffset;
+  auto tag = readBytesAtIndex<uint16_t>(content_, currentXmlChunkOffset);
+
+  do {
+    auto const headerSize = readBytesAtIndex<uint16_t>(content_, currentXmlChunkOffset);
+    auto const chunkSize = readBytesAtIndex<uint32_t>(content_, currentXmlChunkOffset);
+    auto const strings = readStrings();
+
+    LOGV("makeApkDebuggable: tag = [{:d}], headerSize = [{:d}], chunkSize = [{:d}]", tag, headerSize, chunkSize);
+
+    (void)headerSize;
+
+    switch (tag) {
+    case RES_XML_START_NAMESPACE_TYPE: {
+      currentXmlChunkOffset += chunkSize - 8;
+      break;
+    }
+    case RES_XML_RESOURCE_MAP_TYPE: {
+      currentXmlChunkOffset += chunkSize - 8;
+      break;
+    }
+    case RES_XML_START_ELEMENT_TYPE: {
+      handleStartElementTag(content_, strings, currentXmlChunkOffset);
+      break;
+    }
+    case RES_XML_END_ELEMENT_TYPE: {
+      handleEndElementTag(content_, strings, currentXmlChunkOffset);
+      break;
+    }
+    case RES_XML_CDATA_TYPE: {
+      handleCDataTag(content_, strings, currentXmlChunkOffset);
+      break;
+    }
+    default: {
+      LOGW("skipping unknown tag [%d]", tag);
+    }
+    }
+    tag = readBytesAtIndex<uint16_t>(content_, currentXmlChunkOffset);
+  } while (tag != RES_XML_END_NAMESPACE_TYPE);
+}

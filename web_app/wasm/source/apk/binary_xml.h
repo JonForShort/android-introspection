@@ -28,45 +28,22 @@
 #include <string>
 #include <vector>
 
-namespace ai {
+#include "binary_xml_visitor.h"
 
-class BinaryXmlVisitor;
+namespace ai {
 
 class BinaryXml {
 
   std::vector<std::byte> const content_;
 
+  auto getXmlChunkOffset() const -> uint64_t;
+
 public:
   BinaryXml(std::vector<std::byte> const &content) : content_(content) {}
 
-  auto readStrings() -> std::vector<std::string>;
-
-  auto getXmlChunkOffset() const -> uint64_t;
+  auto readStrings() const -> std::vector<std::string>;
 
   auto traverseXml(BinaryXmlVisitor const &visitor) const -> void;
-};
-
-class BinaryXmlElement {
-public:
-  virtual ~BinaryXmlElement() = default;
-};
-
-class BinaryXmlTagElement : public BinaryXmlElement {
-  std::string const tag_;
-
-public:
-  ~BinaryXmlTagElement() override = default;
-
-  BinaryXmlTagElement(std::string const tag) : tag_(tag) {}
-
-  auto tag() -> std::string { return tag_; }
-};
-
-class BinaryXmlVisitor {
-public:
-  virtual ~BinaryXmlVisitor() = default;
-
-  virtual auto visit(BinaryXmlTagElement const &element) const -> void = 0;
 };
 
 } // namespace ai
