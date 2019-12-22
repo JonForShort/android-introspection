@@ -24,6 +24,7 @@
 #ifndef ANDROID_INTROSPECTION_APK_BINARY_XML_VISITOR_H_
 #define ANDROID_INTROSPECTION_APK_BINARY_XML_VISITOR_H_
 
+#include <map>
 #include <string>
 
 namespace ai {
@@ -36,12 +37,16 @@ public:
 class StartXmlTagElement final : public BinaryXmlElement {
   std::string const tag_;
 
+  std::map<std::string, std::string> attributes_;
+
 public:
-  StartXmlTagElement(std::string const tag) : tag_(tag) {}
+  StartXmlTagElement(std::string const tag, std::map<std::string, std::string> attributes) : tag_(tag), attributes_(attributes) {}
 
   ~StartXmlTagElement() override = default;
 
   auto tag() const -> std::string { return tag_; }
+
+  auto attributes() const -> std::map<std::string, std::string> { return attributes_; }
 };
 
 class EndXmlTagElement final : public BinaryXmlElement {

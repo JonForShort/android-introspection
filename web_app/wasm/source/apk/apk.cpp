@@ -45,7 +45,7 @@ auto Apk::makeDebuggable() -> void {
     throw MissingAndroidManifestException(apkPath_);
   }
 
-  auto const contents = apkParser.getFileContents("AndroidManifest.xml");
+  auto const contents = apkParser.getFileContents(ANDROID_MANIFEST);
   if (contents.empty()) {
     LOGW("unable to read [%s]", apkPath_);
     throw MissingAndroidManifestException(apkPath_);
