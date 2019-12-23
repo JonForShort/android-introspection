@@ -35,6 +35,9 @@ using namespace ai;
 
 using ai::utils::formatString;
 
+using bytes = std::vector<std::byte>;
+using strings = std::vector<std::string>;
+
 //
 // Implementation used the following resources.
 //
@@ -71,14 +74,14 @@ struct BinaryXmlHeader {
   uint32_t stylesOffset;
 };
 
-template <typename T, typename U> auto readBytesAtIndex(std::vector<std::byte> const &data, U &index) {
+template <typename T, typename U> auto readBytesAtIndex(bytes const &data, U &index) {
   T value = {0};
   memcpy(&value, &data[index], sizeof(value));
   index += sizeof(value);
   return value;
 }
 
-auto handleAttributes(std::vector<std::byte> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> std::map<std::string, std::string> {
+auto handleAttributes(bytes const &contents, strings const &strings, uint64_t &contentsOffset) -> std::map<std::string, std::string> {
   std::map<std::string, std::string> attributes;
   auto const attributeMarker = readBytesAtIndex<uint32_t>(contents, contentsOffset);
   if (attributeMarker != XML_ATTRS_MARKER) {
@@ -159,8 +162,7 @@ auto handleAttributes(std::vector<std::byte> const &contents, std::vector<std::s
   return attributes;
 }
 
-auto handleStartElementTag(std::vector<std::byte> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset,
-                           BinaryXmlVisitor const &visitor) -> void {
+auto handleStartElementTag(bytes const &contents, strings const &strings, uint64_t &contentsOffset, BinaryXmlVisitor const &visitor) -> void {
   readBytesAtIndex<uint32_t>(contents, contentsOffset);
   readBytesAtIndex<uint32_t>(contents, contentsOffset);
 
@@ -174,11 +176,10 @@ auto handleStartElementTag(std::vector<std::byte> const &contents, std::vector<s
 
   LOGI("start tag [{}] namespace [{}]", string.c_str(), namespaceString.c_str());
 
-  visitor.visit(StartXmlTagElement(string, attributes));
+  StartXmlTagElement(string, attributes).accept(visitor);
 }
 
-auto handleEndElementTag(std::vector<std::byte> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset,
-                         BinaryXmlVisitor const &visitor) -> void {
+auto handleEndElementTag(bytes const &contents, strings const &strings, uint64_t &contentsOffset, BinaryXmlVisitor const &visitor) -> void {
   readBytesAtIndex<uint32_t>(contents, contentsOffset);
   readBytesAtIndex<uint32_t>(contents, contentsOffset);
 
@@ -190,10 +191,10 @@ auto handleEndElementTag(std::vector<std::byte> const &contents, std::vector<std
 
   LOGI("end tag [{}] namespace [{}]", string.c_str(), namespaceString.c_str());
 
-  visitor.visit(EndXmlTagElement(string));
+  EndXmlTagElement(string).accept(visitor);
 }
 
-auto handleCDataTag(std::vector<std::byte> const &contents, std::vector<std::string> const &strings, uint64_t &contentsOffset) -> void {
+auto handleCDataTag(bytes const &contents, strings const &strings, uint64_t &contentsOffset) -> void {
   readBytesAtIndex<uint32_t>(contents, contentsOffset);
   readBytesAtIndex<uint32_t>(contents, contentsOffset);
 
@@ -208,7 +209,7 @@ auto handleCDataTag(std::vector<std::byte> const &contents, std::vector<std::str
 
 } // namespace
 
-auto BinaryXml::readStrings() const -> std::vector<std::string> {
+auto BinaryXml::readStrings() const -> strings {
 
   std::vector<std::string> strings;
   auto xmlHeader = reinterpret_cast<BinaryXmlHeader const *>(content_.data());
@@ -275,7 +276,7 @@ auto BinaryXml::getXmlChunkOffset() const -> uint64_t {
 auto BinaryXml::traverseXml(BinaryXmlVisitor const &visitor) const -> void {
   auto const xmlChunkOffset = getXmlChunkOffset();
   if (xmlChunkOffset == 0) {
-    visitor.visit(InvalidXmlTagElement("chunk offset is zero"));
+    InvalidXmlTagElement("chunk offset is zero").accept(visitor);
     return;
   }
 

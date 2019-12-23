@@ -29,6 +29,23 @@
 
 namespace ai {
 
+class StartXmlTagElement;
+
+class EndXmlTagElement;
+
+class InvalidXmlTagElement;
+
+class BinaryXmlVisitor {
+public:
+  virtual ~BinaryXmlVisitor() = default;
+
+  virtual auto visit(StartXmlTagElement const &element) const -> void = 0;
+
+  virtual auto visit(EndXmlTagElement const &element) const -> void = 0;
+
+  virtual auto visit(InvalidXmlTagElement const &element) const -> void = 0;
+};
+
 class BinaryXmlElement {
 public:
   virtual ~BinaryXmlElement() = default;
@@ -47,6 +64,8 @@ public:
   auto tag() const -> std::string { return tag_; }
 
   auto attributes() const -> std::map<std::string, std::string> { return attributes_; }
+
+  auto accept(BinaryXmlVisitor const &visitor) const -> void { visitor.visit(*this); }
 };
 
 class EndXmlTagElement final : public BinaryXmlElement {
@@ -58,6 +77,8 @@ public:
   ~EndXmlTagElement() override = default;
 
   auto tag() const -> std::string { return tag_; }
+
+  auto accept(BinaryXmlVisitor const &visitor) const -> void { visitor.visit(*this); }
 };
 
 class InvalidXmlTagElement final : public BinaryXmlElement {
@@ -69,17 +90,8 @@ public:
   ~InvalidXmlTagElement() override = default;
 
   auto error() const -> std::string { return error_; }
-};
 
-class BinaryXmlVisitor {
-public:
-  virtual ~BinaryXmlVisitor() = default;
-
-  virtual auto visit(StartXmlTagElement const &element) const -> void = 0;
-
-  virtual auto visit(EndXmlTagElement const &element) const -> void = 0;
-
-  virtual auto visit(InvalidXmlTagElement const &element) const -> void = 0;
+  auto accept(BinaryXmlVisitor const &visitor) const -> void { visitor.visit(*this); }
 };
 
 } // namespace ai
