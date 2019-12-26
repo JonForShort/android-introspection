@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10.2)
 
-set(source apk.cpp binary_xml.cpp apk_parser.cpp)
+set(source apk.cpp binary_xml.cpp apk_parser.cpp zip_archiver.cpp)
 
 add_library(apk STATIC ${source})
 
