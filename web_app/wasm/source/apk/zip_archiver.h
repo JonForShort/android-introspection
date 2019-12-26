@@ -27,21 +27,19 @@
 #include <string>
 #include <vector>
 
-#include "zip_stream.h"
-
 namespace ai {
 
 class ZipArchiver final {
-  ZipStream const &stream_;
+  std::string const zipPath_;
 
 public:
-  ZipArchiver(ZipStream const &stream) : stream_(stream) {}
+  ZipArchiver(std::string const &zipPath) : zipPath_(zipPath) {}
 
   auto createArchive() -> void;
 
   auto deleteArchive() -> void;
 
-  auto addToArchive(std::string const &fileName, uint64_t fileSize, uint64_t modificationTime, bool isDirectory) -> void;
+  auto addFileToArchive(std::string const &fileName, std::string const &filePath) -> void;
 };
 
 } // namespace ai

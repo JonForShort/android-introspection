@@ -182,29 +182,5 @@ auto ApkParser::setFileContents(char const *szFileName, std::vector<std::byte> c
     }
   } else {
     LOGD("file name does not exist in zip file; szPathToApk=[%s] szFileName=[%s]", szPathToApk, szFileName);
-
-    mz_zip_file fileInfo = {};
-    fileInfo.creation_date = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    fileInfo.modified_date = fileInfo.creation_date;
-    fileInfo.accessed_date = fileInfo.creation_date;
-    fileInfo.uncompressed_size = static_cast<long>(content.size());
-    fileInfo.filename = szFileName;
-    fileInfo.filename_size = static_cast<uint16_t>(strlen(szFileName));
-    fileInfo.flag = MZ_ZIP_FLAG_UTF8;
-    // PKWARE .ZIP File Format Specification version 6.3.x
-    const uint16_t ZIP_SPECIFICATION_VERSION_CODE = 63;
-    fileInfo.version_madeby = MZ_HOST_SYSTEM_UNIX << 8 | ZIP_SPECIFICATION_VERSION_CODE;
-    // Compression options.
-    fileInfo.compression_method = MZ_COMPRESS_METHOD_DEFLATE;
-    fileInfo.zip64 = MZ_ZIP64_AUTO;
-
-    if (auto result = mz_zip_entry_write_open(zipWriter, &fileInfo, MZ_COMPRESS_LEVEL_DEFAULT, 0, nullptr); result != MZ_OK) {
-      LOGW("mz_zip_entry_write_open, result=[%d] szPathToApk=[%s] szFileName=[%s]", result, szPathToApk, szFileName);
-      return;
-    }
-    if (auto result = mz_zip_entry_write(zipWriter, &content[0], content.size()); result != MZ_OK) {
-      LOGW("mz_zip_entry_write, result=[%d] szPathToApk=[%s] szFileName=[%s]", result, szPathToApk, szFileName);
-      return;
-    }
   }
 }
