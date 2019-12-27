@@ -23,70 +23,14 @@
 //
 #include <cstdint>
 #include <mz.h>
-#include <mz_strm.h>
-#include <mz_zip.h>
-#include <mz_zip_rw.h>
-#include <zip.h>
 
 #include "utils/log.h"
 
 #include "apk_parser.h"
+#include "scoped_minizip.h"
 
 using namespace ai;
-
-namespace {
-
-struct ScopedUnzOpenFile {
-
-  explicit ScopedUnzOpenFile(const char *szFileName) : zip_(unzOpen(szFileName)) {}
-
-  ~ScopedUnzOpenFile() { unzClose(zip_); }
-
-  auto get() const -> unzFile { return zip_; }
-
-private:
-  unzFile zip_;
-};
-
-struct ScopedUnzOpenCurrentFile {
-
-  explicit ScopedUnzOpenCurrentFile(unzFile const zipFile) : zipFile_(zipFile), result_(unzOpenCurrentFile(zipFile)) {}
-
-  ~ScopedUnzOpenCurrentFile() {
-    if (result_ == MZ_OK) {
-      unzCloseCurrentFile(zipFile_);
-    }
-  }
-
-  auto result() const -> int { return result_; }
-
-private:
-  unzFile const zipFile_;
-
-  int const result_;
-};
-
-struct ScopedMzZipWriterDelete {
-
-  explicit ScopedMzZipWriterDelete(void *handle) : handle_(handle) {}
-
-  ~ScopedMzZipWriterDelete() { mz_zip_writer_delete(&handle_); }
-
-private:
-  void *handle_;
-};
-
-struct ScopedMzZipEntryClose {
-
-  explicit ScopedMzZipEntryClose(void *handle) : handle_(handle) {}
-
-  ~ScopedMzZipEntryClose() { mz_zip_entry_close(&handle_); }
-
-private:
-  void *handle_;
-};
-
-} // namespace
+using namespace ai::minizip;
 
 auto ApkParser::getFileNames() const -> std::vector<std::string> {
   std::vector<std::string> fileNames;

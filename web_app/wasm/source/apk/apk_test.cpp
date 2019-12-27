@@ -22,6 +22,7 @@
 // SOFTWARE.
 //
 #include <filesystem>
+#include <fstream>
 #include <gtest/gtest.h>
 #include <memory>
 #include <string>
@@ -29,6 +30,7 @@
 #include "apk/apk.h"
 #include "apk_analyzer/apk_analyzer.h"
 #include "utils/log.h"
+#include "zip_archiver.h"
 
 #include "apk_parser.h"
 
@@ -132,6 +134,21 @@ TEST(ApkParser, AddFileToApk_FileIsAddedSuccessfully) {
   auto fileNames = apkParser.getFileNames();
   auto maybeTestFile = std::find(fileNames.begin(), fileNames.end(), "test_file");
   EXPECT_TRUE(maybeTestFile != fileNames.end());
+}
+
+TEST(ZipArchiver, AddFileToZip_FileIsAddedSuccessfully) {
+  auto testZipFilePath = fs::temp_directory_path() / "AddFileToZip_FileIsAddedSuccessfully";
+  auto testZipFileStream = std::ofstream(testZipFilePath.string());
+  testZipFileStream << "test";
+  testZipFileStream.close();
+
+  auto zipArchiver = ai::ZipArchiver(testZipFilePath);
+
+  zipArchiver.createArchive();
+  EXPECT_TRUE(fs::exists(testZipFilePath));
+
+  zipArchiver.deleteArchive();
+  EXPECT_FALSE(fs::exists(testZipFilePath));
 }
 
 int main(int argc, char **argv) {
