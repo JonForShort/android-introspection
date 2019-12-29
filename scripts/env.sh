@@ -11,15 +11,18 @@ ai_root_dir()
 
 ai_setup_environment()
 {
-    if [[ -z "${AI_ANDROID_HOME}" ]]; then
-	    if [[ -z "${ANDROID_HOME}" ]]; then
-	      export AI_ANDROID_HOME=${ROOT_DIR}/external/android/sdk
+    if [[ -z "${AI_ANDROID_HOME}" ]]
+    then
+        if [[ -z "${ANDROID_HOME}" ]]
+        then
+	        export AI_ANDROID_HOME=${ROOT_DIR}/external/android/sdk
 	    else
-	      export AI_ANDROID_HOME=${ANDROID_HOME}
-	    fi
+            export AI_ANDROID_HOME=${ANDROID_HOME}
+        fi
     fi
 
-    if [[ -z "${AI_TESTS_DIR}" ]]; then
+    if [[ -z "${AI_TESTS_DIR}" ]]
+    then
         export AI_TESTS_DIR=${ROOT_DIR}/web_app/wasm/test
     fi
 }
