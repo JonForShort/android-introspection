@@ -15,7 +15,7 @@ ai_setup_environment()
     then
         if [[ -z "${ANDROID_HOME}" ]]
         then
-	    export AI_ANDROID_HOME=${ROOT_DIR}/external/android/sdk
+            export AI_ANDROID_HOME=${ROOT_DIR}/external/android/sdk
         else
             export AI_ANDROID_HOME=${ANDROID_HOME}
         fi
