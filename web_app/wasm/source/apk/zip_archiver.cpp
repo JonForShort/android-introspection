@@ -21,7 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#include "zip_archiver.h"
+#include <filesystem>
+
 #include "mz.h"
 #include "mz_strm.h"
 #include "mz_zip.h"
@@ -29,27 +30,13 @@
 #include "scoped_minizip.h"
 #include "utils/log.h"
 #include "utils/utils.h"
-
-#include <filesystem>
+#include "zip_archiver.h"
 
 using namespace ai;
 
-namespace {
+using ai::minizip::ScopedMzStreamClose;
 
-auto makeZipFileInfo(std::string const &fileName, uintmax_t const fileSize, time_t const currentTime) -> mz_zip_file {
-  mz_zip_file fileInfo = {};
-  fileInfo.creation_date = currentTime;
-  fileInfo.modified_date = fileInfo.creation_date;
-  fileInfo.accessed_date = fileInfo.creation_date;
-  fileInfo.uncompressed_size = static_cast<long>(fileSize);
-  fileInfo.filename = fileName.c_str();
-  fileInfo.filename_size = static_cast<uint16_t>(fileName.size());
-  fileInfo.flag = MZ_ZIP_FLAG_UTF8;
-  fileInfo.version_madeby = MZ_HOST_SYSTEM_UNIX << 8 | 63;
-  fileInfo.compression_method = MZ_COMPRESS_METHOD_DEFLATE;
-  fileInfo.zip64 = MZ_ZIP64_AUTO;
-  return fileInfo;
-}
+namespace {
 
 class ZipException : public std::logic_error {
   int64_t const errorCode_;
@@ -60,58 +47,61 @@ public:
   auto errorCode() -> int64_t { return errorCode_; }
 };
 
+auto getZipHandle(std::string const &archivePath) -> void * {
+  void *handle = nullptr;
+  if (auto result = mz_stream_open(handle, archivePath.c_str(), MZ_OPEN_MODE_READWRITE | MZ_OPEN_MODE_CREATE); result != MZ_OK) {
+    LOGW("mz_stream_open, path [%s]", archivePath.c_str());
+    throw ZipException("mz_stream_open", result);
+  }
+  return handle;
+}
+
 } // namespace
 
 auto ZipArchiver::createArchive() const -> void {
-  LOGD("createArchive, creating archive [%s]", zipPath_);
-  void *archiveStream = nullptr;
-  if (auto result = mz_stream_open(archiveStream, zipPath_.data(), MZ_OPEN_MODE_READWRITE | MZ_OPEN_MODE_CREATE); result != MZ_OK) {
-    LOGW("mz_stream_open, unable to create archive [%s]", zipPath_.c_str());
-    throw ZipException("mz_stream_open", result);
-  }
-  auto scopedStreamClose = ai::minizip::ScopedMzStreamClose(archiveStream);
+  LOGD("createArchive, path [%s]", zipPath_);
+  auto *handle = getZipHandle(zipPath_);
+  auto scopedStreamClose = ScopedMzStreamClose(handle);
 }
 
 auto ZipArchiver::deleteArchive() const -> void {
-  LOGD("deleteArchive, deleting archive [%s]", zipPath_);
+  LOGD("deleteArchive, path [%s]", zipPath_);
   std::filesystem::remove(zipPath_);
 }
 
 auto ZipArchiver::createFile(std::string_view const fileName, std::string_view const filePath) const -> void {
-  using std::chrono::system_clock;
-  using std::filesystem::file_size;
-
+  LOGD("createFile, creating file [%s]", filePath);
+  auto *handle = getZipHandle(zipPath_);
+  auto scopedStreamClose = ScopedMzStreamClose(handle);
   auto fileNameAsString = std::string(fileName);
-  auto fileInfo = makeZipFileInfo(fileNameAsString, file_size(filePath), system_clock::to_time_t(system_clock::now()));
-  auto *archiveStream = static_cast<void *>(nullptr);
-  if (auto result = mz_stream_open(archiveStream, zipPath_.data(), MZ_OPEN_MODE_WRITE); result != MZ_OK) {
-    LOGW("mz_stream_open, unable to open stream, result=[%d] zipPath[%s]", result, zipPath_.c_str());
+  auto filePathAsString = std::string(filePath);
+  if (auto result = mz_zip_writer_add_file(handle, filePathAsString.c_str(), fileNameAsString.c_str()); result != MZ_OK) {
+    LOGW("mz_zip_writer_add_file, result [%d] zipPath [%s] fileName [%s] filePath [%s]", result, zipPath_.c_str(), fileName, filePath);
     throw ZipException("mz_stream_open", result);
-  }
-  auto scopedStreamClose = ai::minizip::ScopedMzStreamClose(archiveStream);
-  if (auto result = mz_zip_entry_write_open(archiveStream, &fileInfo, MZ_COMPRESS_LEVEL_DEFAULT, 0, nullptr); result != MZ_OK) {
-    LOGW("mz_zip_entry_write_open, result=[%d] zipPath=[%s] fileName=[%s]", result, zipPath_.c_str(), fileNameAsString.c_str());
-    throw ZipException("mz_zip_entry_write_open", result);
-  }
-  auto const content = std::vector<std::byte>();
-  if (auto result = mz_zip_entry_write(archiveStream, &content[0], static_cast<int32_t>(content.size())); result != MZ_OK) {
-    LOGW("mz_zip_entry_write, result=[%d] zipPath=[%s] fileName=[%s]", result, zipPath_.c_str(), fileNameAsString.c_str());
-    throw ZipException("mz_zip_entry_write", result);
   }
 }
 
 auto ZipArchiver::createDirectory(std::string_view const directoryPath) const -> void {
-  LOGD("createDirectory, creating directory [%s]", directoryPath);
-  (void)directoryPath;
+  LOGD("createDirectory, path [%s]", directoryPath);
+  auto *handle = getZipHandle(zipPath_);
+  auto scopedStreamClose = ScopedMzStreamClose(handle);
+  auto directoryPathAsString = std::string(directoryPath);
+  if (auto result = mz_zip_writer_add_path(handle, directoryPathAsString.c_str(), nullptr, 1, 1); result != MZ_OK) {
+    LOGW("mz_zip_writer_add_path, result [%d] zipPath [%s] directoryPath [%s]", result, zipPath_.c_str(), directoryPath);
+    throw ZipException("mz_stream_open", result);
+  }
 }
 
 auto ZipArchiver::deletePath(std::string_view const path) const -> void {
-  LOGD("deletePath, deleting path [%s]", path);
+  LOGD("deletePath, path [%s]", path);
   (void)path;
 }
 
 auto ZipArchiver::containsPath(std::string_view const path) const -> bool {
-  LOGD("containsPath, checking for path [%s]", path);
-  (void)path;
-  return true;
+  LOGD("containsPath, path [%s]", path);
+  auto *handle = getZipHandle(zipPath_);
+  auto scopedStreamClose = ScopedMzStreamClose(handle);
+  auto pathAsString = std::string(path);
+  auto result = mz_zip_reader_locate_entry(handle, pathAsString.c_str(), 0);
+  return result == MZ_OK;
 }

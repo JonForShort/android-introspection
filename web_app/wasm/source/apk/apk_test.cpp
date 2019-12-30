@@ -136,19 +136,59 @@ TEST(ApkParser, AddFileToApk_FileIsAddedSuccessfully) {
   EXPECT_TRUE(maybeTestFile != fileNames.end());
 }
 
-TEST(ZipArchiver, AddFileToZip_FileIsAddedSuccessfully) {
-  auto testZipFilePath = fs::temp_directory_path() / "AddFileToZip_FileIsAddedSuccessfully";
-  auto testZipFileStream = std::ofstream(testZipFilePath.string());
-  testZipFileStream << "test";
-  testZipFileStream.close();
+TEST(ZipArchiver, createArchive_ArchiveIsCreatedSuccessfully) {
+  auto testFilePath = fs::temp_directory_path() / "createArchive_ArchiveIsCreatedSuccessfully";
+  fs::remove(testFilePath);
 
-  auto zipArchiver = ai::ZipArchiver(testZipFilePath.string());
+  auto testFileStream = std::ofstream(testFilePath.string());
+  testFileStream << "test";
+  testFileStream.close();
+
+  auto testZipPath = testFilePath.string() + ".zip";
+  auto zipArchiver = ai::ZipArchiver(testZipPath);
+  fs::remove(testZipPath);
 
   zipArchiver.createArchive();
-  EXPECT_TRUE(fs::exists(testZipFilePath));
+  EXPECT_TRUE(fs::exists(testZipPath));
+}
+
+TEST(ZipArchiver, deleteArchive_ArchiveIsDeletedSuccessfully) {
+  auto testFilePath = fs::temp_directory_path() / "deleteArchive_ArchiveIsDeletedSuccessfully";
+  fs::remove(testFilePath);
+
+  auto testFileStream = std::ofstream(testFilePath.string());
+  testFileStream << "test";
+  testFileStream.close();
+
+  auto testZipPath = testFilePath.string() + ".zip";
+  auto zipArchiver = ai::ZipArchiver(testZipPath);
+  fs::remove(testZipPath);
+
+  zipArchiver.createArchive();
+  EXPECT_TRUE(fs::exists(testZipPath));
 
   zipArchiver.deleteArchive();
-  EXPECT_FALSE(fs::exists(testZipFilePath));
+  EXPECT_FALSE(fs::exists(testZipPath));
+}
+
+TEST(ZipArchiver, addFile_FileIsAddedSuccessfully) {
+  auto testFileName = "addFile_FileIsAddedSuccessfully";
+  auto testFilePath = fs::temp_directory_path() / testFileName;
+  fs::remove(testFilePath);
+
+  auto testFileStream = std::ofstream(testFilePath.string());
+  testFileStream << "test";
+  testFileStream.close();
+
+  auto testZipPath = testFilePath.string() + ".zip";
+  auto zipArchiver = ai::ZipArchiver(testZipPath);
+  fs::remove(testZipPath);
+
+  zipArchiver.createArchive();
+  EXPECT_TRUE(fs::exists(testZipPath));
+
+  zipArchiver.createFile(testFileName, testFilePath.c_str());
+  EXPECT_TRUE(zipArchiver.containsPath(testFileName));
 }
 
 int main(int argc, char **argv) {
