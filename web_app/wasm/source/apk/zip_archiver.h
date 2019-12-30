@@ -25,7 +25,7 @@
 #define ANDROID_INTROSPECTION_APK_ZIP_ARCHIVER_H_
 
 #include <string>
-#include <vector>
+#include <string_view>
 
 namespace ai {
 
@@ -33,13 +33,19 @@ class ZipArchiver final {
   std::string const zipPath_;
 
 public:
-  ZipArchiver(std::string const &zipPath) : zipPath_(zipPath) {}
+  ZipArchiver(std::string_view zipPath) : zipPath_(zipPath) {}
 
-  auto createArchive() -> void;
+  auto createArchive() const -> void;
 
-  auto deleteArchive() -> void;
+  auto deleteArchive() const -> void;
 
-  auto addFileToArchive(std::string const &fileName, std::string const &filePath) -> void;
+  auto createFile(std::string_view fileName, std::string_view filePath) const -> void;
+
+  auto createDirectory(std::string_view directoryPath) const -> void;
+
+  auto deletePath(std::string_view path) const -> void;
+
+  auto containsPath(std::string_view path) const -> bool;
 };
 
 } // namespace ai

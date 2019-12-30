@@ -33,7 +33,7 @@ using namespace std;
 
 namespace ai::utils {
 
-auto fileExists(const char *path) -> bool {
+inline auto fileExists(const char *path) -> bool {
   ifstream infile(path);
   return infile.good();
 }

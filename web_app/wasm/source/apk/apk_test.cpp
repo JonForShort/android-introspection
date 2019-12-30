@@ -142,7 +142,7 @@ TEST(ZipArchiver, AddFileToZip_FileIsAddedSuccessfully) {
   testZipFileStream << "test";
   testZipFileStream.close();
 
-  auto zipArchiver = ai::ZipArchiver(testZipFilePath);
+  auto zipArchiver = ai::ZipArchiver(testZipFilePath.string());
 
   zipArchiver.createArchive();
   EXPECT_TRUE(fs::exists(testZipFilePath));
