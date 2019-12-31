@@ -24,6 +24,7 @@
 #ifndef ANDROID_INTROSPECTION_APK_ZIP_ARCHIVER_H_
 #define ANDROID_INTROSPECTION_APK_ZIP_ARCHIVER_H_
 
+#include <istream>
 #include <string>
 #include <string_view>
 
@@ -35,15 +36,7 @@ class ZipArchiver final {
 public:
   ZipArchiver(std::string_view zipPath) : zipPath_(zipPath) {}
 
-  auto createArchive() const -> void;
-
-  auto deleteArchive() const -> void;
-
-  auto createFile(std::string_view fileName, std::string_view filePath) const -> void;
-
-  auto createDirectory(std::string_view directoryPath) const -> void;
-
-  auto deletePath(std::string_view path) const -> void;
+  auto addPath(std::istream &source, std::string_view path) const -> void;
 
   auto containsPath(std::string_view path) const -> bool;
 };

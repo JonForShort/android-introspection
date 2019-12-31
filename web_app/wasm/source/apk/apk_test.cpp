@@ -136,8 +136,8 @@ TEST(ApkParser, AddFileToApk_FileIsAddedSuccessfully) {
   EXPECT_TRUE(maybeTestFile != fileNames.end());
 }
 
-TEST(ZipArchiver, createArchive_ArchiveIsCreatedSuccessfully) {
-  auto testFilePath = fs::temp_directory_path() / "createArchive_ArchiveIsCreatedSuccessfully";
+TEST(ZipArchiver, addPath_PathIsAddedSuccessfully) {
+  auto testFilePath = fs::temp_directory_path() / "addPath_PathIsAddedSuccessfully";
   fs::remove(testFilePath);
 
   auto testFileStream = std::ofstream(testFilePath.string());
@@ -148,47 +148,10 @@ TEST(ZipArchiver, createArchive_ArchiveIsCreatedSuccessfully) {
   auto zipArchiver = ai::ZipArchiver(testZipPath);
   fs::remove(testZipPath);
 
-  zipArchiver.createArchive();
+  std::ifstream testInputFileStream(testFilePath.string());
+  zipArchiver.addPath(testInputFileStream, "test");
   EXPECT_TRUE(fs::exists(testZipPath));
-}
-
-TEST(ZipArchiver, deleteArchive_ArchiveIsDeletedSuccessfully) {
-  auto testFilePath = fs::temp_directory_path() / "deleteArchive_ArchiveIsDeletedSuccessfully";
-  fs::remove(testFilePath);
-
-  auto testFileStream = std::ofstream(testFilePath.string());
-  testFileStream << "test";
-  testFileStream.close();
-
-  auto testZipPath = testFilePath.string() + ".zip";
-  auto zipArchiver = ai::ZipArchiver(testZipPath);
-  fs::remove(testZipPath);
-
-  zipArchiver.createArchive();
-  EXPECT_TRUE(fs::exists(testZipPath));
-
-  zipArchiver.deleteArchive();
-  EXPECT_FALSE(fs::exists(testZipPath));
-}
-
-TEST(ZipArchiver, addFile_FileIsAddedSuccessfully) {
-  auto testFileName = "addFile_FileIsAddedSuccessfully";
-  auto testFilePath = fs::temp_directory_path() / testFileName;
-  fs::remove(testFilePath);
-
-  auto testFileStream = std::ofstream(testFilePath.string());
-  testFileStream << "test";
-  testFileStream.close();
-
-  auto testZipPath = testFilePath.string() + ".zip";
-  auto zipArchiver = ai::ZipArchiver(testZipPath);
-  fs::remove(testZipPath);
-
-  zipArchiver.createArchive();
-  EXPECT_TRUE(fs::exists(testZipPath));
-
-  zipArchiver.createFile(testFileName, testFilePath.c_str());
-  EXPECT_TRUE(zipArchiver.containsPath(testFileName));
+  EXPECT_TRUE(zipArchiver.containsPath("test"));
 }
 
 int main(int argc, char **argv) {

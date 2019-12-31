@@ -31,9 +31,21 @@
 
 namespace ai::minizip {
 
+struct ScopedZipOpen {
+
+  explicit ScopedZipOpen(char const *const szFileName, int const mode) : zip_(zipOpen(szFileName, mode)) {}
+
+  ~ScopedZipOpen() { zipClose(zip_, nullptr); }
+
+  auto get() const -> zipFile { return zip_; }
+
+private:
+  zipFile const zip_;
+};
+
 struct ScopedUnzOpenFile {
 
-  explicit ScopedUnzOpenFile(const char *szFileName) : zip_(unzOpen(szFileName)) {}
+  explicit ScopedUnzOpenFile(char const *const szFileName) : zip_(unzOpen(szFileName)) {}
 
   ~ScopedUnzOpenFile() { unzClose(zip_); }
 
