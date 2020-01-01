@@ -36,9 +36,11 @@ class ZipArchiver final {
 public:
   ZipArchiver(std::string_view zipPath) : zipPath_(zipPath) {}
 
-  auto addPath(std::istream &source, std::string_view path) const -> void;
+  auto add(std::istream &source, std::string_view path) const -> void;
 
-  auto containsPath(std::string_view path) const -> bool;
+  auto contains(std::string_view path) const -> bool;
+
+  auto extractTo(std::string_view path) const -> void;
 };
 
 } // namespace ai

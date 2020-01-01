@@ -22,6 +22,7 @@
 // SOFTWARE.
 //
 #include <filesystem>
+#include <memory>
 
 #include "scoped_minizip.h"
 #include "utils/log.h"
@@ -32,31 +33,68 @@
 using namespace ai;
 using namespace ai::minizip;
 
-auto ZipArchiver::addPath(std::istream &source, std::string_view path) const -> void {
-  LOGD("addPath, path [%s]", path);
-  auto const fileExists = std::filesystem::exists(zipPath_);
-  auto const zipMode = fileExists ? APPEND_STATUS_ADDINZIP : APPEND_STATUS_CREATE;
-  auto const zipFile = ScopedZipOpen(zipPath_.c_str(), zipMode);
-  auto const pathString = std::string(path);
-  if (auto result = zipOpenNewFileInZip_64(zipFile.get(), pathString.c_str(), nullptr, nullptr, 0, nullptr, 0, nullptr, 0, 0, false); result == ZIP_OK) {
-    std::vector<char> readBuffer;
-    auto constexpr readBufferSize = 0xFF;
-    readBuffer.resize(readBufferSize);
-    size_t readCount = 0;
+namespace {
+
+auto openZipFile(std::string const &path) {
+  auto fileExists = std::filesystem::exists(path);
+  auto zipMode = fileExists ? APPEND_STATUS_ADDINZIP : APPEND_STATUS_CREATE;
+  auto openedZipFile = std::make_unique<ScopedZipOpen>(path.c_str(), zipMode);
+  if (openedZipFile->get() == nullptr) {
+    throw std::logic_error("unable to open zip file");
+  }
+  return openedZipFile;
+}
+
+auto writeStreamToOpenZipFile(std::istream &source, zipFile const zipFile) {
+  auto result = ZIP_OK;
+  std::vector<char> readBuffer;
+  readBuffer.resize(BUFSIZ);
+  size_t readCount = 0;
+  do {
+    source.read(readBuffer.data(), static_cast<uint32_t>(readBuffer.size()));
+    readCount = static_cast<size_t>(source.gcount());
+    if (readCount < readBuffer.size() && !source.eof() && !source.good()) {
+      result = ZIP_ERRNO;
+    } else if (readCount > 0) {
+      result = zipWriteInFileInZip(zipFile, readBuffer.data(), static_cast<uint32_t>(readCount));
+    }
+  } while ((result == ZIP_OK) && (readCount > 0));
+}
+
+auto getAllEntriesInZipFile(std::string const &path) {
+  auto entries = std::vector<unz_file_info64>();
+  auto openedZipFile = ScopedUnzOpenFile(path.c_str());
+  if (openedZipFile.get() == nullptr) {
+    LOGW("getAllEntriesInZipFile, path [%s]", path.c_str());
+    return entries;
+  }
+  if (auto result = unzGoToFirstFile(openedZipFile.get()); result == UNZ_OK) {
     do {
-      source.read(readBuffer.data(), static_cast<uint32_t>(readBuffer.size()));
-      readCount = static_cast<size_t>(source.gcount());
-      if (readCount < readBuffer.size() && !source.eof() && !source.good()) {
-        result = ZIP_ERRNO;
-      } else if (readCount > 0) {
-        result = zipWriteInFileInZip(zipFile.get(), readBuffer.data(), static_cast<uint32_t>(readCount));
+      unz_file_info64 fileInfo = {};
+      char fileNameInZip[256] = {};
+      result = unzGetCurrentFileInfo64(openedZipFile.get(), &fileInfo, fileNameInZip, sizeof(fileNameInZip), nullptr, 0, nullptr, 0);
+      if (result == UNZ_OK) {
+        entries.push_back(fileInfo);
       }
-    } while ((result == ZIP_OK) && (readCount > 0));
-    zipCloseFileInZip64(zipFile.get());
+      result = unzGoToNextFile(openedZipFile.get());
+    } while (UNZ_OK == result);
+  }
+  return entries;
+}
+
+} // namespace
+
+auto ZipArchiver::add(std::istream &source, std::string_view const path) const -> void {
+  LOGD("addPath, path [%s]", path);
+  auto const zipFile = openZipFile(zipPath_);
+  auto const pathString = std::string(path);
+  if (auto result = zipOpenNewFileInZip_64(zipFile->get(), pathString.c_str(), nullptr, nullptr, 0, nullptr, 0, nullptr, 0, 0, false); result == ZIP_OK) {
+    ScopedZipCloseFileInZip(zipFile->get());
+    writeStreamToOpenZipFile(source, zipFile->get());
   }
 }
 
-auto ZipArchiver::containsPath(std::string_view path) const -> bool {
+auto ZipArchiver::contains(std::string_view path) const -> bool {
   LOGD("containsPath, path [%s]", path);
   if (auto const zipFile = ScopedUnzOpenFile(zipPath_.c_str()); zipFile.get() != nullptr) {
     auto const pathString = std::string(path);
@@ -64,4 +102,14 @@ auto ZipArchiver::containsPath(std::string_view path) const -> bool {
   } else {
     return false;
   }
+}
+
+auto ZipArchiver::extractTo(std::string_view path) const -> void {
+  LOGD("extractTo, path [%s]", path);
+  using namespace std::filesystem;
+  auto const isPathValid = is_directory(path) or !exists(path);
+  if (!isPathValid) {
+    throw std::logic_error("path must be a directory or not exists");
+  }
+  auto const entries = getAllEntriesInZipFile(zipPath_);
 }

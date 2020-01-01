@@ -35,12 +35,26 @@ struct ScopedZipOpen {
 
   explicit ScopedZipOpen(char const *const szFileName, int const mode) : zip_(zipOpen(szFileName, mode)) {}
 
-  ~ScopedZipOpen() { zipClose(zip_, nullptr); }
+  ~ScopedZipOpen() {
+    if (zip_ != nullptr) {
+      zipClose(zip_, nullptr);
+    }
+  }
 
   auto get() const -> zipFile { return zip_; }
 
 private:
   zipFile const zip_;
+};
+
+struct ScopedZipCloseFileInZip {
+
+  explicit ScopedZipCloseFileInZip(zipFile const zipFile) : zipFile_(zipFile) {}
+
+  ~ScopedZipCloseFileInZip() { zipCloseFileInZip(zipFile_); }
+
+private:
+  zipFile const zipFile_;
 };
 
 struct ScopedUnzOpenFile {
