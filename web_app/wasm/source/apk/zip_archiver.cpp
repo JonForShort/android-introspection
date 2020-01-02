@@ -89,7 +89,7 @@ auto ZipArchiver::add(std::istream &source, std::string_view const path) const -
   auto const zipFile = openZipFile(zipPath_);
   auto const pathString = std::string(path);
   if (auto result = zipOpenNewFileInZip_64(zipFile->get(), pathString.c_str(), nullptr, nullptr, 0, nullptr, 0, nullptr, 0, 0, false); result == ZIP_OK) {
-    ScopedZipCloseFileInZip(zipFile->get());
+    auto scopedZipCloseFileInZip = ScopedZipCloseFileInZip(zipFile->get());
     writeStreamToOpenZipFile(source, zipFile->get());
   }
 }

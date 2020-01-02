@@ -149,9 +149,14 @@ TEST(ZipArchiver, addPath_PathIsAddedSuccessfully) {
   fs::remove(testZipPath);
 
   std::ifstream testInputFileStream(testFilePath.string());
-  zipArchiver.addPath(testInputFileStream, "test");
+  zipArchiver.add(testInputFileStream, "test");
   EXPECT_TRUE(fs::exists(testZipPath));
-  EXPECT_TRUE(zipArchiver.containsPath("test"));
+  EXPECT_TRUE(zipArchiver.contains("test"));
+
+  auto testExtractPath = fs::temp_directory_path() / "addPath_PathIsAddedSuccessfully_dir";
+  zipArchiver.extractTo(testExtractPath.string());
+  EXPECT_TRUE(fs::exists(testExtractPath));
+  EXPECT_TRUE(fs::exists(testExtractPath / "test"));
 }
 
 int main(int argc, char **argv) {
