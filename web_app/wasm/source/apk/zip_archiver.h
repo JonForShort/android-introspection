@@ -40,7 +40,9 @@ public:
 
   auto contains(std::string_view path) const -> bool;
 
-  auto extractTo(std::string_view path) const -> void;
+  auto extractAll(std::string_view path) const -> void;
+
+  auto extract(std::string_view fileToExtract, std::string_view path) const -> void;
 };
 
 } // namespace ai
