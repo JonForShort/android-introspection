@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright 2019
+// Copyright 2019-2020
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -85,7 +85,7 @@ auto getAllEntriesInZipFile(std::string const &path) {
 } // namespace
 
 auto ZipArchiver::add(std::istream &source, std::string_view const path) const -> void {
-  LOGD("addPath, path [%s]", path);
+  LOGD("add, path [%s]", path);
   auto const zipFile = openZipFile(zipPath_);
   auto const pathString = std::string(path);
   if (auto result = zipOpenNewFileInZip_64(zipFile->get(), pathString.c_str(), nullptr, nullptr, 0, nullptr, 0, nullptr, 0, 0, false); result == ZIP_OK) {
@@ -95,7 +95,7 @@ auto ZipArchiver::add(std::istream &source, std::string_view const path) const -
 }
 
 auto ZipArchiver::contains(std::string_view path) const -> bool {
-  LOGD("containsPath, path [%s]", path);
+  LOGD("contains, path [%s]", path);
   if (auto const zipFile = ScopedUnzOpenFile(zipPath_.c_str()); zipFile.get() != nullptr) {
     auto const pathString = std::string(path);
     return unzLocateFile(zipFile.get(), pathString.c_str(), nullptr) == UNZ_OK;
@@ -109,7 +109,7 @@ auto ZipArchiver::extractAll(std::string_view path) const -> void {
   using namespace std::filesystem;
   auto const isPathValid = is_directory(path) or !exists(path);
   if (!isPathValid) {
-    throw std::logic_error("path must be a directory or not exists");
+    throw std::logic_error("path must be a directory or must not exist");
   }
   auto const entries = getAllEntriesInZipFile(zipPath_);
 }
@@ -119,7 +119,7 @@ auto ZipArchiver::extract(std::string_view fileToExtract, std::string_view path)
   using namespace std::filesystem;
   auto const isPathValid = is_regular_file(path) or !exists(path);
   if (!isPathValid) {
-    throw std::logic_error("path must be a file or not exists");
+    throw std::logic_error("path must be a file or must not exist");
   }
   auto const entries = getAllEntriesInZipFile(zipPath_);
   auto const fileExistsInZip = std::find(entries.cbegin(), entries.cend(), fileToExtract) != entries.cend();
