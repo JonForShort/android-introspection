@@ -23,6 +23,7 @@
 //
 #include <filesystem>
 #include <memory>
+#include <utility>
 
 #include "scoped_minizip.h"
 #include "utils/log.h"
@@ -62,7 +63,7 @@ auto writeStreamToOpenZipFile(std::istream &source, zipFile const zipFile) {
 }
 
 auto getAllEntriesInZipFile(std::string const &path) {
-  auto entries = std::vector<unz_file_info64>();
+  auto entries = std::vector<std::pair<std::string, unz_file_info64>>();
   auto openedZipFile = ScopedUnzOpenFile(path.c_str());
   if (openedZipFile.get() == nullptr) {
     LOGW("getAllEntriesInZipFile, path [%s]", path.c_str());
@@ -74,7 +75,7 @@ auto getAllEntriesInZipFile(std::string const &path) {
       char fileNameInZip[256] = {};
       result = unzGetCurrentFileInfo64(openedZipFile.get(), &fileInfo, fileNameInZip, sizeof(fileNameInZip), nullptr, 0, nullptr, 0);
       if (result == UNZ_OK) {
-        entries.push_back(fileInfo);
+        entries.push_back(std::make_pair(std::string(fileNameInZip), fileInfo));
       }
       result = unzGoToNextFile(openedZipFile.get());
     } while (UNZ_OK == result);
@@ -112,6 +113,9 @@ auto ZipArchiver::extractAll(std::string_view path) const -> void {
     throw std::logic_error("path must be a directory or must not exist");
   }
   auto const entries = getAllEntriesInZipFile(zipPath_);
+  for (auto const &entry : entries) {
+    extract(entry.first, path);
+  }
 }
 
 auto ZipArchiver::extract(std::string_view pathToExtract, std::string_view path) const -> void {
@@ -125,5 +129,12 @@ auto ZipArchiver::extract(std::string_view pathToExtract, std::string_view path)
   auto const pathExistsInZip = std::find(entries.cbegin(), entries.cend(), pathToExtract) != entries.cend();
   if (!pathExistsInZip) {
     throw std::logic_error("path does not exist in archive");
+  }
+  if (auto const zipFile = ScopedUnzOpenFile(zipPath_.c_str()); zipFile.get() == nullptr) {
+    throw std::logic_error("archive does not exist");
+  } else {
+    auto const pathString = std::string(path);
+    if (auto const result = unzLocateFile(zipFile.get(), pathString.c_str(), nullptr); result == UNZ_OK) {
+    }
   }
 }
