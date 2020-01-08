@@ -114,16 +114,16 @@ auto ZipArchiver::extractAll(std::string_view path) const -> void {
   auto const entries = getAllEntriesInZipFile(zipPath_);
 }
 
-auto ZipArchiver::extract(std::string_view fileToExtract, std::string_view path) const -> void {
-  LOGD("extract, fileToExtract [%s] path [%s]", fileToExtract, path);
+auto ZipArchiver::extract(std::string_view pathToExtract, std::string_view path) const -> void {
+  LOGD("extract, pathToExtract [%s] path [%s]", pathToExtract, path);
   using namespace std::filesystem;
-  auto const isPathValid = is_regular_file(path) or !exists(path);
+  auto const isPathValid = is_directory(path) or !exists(path);
   if (!isPathValid) {
-    throw std::logic_error("path must be a file or must not exist");
+    throw std::logic_error("path must be a directory or must not exist");
   }
   auto const entries = getAllEntriesInZipFile(zipPath_);
-  auto const fileExistsInZip = std::find(entries.cbegin(), entries.cend(), fileToExtract) != entries.cend();
-  if (fileExistsInZip) {
-    LOGD("extract, file exists in archive");
+  auto const pathExistsInZip = std::find(entries.cbegin(), entries.cend(), pathToExtract) != entries.cend();
+  if (!pathExistsInZip) {
+    throw std::logic_error("path does not exist in archive");
   }
 }
