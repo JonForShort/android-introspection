@@ -134,7 +134,8 @@ auto ZipArchiver::extract(std::string_view pathToExtract, std::string_view path)
     throw std::logic_error("archive does not exist");
   } else {
     auto const pathString = std::string(path);
-    if (auto const result = unzLocateFile(zipFile.get(), pathString.c_str(), nullptr); result == UNZ_OK) {
+    if (auto const result = unzLocateFile(zipFile.get(), pathString.c_str(), nullptr); result != UNZ_OK) {
+      throw std::logic_error("path does not exist in archive");
     }
   }
 }
