@@ -34,9 +34,11 @@ namespace {
 
 static constexpr char const *const ANDROID_MANIFEST = "AndroidManifest.xml";
 
-}
+static constexpr char const *const ANDROID_MANIFEST_TAG_APPLICATION = "application";
 
-auto Apk::makeDebuggable() -> void {
+} // namespace
+
+auto Apk::makeDebuggable() const -> void {
   auto const apkParser = ai::ApkParser(apkPath_);
   auto const fileNames = apkParser.getFileNames();
   auto const missingAndroidManifest = std::find(fileNames.cbegin(), fileNames.cend(), ANDROID_MANIFEST) == fileNames.end();
@@ -58,8 +60,8 @@ auto Apk::makeDebuggable() -> void {
     throw MalformedAndroidManifestException(apkPath_);
   }
 
-  auto const missingApplicationTag = std::find(strings.cbegin(), strings.cend(), "application") == strings.end();
-  if (missingApplicationTag) {
+  auto const hasApplicationTag = std::find(strings.cbegin(), strings.cend(), ANDROID_MANIFEST_TAG_APPLICATION) != strings.end();
+  if (!hasApplicationTag) {
     LOGW("unable to find application tag in [%s]", apkPath_);
     throw MalformedAndroidManifestException(apkPath_);
   }
@@ -72,7 +74,7 @@ auto Apk::makeDebuggable() -> void {
     auto visit(StartXmlTagElement const &element) const -> void override {
       auto const tag = element.tag();
       LOGD("traverse start tag element [%s]", tag);
-      if (tag == "application") {
+      if (tag == ANDROID_MANIFEST_TAG_APPLICATION) {
         LOGD("found application tag");
       }
     }
@@ -80,7 +82,7 @@ auto Apk::makeDebuggable() -> void {
     auto visit(EndXmlTagElement const &element) const -> void override {
       auto const tag = element.tag();
       LOGD("traverse end tag element [%s]", tag);
-      if (tag == "application") {
+      if (tag == ANDROID_MANIFEST_TAG_APPLICATION) {
         LOGD("found application tag");
       }
     }
@@ -95,4 +97,4 @@ auto Apk::makeDebuggable() -> void {
   binaryXml.traverseXml(visitor);
 }
 
-auto Apk::isDebuggable() -> bool { return false; }
+auto Apk::isDebuggable() const -> bool { return false; }

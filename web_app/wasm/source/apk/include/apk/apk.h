@@ -28,15 +28,15 @@
 
 namespace ai {
 
-class Apk {
+class Apk final {
   char const *const apkPath_;
 
 public:
   Apk(char const *const apkPath) : apkPath_(apkPath) {}
 
-  auto makeDebuggable() -> void;
+  auto makeDebuggable() const -> void;
 
-  auto isDebuggable() -> bool;
+  auto isDebuggable() const -> bool;
 };
 
 } // namespace ai
