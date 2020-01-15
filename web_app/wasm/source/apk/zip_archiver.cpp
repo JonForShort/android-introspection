@@ -63,7 +63,8 @@ auto writeStreamToOpenZipFile(std::istream &source, zipFile const zipFile) {
 }
 
 auto getAllEntriesInZipFile(std::string const &path) {
-  auto entries = std::vector<std::pair<std::string, unz_file_info64>>();
+  using PathAndFileInfo = std::pair<std::string, unz_file_info64>;
+  auto entries = std::vector<PathAndFileInfo>();
   auto openedZipFile = ScopedUnzOpenFile(path.c_str());
   if (openedZipFile.get() == nullptr) {
     LOGW("getAllEntriesInZipFile, path [%s]", path.c_str());
@@ -126,13 +127,9 @@ auto ZipArchiver::extract(std::string_view pathToExtract, std::string_view path)
     throw std::logic_error("path must be a directory or must not exist");
   }
   auto const entries = getAllEntriesInZipFile(zipPath_);
-  auto pathExistsInZip = false;
-  for (auto const &entry : entries) {
-    if (entry.first == pathToExtract) {
-      pathExistsInZip = true;
-    }
-  }
-  if (!pathExistsInZip) {
+  auto pathInZip = std::find_if(entries.cbegin(), entries.cend(),
+                                [&pathToExtract = std::as_const(pathToExtract)](auto const &entry) { return entry.first == pathToExtract; });
+  if (pathInZip == entries.cend()) {
     throw std::logic_error("path does not exist in archive");
   }
   if (auto const zipFile = ScopedUnzOpenFile(zipPath_.c_str()); zipFile.get() == nullptr) {
