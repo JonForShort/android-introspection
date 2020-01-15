@@ -154,7 +154,7 @@ TEST(ZipArchiver, addPath_PathIsAddedSuccessfully) {
   EXPECT_TRUE(zipArchiver.contains("test"));
 
   auto testExtractPath = fs::temp_directory_path() / "addPath_PathIsAddedSuccessfully_dir";
-  zipArchiver.extractTo(testExtractPath.string());
+  zipArchiver.extractAll(testExtractPath.string());
   EXPECT_TRUE(fs::exists(testExtractPath));
   EXPECT_TRUE(fs::exists(testExtractPath / "test"));
 }

@@ -126,7 +126,12 @@ auto ZipArchiver::extract(std::string_view pathToExtract, std::string_view path)
     throw std::logic_error("path must be a directory or must not exist");
   }
   auto const entries = getAllEntriesInZipFile(zipPath_);
-  auto const pathExistsInZip = std::find(entries.cbegin(), entries.cend(), pathToExtract) != entries.cend();
+  auto pathExistsInZip = false;
+  for (auto const &entry : entries) {
+    if (entry.first == pathToExtract) {
+      pathExistsInZip = true;
+    }
+  }
   if (!pathExistsInZip) {
     throw std::logic_error("path does not exist in archive");
   }
