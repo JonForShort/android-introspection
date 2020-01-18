@@ -22,6 +22,7 @@
 // SOFTWARE.
 //
 #include <filesystem>
+#include <fstream>
 #include <memory>
 #include <utility>
 
@@ -121,8 +122,8 @@ auto ZipArchiver::extractAll(std::string_view path) const -> void {
 
 auto ZipArchiver::extract(std::string_view pathToExtract, std::string_view path) const -> void {
   LOGD("extract, pathToExtract [%s] path [%s]", pathToExtract, path);
-  using namespace std::filesystem;
-  auto const isPathValid = is_directory(path) or !exists(path);
+  namespace fs = std::filesystem;
+  auto const isPathValid = fs::is_directory(path) or !fs::exists(path);
   if (!isPathValid) {
     throw std::logic_error("path must be a directory or must not exist");
   }
@@ -135,9 +136,26 @@ auto ZipArchiver::extract(std::string_view pathToExtract, std::string_view path)
   if (auto const zipFile = ScopedUnzOpenFile(zipPath_.c_str()); zipFile.get() == nullptr) {
     throw std::logic_error("archive does not exist");
   } else {
-    auto const pathString = std::string(path);
-    if (auto const result = unzLocateFile(zipFile.get(), pathString.c_str(), nullptr); result != UNZ_OK) {
+    if (auto const result = unzLocateFile(zipFile.get(), pathInZip->first.c_str(), nullptr); result != UNZ_OK) {
       throw std::logic_error("path does not exist in archive");
     }
+    unz_file_info zipFileInfo;
+    if (auto const result = unzGetCurrentFileInfo(zipFile.get(), &zipFileInfo, nullptr, 0, nullptr, 0, nullptr, 0); result != UNZ_OK) {
+      throw std::logic_error("unable to get file info in archive");
+    }
+    auto const openedZipFile = ScopedUnzOpenCurrentFile(zipFile.get());
+    if (auto result = openedZipFile.result(); result != MZ_OK) {
+      throw std::logic_error("unable to open zip entry in archive");
+    }
+    auto fileContents = std::vector<std::byte>(zipFileInfo.uncompressed_size);
+    auto fileContentsSize = static_cast<uint32_t>(fileContents.size());
+    if (auto const bytesRead = unzReadCurrentFile(zipFile.get(), &fileContents[0], fileContentsSize); static_cast<uint32_t>(bytesRead) != fileContentsSize) {
+      throw std::logic_error("unable to read full file in archive");
+    }
+    auto const pathString = std::string(path);
+    auto const fullPathToExtract = fs::path(pathString) / pathInZip->first.c_str();
+    auto outputFile = std::ofstream(fullPathToExtract.string(), std::fstream::binary);
+    outputFile.write(reinterpret_cast<char const *>(fileContents.data()), sizeof(std::byte) * fileContents.size());
+    outputFile.close();
   }
 }

@@ -144,9 +144,11 @@ TEST(ZipArchiver, addPath_PathIsAddedSuccessfully) {
   testFileStream << "test";
   testFileStream.close();
 
-  auto testZipPath = testFilePath.string() + ".zip";
-  auto zipArchiver = ai::ZipArchiver(testZipPath);
+  auto const testZipPath = testFilePath.string() + ".zip";
+  // removing file that might have been left from previous run.
   fs::remove(testZipPath);
+
+  auto const zipArchiver = ai::ZipArchiver(testZipPath);
 
   std::ifstream testInputFileStream(testFilePath.string());
   zipArchiver.add(testInputFileStream, "test");
