@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright 2019
+// Copyright 2019-2020
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,9 +36,9 @@ public:
 
   auto getFileNames() const -> std::vector<std::string>;
 
-  auto getFileContents(char const *fileName) const -> std::vector<std::byte>;
+  auto getFileContents(char const *szFileInArchive) const -> std::vector<std::byte>;
 
-  auto setFileContents(char const *fileName, std::vector<std::byte> const &content) const -> void;
+  auto setFileContents(char const *szFileInArchive, std::vector<std::byte> const &content) const -> void;
 
 private:
   std::string const pathToApk_;

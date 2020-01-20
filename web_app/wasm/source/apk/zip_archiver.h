@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright 2019
+// Copyright 2019-2020
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +24,9 @@
 #ifndef ANDROID_INTROSPECTION_APK_ZIP_ARCHIVER_H_
 #define ANDROID_INTROSPECTION_APK_ZIP_ARCHIVER_H_
 
-#include <istream>
 #include <string>
 #include <string_view>
+#include <vector>
 
 namespace ai {
 
@@ -34,15 +34,19 @@ class ZipArchiver final {
   std::string const zipPath_;
 
 public:
-  ZipArchiver(std::string_view zipPath) : zipPath_(zipPath) {}
+  explicit ZipArchiver(std::string_view zipPath) : zipPath_(zipPath) {}
 
-  auto add(std::istream &source, std::string_view path) const -> void;
+  auto add(std::istream &source, std::string_view pathInArchive) const -> void;
 
-  auto contains(std::string_view path) const -> bool;
+  auto files() const -> std::vector<std::string>;
 
-  auto extractAll(std::string_view path) const -> void;
+  auto contains(std::string_view pathInArchive) const -> bool;
 
-  auto extract(std::string_view fileToExtract, std::string_view path) const -> void;
+  auto extractAll(std::string_view destinationDirectory) const -> void;
+
+  auto extract(std::string_view pathInArchive, std::string_view destinationDirectory) const -> void;
+
+  auto extract(std::string_view pathInArchive) const -> std::vector<std::byte>;
 };
 
 } // namespace ai
