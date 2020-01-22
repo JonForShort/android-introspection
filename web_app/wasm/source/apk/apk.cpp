@@ -40,8 +40,8 @@ static constexpr char const *const ANDROID_MANIFEST_TAG_APPLICATION = "applicati
 
 auto Apk::makeDebuggable() const -> void {
   auto const apkParser = ai::ApkParser(apkPath_);
-  auto const fileNames = apkParser.getFileNames();
-  auto const missingAndroidManifest = std::find(fileNames.cbegin(), fileNames.cend(), ANDROID_MANIFEST) == fileNames.end();
+  auto const files = apkParser.getFiles();
+  auto const missingAndroidManifest = std::find(files.cbegin(), files.cend(), ANDROID_MANIFEST) == files.end();
   if (!missingAndroidManifest) {
     LOGD("unable to find manifest in [%s]", apkPath_);
     throw MissingAndroidManifestException(apkPath_);
@@ -54,7 +54,7 @@ auto Apk::makeDebuggable() const -> void {
   }
 
   auto const binaryXml = BinaryXml(contents);
-  auto const strings = binaryXml.readStrings();
+  auto const strings = binaryXml.getStrings();
   if (strings.empty()) {
     LOGW("unable to parse strings in [%s]", apkPath_);
     throw MalformedAndroidManifestException(apkPath_);

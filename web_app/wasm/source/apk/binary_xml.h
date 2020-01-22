@@ -25,6 +25,7 @@
 #define ANDROID_INTROSPECTION_APK_BINARY_XML_H_
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -34,14 +35,28 @@ namespace ai {
 
 class BinaryXml {
 
-  std::vector<std::byte> const content_;
+  struct BinaryXmlContent {
+    std::vector<std::byte> bytes;
+
+    std::vector<std::string> strings;
+
+    std::vector<uint32_t> stringOffsets;
+
+    bool isUtf8Encoded;
+  };
+
+  std::unique_ptr<BinaryXmlContent> content_;
 
   auto getXmlChunkOffset() const -> uint64_t;
 
-public:
-  BinaryXml(std::vector<std::byte> const &content) : content_(content) {}
+  auto getStringOffsets() const -> std::vector<std::uint32_t>;
 
-  auto readStrings() const -> std::vector<std::string>;
+  auto isStringsUtf8Encoded() const -> bool;
+
+public:
+  explicit BinaryXml(std::vector<std::byte> const &bytes);
+
+  auto getStrings() const -> std::vector<std::string>;
 
   auto traverseXml(BinaryXmlVisitor const &visitor) const -> void;
 };

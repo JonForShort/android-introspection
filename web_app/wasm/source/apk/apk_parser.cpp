@@ -38,10 +38,9 @@ using namespace ai::minizip;
 namespace {
 
 auto writeToTempFile(std::vector<std::byte> const &content) {
-  namespace fs = std::filesystem;
   auto tempName = std::vector<char>(L_tmpnam);
   std::tmpnam(&tempName[0]);
-  auto tempPath = fs::temp_directory_path() / tempName.data();
+  auto tempPath = std::filesystem::temp_directory_path() / tempName.data();
   auto outputFile = std::ofstream(tempPath, std::fstream::binary);
   outputFile.write(reinterpret_cast<char const *>(content.data()), static_cast<uint32_t>(content.size()));
   outputFile.close();
@@ -50,7 +49,7 @@ auto writeToTempFile(std::vector<std::byte> const &content) {
 
 } // namespace
 
-auto ApkParser::getFileNames() const -> std::vector<std::string> {
+auto ApkParser::getFiles() const -> std::vector<std::string> {
   LOGD("getFileNames");
   return ai::ZipArchiver(pathToApk_).files();
 }
@@ -64,7 +63,7 @@ auto ApkParser::getFileContents(char const *szFileInArchive) const -> std::vecto
 }
 
 auto ApkParser::setFileContents(char const *szFileInArchive, std::vector<std::byte> const &contents) const -> void {
-  LOGD("setFileContents, szFileInArchive [%s]", szFileInArchive);
+  LOGD("setFileContents, szFileInArchive [%s] contents [%d]", szFileInArchive, contents.size());
   if (szFileInArchive == nullptr) {
     std::invalid_argument("file is null");
   }

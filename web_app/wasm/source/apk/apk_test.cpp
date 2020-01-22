@@ -102,7 +102,7 @@ TEST(ApkParser, ReleaseApkContainsAndroidManifest_AndroidManifestFoundSuccessful
   auto pathToApk = getTestApkPath("test_release.apk");
   auto apkParser = ai::ApkParser(pathToApk.string().c_str());
 
-  auto fileNames = apkParser.getFileNames();
+  auto fileNames = apkParser.getFiles();
   EXPECT_TRUE(!fileNames.empty());
 
   auto maybeAndroidManifest = std::find(fileNames.begin(), fileNames.end(), "AndroidManifest.xml");
@@ -113,7 +113,7 @@ TEST(ApkParser, ReleaseApkContainsNonExistantFile_FileNotFoundError) {
   auto pathToApk = getTestApkPath("test_release.apk");
   auto apkParser = ai::ApkParser(pathToApk.string().c_str());
 
-  auto fileNames = apkParser.getFileNames();
+  auto fileNames = apkParser.getFiles();
   EXPECT_TRUE(!fileNames.empty());
 
   auto maybeNonExistingFile = std::find(fileNames.begin(), fileNames.end(), "NonExistingFile.xml");
@@ -131,7 +131,7 @@ TEST(ApkParser, AddFileToApk_FileIsAddedSuccessfully) {
   contents.push_back(std::byte(0x1));
   apkParser.setFileContents("test_file", contents);
 
-  auto fileNames = apkParser.getFileNames();
+  auto fileNames = apkParser.getFiles();
   auto maybeTestFile = std::find(fileNames.begin(), fileNames.end(), "test_file");
   EXPECT_TRUE(maybeTestFile != fileNames.end());
 }

@@ -34,7 +34,7 @@ class ApkParser {
 public:
   ApkParser(char const *pathToApk) : pathToApk_(pathToApk) {}
 
-  auto getFileNames() const -> std::vector<std::string>;
+  auto getFiles() const -> std::vector<std::string>;
 
   auto getFileContents(char const *szFileInArchive) const -> std::vector<std::byte>;
 

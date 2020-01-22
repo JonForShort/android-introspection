@@ -209,10 +209,33 @@ auto handleCDataTag(bytes const &contents, strings const &strings, uint64_t &con
 
 } // namespace
 
-auto BinaryXml::readStrings() const -> strings {
+BinaryXml::BinaryXml(std::vector<std::byte> const &bytes) : content_(std::make_unique<BinaryXmlContent>()) {
+  content_->bytes = bytes;
+  content_->strings = getStrings();
+  content_->stringOffsets = getStringOffsets();
+  content_->isUtf8Encoded = isStringsUtf8Encoded();
+}
+
+auto BinaryXml::getStringOffsets() const -> std::vector<std::uint32_t> {
+  auto xmlHeader = reinterpret_cast<BinaryXmlHeader const *>(content_->bytes.data());
+  auto stringOffsets = std::vector<uint32_t>();
+  for (size_t i = 0; i < xmlHeader->numStrings; i++) {
+    auto index = sizeof(BinaryXmlHeader) + i * (sizeof(uint32_t));
+    auto const offset = readBytesAtIndex<uint32_t>(content_->bytes, index);
+    stringOffsets.push_back(offset);
+  }
+  return stringOffsets;
+}
+
+auto BinaryXml::isStringsUtf8Encoded() const -> bool {
+  auto xmlHeader = reinterpret_cast<BinaryXmlHeader const *>(content_->bytes.data());
+  return (xmlHeader->flags & RES_FLAG_UTF8) == RES_FLAG_UTF8;
+}
+
+auto BinaryXml::getStrings() const -> strings {
 
   std::vector<std::string> strings;
-  auto xmlHeader = reinterpret_cast<BinaryXmlHeader const *>(content_.data());
+  auto xmlHeader = reinterpret_cast<BinaryXmlHeader const *>(content_->bytes.data());
   if (xmlHeader->xmlMagicNumber != XML_IDENTIFIER) {
     LOGW("unable to get strings; compressed xml is invalid");
     return strings;
@@ -222,32 +245,26 @@ auto BinaryXml::readStrings() const -> strings {
     return strings;
   }
 
-  auto stringOffsets = std::vector<uint32_t>();
-  for (size_t i = 0; i < xmlHeader->numStrings; i++) {
-    auto index = sizeof(BinaryXmlHeader) + i * (sizeof(uint32_t));
-    auto const offset = readBytesAtIndex<uint32_t>(content_, index);
-    stringOffsets.push_back(offset);
-  }
-
   //
   // TODO: Figure out why we can't just use xmlheader->stringsOffset.  Using
   // this will make us 8 bytes short of where strings really start.
   //
 
+  auto const stringOffsets = getStringOffsets();
   auto const stringOffsetsInBytes = stringOffsets.size() * sizeof(decltype(stringOffsets)::value_type);
   auto const startStringsOffset = sizeof(BinaryXmlHeader) + stringOffsetsInBytes;
-  auto const isUtf8Encoded = (xmlHeader->flags & RES_FLAG_UTF8) == RES_FLAG_UTF8;
+  auto const isUtf8Encoded = isStringsUtf8Encoded();
   for (auto &offset : stringOffsets) {
     if (isUtf8Encoded) {
       auto stringLengthOffset = startStringsOffset + offset;
-      auto stringLength = readBytesAtIndex<uint8_t>(content_, stringLengthOffset);
-      auto stringOffset = reinterpret_cast<const char *>(content_.data() + startStringsOffset + offset + 2);
+      auto stringLength = readBytesAtIndex<uint8_t>(content_->bytes, stringLengthOffset);
+      auto stringOffset = reinterpret_cast<const char *>(content_->bytes.data() + startStringsOffset + offset + 2);
       auto string = std::string(stringOffset, stringLength);
       strings.push_back(string);
     } else {
       auto stringLengthOffset = startStringsOffset + offset;
-      auto stringLength = readBytesAtIndex<uint16_t>(content_, stringLengthOffset);
-      auto stringOffset = reinterpret_cast<const char16_t *>(content_.data() + startStringsOffset + offset + 2);
+      auto stringLength = readBytesAtIndex<uint16_t>(content_->bytes, stringLengthOffset);
+      auto stringOffset = reinterpret_cast<const char16_t *>(content_->bytes.data() + startStringsOffset + offset + 2);
       auto string = std::u16string(stringOffset, stringLength);
       std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
       strings.push_back(converter.to_bytes(string));
@@ -257,7 +274,7 @@ auto BinaryXml::readStrings() const -> strings {
 }
 
 auto BinaryXml::getXmlChunkOffset() const -> uint64_t {
-  auto xmlHeader = reinterpret_cast<BinaryXmlHeader const *>(content_.data());
+  auto xmlHeader = reinterpret_cast<BinaryXmlHeader const *>(content_->bytes.data());
   if (xmlHeader->xmlMagicNumber != XML_IDENTIFIER) {
     LOGW("unable to get chunk size; compressed xml is invalid");
     return 0;
@@ -266,11 +283,11 @@ auto BinaryXml::getXmlChunkOffset() const -> uint64_t {
     LOGW("unable to get chunk size; missing string marker");
     return 0;
   }
-  if (content_.size() <= xmlHeader->chunkSize) {
+  if (content_->bytes.size() <= xmlHeader->chunkSize) {
     LOGW("unable to get chunk size; missing string marker");
     return 0;
   }
-  return content_.size() - (content_.size() - xmlHeader->chunkSize);
+  return content_->bytes.size() - (content_->bytes.size() - xmlHeader->chunkSize);
 }
 
 auto BinaryXml::traverseXml(BinaryXmlVisitor const &visitor) const -> void {
@@ -281,12 +298,12 @@ auto BinaryXml::traverseXml(BinaryXmlVisitor const &visitor) const -> void {
   }
 
   auto currentXmlChunkOffset = xmlChunkOffset;
-  auto tag = readBytesAtIndex<uint16_t>(content_, currentXmlChunkOffset);
+  auto tag = readBytesAtIndex<uint16_t>(content_->bytes, currentXmlChunkOffset);
 
   do {
-    auto const headerSize = readBytesAtIndex<uint16_t>(content_, currentXmlChunkOffset);
-    auto const chunkSize = readBytesAtIndex<uint32_t>(content_, currentXmlChunkOffset);
-    auto const strings = readStrings();
+    auto const headerSize = readBytesAtIndex<uint16_t>(content_->bytes, currentXmlChunkOffset);
+    auto const chunkSize = readBytesAtIndex<uint32_t>(content_->bytes, currentXmlChunkOffset);
+    auto const strings = getStrings();
 
     LOGV("makeApkDebuggable: tag = [{:d}], headerSize = [{:d}], chunkSize = [{:d}]", tag, headerSize, chunkSize);
 
@@ -302,21 +319,21 @@ auto BinaryXml::traverseXml(BinaryXmlVisitor const &visitor) const -> void {
       break;
     }
     case RES_XML_START_ELEMENT_TYPE: {
-      handleStartElementTag(content_, strings, currentXmlChunkOffset, visitor);
+      handleStartElementTag(content_->bytes, strings, currentXmlChunkOffset, visitor);
       break;
     }
     case RES_XML_END_ELEMENT_TYPE: {
-      handleEndElementTag(content_, strings, currentXmlChunkOffset, visitor);
+      handleEndElementTag(content_->bytes, strings, currentXmlChunkOffset, visitor);
       break;
     }
     case RES_XML_CDATA_TYPE: {
-      handleCDataTag(content_, strings, currentXmlChunkOffset);
+      handleCDataTag(content_->bytes, strings, currentXmlChunkOffset);
       break;
     }
     default: {
       LOGW("skipping unknown tag [%d]", tag);
     }
     }
-    tag = readBytesAtIndex<uint16_t>(content_, currentXmlChunkOffset);
+    tag = readBytesAtIndex<uint16_t>(content_->bytes, currentXmlChunkOffset);
   } while (tag != RES_XML_END_NAMESPACE_TYPE);
 }
