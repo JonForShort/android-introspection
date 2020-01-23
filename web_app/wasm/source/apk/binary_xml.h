@@ -67,6 +67,8 @@ private:
 
   struct BinaryXmlContent {
 
+    BinaryXmlHeader const *header;
+
     std::vector<std::byte> bytes;
 
     std::vector<std::string> strings;

@@ -197,6 +197,7 @@ auto handleCDataTag(bytes const &contents, strings const &strings, uint64_t &con
 } // namespace
 
 BinaryXml::BinaryXml(std::vector<std::byte> const &bytes) : content_(std::make_unique<BinaryXmlContent>()) {
+  content_->header = getXmlHeader();
   content_->bytes = bytes;
   content_->strings = getStrings();
   content_->stringOffsets = getStringOffsets();
@@ -215,9 +216,8 @@ auto BinaryXml::getXmlHeader() const -> BinaryXmlHeader const * {
 }
 
 auto BinaryXml::getStringOffsets() const -> std::vector<std::uint32_t> {
-  auto const xmlHeader = getXmlHeader();
   auto stringOffsets = std::vector<uint32_t>();
-  for (size_t i = 0; i < xmlHeader->numStrings; i++) {
+  for (size_t i = 0; i < content_->header->numStrings; i++) {
     auto index = sizeof(BinaryXmlHeader) + i * (sizeof(uint32_t));
     auto const offset = readBytesAtIndex<uint32_t>(content_->bytes, index);
     stringOffsets.push_back(offset);
@@ -226,7 +226,7 @@ auto BinaryXml::getStringOffsets() const -> std::vector<std::uint32_t> {
 }
 
 auto BinaryXml::isStringsUtf8Encoded() const -> bool {
-  auto const xmlHeader = getXmlHeader();
+  auto const xmlHeader = content_->header;
   return (xmlHeader->flags & RES_FLAG_UTF8) == RES_FLAG_UTF8;
 }
 
