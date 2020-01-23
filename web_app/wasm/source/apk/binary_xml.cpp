@@ -61,19 +61,6 @@ using strings = std::vector<std::string>;
 
 namespace {
 
-struct BinaryXmlHeader {
-  uint32_t xmlMagicNumber;
-  uint32_t reservedBytes;
-  uint16_t stringTableIdentifier;
-  uint16_t headerSize;
-  uint32_t chunkSize;
-  uint32_t numStrings;
-  uint32_t numStyles;
-  uint32_t flags;
-  uint32_t stringsOffset;
-  uint32_t stylesOffset;
-};
-
 template <typename T, typename U> auto readBytesAtIndex(bytes const &data, U &index) {
   T value = {0};
   memcpy(&value, &data[index], sizeof(value));
@@ -216,8 +203,19 @@ BinaryXml::BinaryXml(std::vector<std::byte> const &bytes) : content_(std::make_u
   content_->isUtf8Encoded = isStringsUtf8Encoded();
 }
 
-auto BinaryXml::getStringOffsets() const -> std::vector<std::uint32_t> {
+auto BinaryXml::getXmlHeader() const -> BinaryXmlHeader const * {
   auto xmlHeader = reinterpret_cast<BinaryXmlHeader const *>(content_->bytes.data());
+  if (xmlHeader->xmlMagicNumber != XML_IDENTIFIER) {
+    throw std::logic_error("invalid xml header; missing xml identifier");
+  }
+  if (xmlHeader->stringTableIdentifier != XML_STRING_TABLE) {
+    throw std::logic_error("invalid xml header; missing xml string table");
+  }
+  return xmlHeader;
+}
+
+auto BinaryXml::getStringOffsets() const -> std::vector<std::uint32_t> {
+  auto const xmlHeader = getXmlHeader();
   auto stringOffsets = std::vector<uint32_t>();
   for (size_t i = 0; i < xmlHeader->numStrings; i++) {
     auto index = sizeof(BinaryXmlHeader) + i * (sizeof(uint32_t));
@@ -228,32 +226,22 @@ auto BinaryXml::getStringOffsets() const -> std::vector<std::uint32_t> {
 }
 
 auto BinaryXml::isStringsUtf8Encoded() const -> bool {
-  auto xmlHeader = reinterpret_cast<BinaryXmlHeader const *>(content_->bytes.data());
+  auto const xmlHeader = getXmlHeader();
   return (xmlHeader->flags & RES_FLAG_UTF8) == RES_FLAG_UTF8;
 }
 
 auto BinaryXml::getStrings() const -> strings {
 
-  std::vector<std::string> strings;
-  auto xmlHeader = reinterpret_cast<BinaryXmlHeader const *>(content_->bytes.data());
-  if (xmlHeader->xmlMagicNumber != XML_IDENTIFIER) {
-    LOGW("unable to get strings; compressed xml is invalid");
-    return strings;
-  }
-  if (xmlHeader->stringTableIdentifier != XML_STRING_TABLE) {
-    LOGW("unable to get strings; missing string marker");
-    return strings;
-  }
-
   //
   // TODO: Figure out why we can't just use xmlheader->stringsOffset.  Using
   // this will make us 8 bytes short of where strings really start.
   //
-
   auto const stringOffsets = getStringOffsets();
   auto const stringOffsetsInBytes = stringOffsets.size() * sizeof(decltype(stringOffsets)::value_type);
   auto const startStringsOffset = sizeof(BinaryXmlHeader) + stringOffsetsInBytes;
   auto const isUtf8Encoded = isStringsUtf8Encoded();
+
+  std::vector<std::string> strings;
   for (auto &offset : stringOffsets) {
     if (isUtf8Encoded) {
       auto stringLengthOffset = startStringsOffset + offset;

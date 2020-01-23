@@ -34,8 +34,39 @@
 namespace ai {
 
 class BinaryXml {
+public:
+  explicit BinaryXml(std::vector<std::byte> const &bytes);
+
+  auto getStrings() const -> std::vector<std::string>;
+
+  auto traverseXml(BinaryXmlVisitor const &visitor) const -> void;
+
+private:
+  struct BinaryXmlHeader {
+
+    uint32_t xmlMagicNumber;
+
+    uint32_t reservedBytes;
+
+    uint16_t stringTableIdentifier;
+
+    uint16_t headerSize;
+
+    uint32_t chunkSize;
+
+    uint32_t numStrings;
+
+    uint32_t numStyles;
+
+    uint32_t flags;
+
+    uint32_t stringsOffset;
+
+    uint32_t stylesOffset;
+  };
 
   struct BinaryXmlContent {
+
     std::vector<std::byte> bytes;
 
     std::vector<std::string> strings;
@@ -45,7 +76,7 @@ class BinaryXml {
     bool isUtf8Encoded;
   };
 
-  std::unique_ptr<BinaryXmlContent> content_;
+  auto getXmlHeader() const -> BinaryXmlHeader const *;
 
   auto getXmlChunkOffset() const -> uint64_t;
 
@@ -53,12 +84,7 @@ class BinaryXml {
 
   auto isStringsUtf8Encoded() const -> bool;
 
-public:
-  explicit BinaryXml(std::vector<std::byte> const &bytes);
-
-  auto getStrings() const -> std::vector<std::string>;
-
-  auto traverseXml(BinaryXmlVisitor const &visitor) const -> void;
+  std::unique_ptr<BinaryXmlContent> content_;
 };
 
 } // namespace ai
