@@ -44,7 +44,7 @@ public:
 private:
   struct BinaryXmlHeader {
 
-    uint32_t xmlMagicNumber;
+    uint32_t magicNumber;
 
     uint32_t reservedBytes;
 
@@ -73,9 +73,9 @@ private:
 
     std::vector<std::string> strings;
 
-    std::vector<uint32_t> stringOffsets;
+    std::vector<uint32_t> offsets;
 
-    bool isUtf8Encoded;
+    bool utf8Encoded;
   };
 
   auto getXmlHeader() const -> BinaryXmlHeader const *;

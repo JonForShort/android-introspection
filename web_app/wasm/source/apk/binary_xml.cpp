@@ -200,13 +200,13 @@ BinaryXml::BinaryXml(std::vector<std::byte> const &bytes) : content_(std::make_u
   content_->header = getXmlHeader();
   content_->bytes = bytes;
   content_->strings = getStrings();
-  content_->stringOffsets = getStringOffsets();
-  content_->isUtf8Encoded = isStringsUtf8Encoded();
+  content_->offsets = getStringOffsets();
+  content_->utf8Encoded = isStringsUtf8Encoded();
 }
 
 auto BinaryXml::getXmlHeader() const -> BinaryXmlHeader const * {
   auto xmlHeader = reinterpret_cast<BinaryXmlHeader const *>(content_->bytes.data());
-  if (xmlHeader->xmlMagicNumber != XML_IDENTIFIER) {
+  if (xmlHeader->magicNumber != XML_IDENTIFIER) {
     throw std::logic_error("invalid xml header; missing xml identifier");
   }
   if (xmlHeader->stringTableIdentifier != XML_STRING_TABLE) {
@@ -262,20 +262,12 @@ auto BinaryXml::getStrings() const -> strings {
 }
 
 auto BinaryXml::getXmlChunkOffset() const -> uint64_t {
-  auto xmlHeader = reinterpret_cast<BinaryXmlHeader const *>(content_->bytes.data());
-  if (xmlHeader->xmlMagicNumber != XML_IDENTIFIER) {
-    LOGW("unable to get chunk size; compressed xml is invalid");
-    return 0;
+  auto const &bytes = content_->bytes;
+  auto const &header = content_->header;
+  if (bytes.size() <= header->chunkSize) {
+    throw std::logic_error("unable to get chunk size; missing string marker");
   }
-  if (xmlHeader->stringTableIdentifier != XML_STRING_TABLE) {
-    LOGW("unable to get chunk size; missing string marker");
-    return 0;
-  }
-  if (content_->bytes.size() <= xmlHeader->chunkSize) {
-    LOGW("unable to get chunk size; missing string marker");
-    return 0;
-  }
-  return content_->bytes.size() - (content_->bytes.size() - xmlHeader->chunkSize);
+  return bytes.size() - (bytes.size() - header->chunkSize);
 }
 
 auto BinaryXml::traverseXml(BinaryXmlVisitor const &visitor) const -> void {
