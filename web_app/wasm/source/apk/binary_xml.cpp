@@ -23,7 +23,6 @@
 //
 #include <codecvt>
 #include <locale>
-#include <map>
 
 #include "binary_xml.h"
 #include "binary_xml_visitor.h"
@@ -62,6 +61,7 @@ using strings = std::vector<std::string>;
 namespace {
 
 template <typename T, typename U> auto readBytesAtIndex(bytes const &data, U &index) {
+  static_assert(std::is_integral<T>::value, "type must be integral");
   T value = {0};
   memcpy(&value, &data[index], sizeof(value));
   index += sizeof(value);
