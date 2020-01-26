@@ -32,7 +32,7 @@ namespace ai {
 class ApkParser {
 
 public:
-  ApkParser(char const *pathToApk) : pathToApk_(pathToApk) {}
+  ApkParser(std::string_view pathToApk) : pathToApk_(pathToApk) {}
 
   auto getFiles() const -> std::vector<std::string>;
 

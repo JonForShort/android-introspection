@@ -24,19 +24,26 @@
 #ifndef ANDROID_INTROSPECTION_APK_APK_H_
 #define ANDROID_INTROSPECTION_APK_APK_H_
 
+#include <memory>
+
 #include "apk_exception.h"
 
 namespace ai {
 
 class Apk final {
-  char const *const apkPath_;
-
 public:
-  Apk(char const *const apkPath) : apkPath_(apkPath) {}
+  explicit Apk(std::string_view apkPath);
+
+  ~Apk();
 
   auto makeDebuggable() const -> void;
 
   auto isDebuggable() const -> bool;
+
+private:
+  class ApkImpl;
+
+  std::unique_ptr<ApkImpl> const pimpl_;
 };
 
 } // namespace ai
