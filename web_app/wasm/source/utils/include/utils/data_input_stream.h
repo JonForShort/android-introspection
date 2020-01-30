@@ -24,13 +24,14 @@
 #ifndef ANDROID_INTROSPECTION_UTILS_DATA_INPUT_STREAM_H_
 #define ANDROID_INTROSPECTION_UTILS_DATA_INPUT_STREAM_H_
 
+#include <cstdint>
 #include <vector>
 
 class DataInputStream final {
 public:
   DataInputStream(std::vector<std::byte> const &data) : data_(data) {}
 
-  template <typename T, typename U> auto read() -> U {
+  template <typename T> auto read() -> T {
     static_assert(std::is_integral<T>::value, "type must be integral");
     T value = {0};
     memcpy(&value, &data_[index_], sizeof(value));
@@ -39,6 +40,8 @@ public:
   }
 
   auto reset() -> void;
+
+  auto skip(uint32_t bytes) -> void;
 
 private:
   std::size_t index_{0};
