@@ -190,8 +190,8 @@ auto handleCDataTag(DataInputStream &contentStream, strings const &strings) -> v
 } // namespace
 
 BinaryXml::BinaryXml(std::vector<std::byte> const &bytes) : content_(std::make_unique<BinaryXmlContent>()) {
-  content_->header = getXmlHeader();
   content_->bytes = bytes;
+  content_->header = getXmlHeader();
   content_->strings = getStrings();
   content_->offsets = getStringOffsets();
   content_->utf8Encoded = isStringsUtf8Encoded();

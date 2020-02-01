@@ -45,8 +45,8 @@ public:
   auto makeDebuggable() const -> void {
     auto const apkParser = ai::ApkParser(apkPath_);
     auto const files = apkParser.getFiles();
-    auto const missingAndroidManifest = std::find(files.cbegin(), files.cend(), ANDROID_MANIFEST) == files.end();
-    if (!missingAndroidManifest) {
+    auto const hasAndroidManifest = std::find(files.cbegin(), files.cend(), ANDROID_MANIFEST) != files.end();
+    if (!hasAndroidManifest) {
       LOGW("unable to find manifest in [%s]", apkPath_);
       throw MissingAndroidManifestException(apkPath_);
     }
