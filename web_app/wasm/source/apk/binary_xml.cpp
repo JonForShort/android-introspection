@@ -27,6 +27,7 @@
 #include "binary_xml.h"
 #include "binary_xml_visitor.h"
 #include "resource_types.h"
+#include "utils/data_input_stream.h"
 #include "utils/log.h"
 #include "utils/utils.h"
 
@@ -60,35 +61,27 @@ using strings = std::vector<std::string>;
 
 namespace {
 
-template <typename T, typename U> auto readBytesAtIndex(bytes const &data, U &index) {
-  static_assert(std::is_integral<T>::value, "type must be integral");
-  T value = {0};
-  memcpy(&value, &data[index], sizeof(value));
-  index += sizeof(value);
-  return value;
-}
-
-auto handleAttributes(bytes const &contents, strings const &strings, uint64_t &contentsOffset) -> std::map<std::string, std::string> {
+auto handleAttributes(DataInputStream &contentStream, strings const &strings) -> std::map<std::string, std::string> {
   std::map<std::string, std::string> attributes;
-  auto const attributeMarker = readBytesAtIndex<uint32_t>(contents, contentsOffset);
+  auto const attributeMarker = contentStream.read<uint32_t>();
   if (attributeMarker != XML_ATTRS_MARKER) {
     LOGW("unexpected attributes marker");
     return attributes;
   }
 
-  auto const attributesCount = readBytesAtIndex<uint32_t>(contents, contentsOffset);
-  readBytesAtIndex<uint32_t>(contents, contentsOffset);
+  auto const attributesCount = contentStream.read<uint32_t>();
+  contentStream.skip(sizeof(uint32_t));
 
   for (auto i = 0U; i < attributesCount; i++) {
-    /* auto const attributeNamespaceIndex = */ readBytesAtIndex<uint32_t>(contents, contentsOffset);
-    auto const attributeNameIndex = readBytesAtIndex<uint32_t>(contents, contentsOffset);
-    auto const attributeValueIndex = readBytesAtIndex<uint32_t>(contents, contentsOffset);
+    /* auto const attributeNamespaceIndex = */ contentStream.skip(sizeof(uint32_t));
+    auto const attributeNameIndex = contentStream.read<uint32_t>();
+    auto const attributeValueIndex = contentStream.read<uint32_t>();
 
-    readBytesAtIndex<uint16_t>(contents, contentsOffset);
-    readBytesAtIndex<uint8_t>(contents, contentsOffset);
+    contentStream.skip(sizeof(uint16_t));
+    contentStream.skip(sizeof(uint8_t));
 
-    auto const attributeValueType = readBytesAtIndex<uint8_t>(contents, contentsOffset);
-    auto const attributeResourceId = readBytesAtIndex<uint32_t>(contents, contentsOffset);
+    auto const attributeValueType = contentStream.read<uint8_t>();
+    auto const attributeResourceId = contentStream.read<uint32_t>();
 
     auto attributeName = strings[attributeNameIndex];
     if (attributeName.empty()) {
@@ -149,31 +142,31 @@ auto handleAttributes(bytes const &contents, strings const &strings, uint64_t &c
   return attributes;
 }
 
-auto handleStartElementTag(bytes const &contents, strings const &strings, uint64_t &contentsOffset, BinaryXmlVisitor const &visitor) -> void {
-  readBytesAtIndex<uint32_t>(contents, contentsOffset);
-  readBytesAtIndex<uint32_t>(contents, contentsOffset);
+auto handleStartElementTag(DataInputStream &contentStream, strings const &strings, BinaryXmlVisitor const &visitor) -> void {
+  contentStream.skip(sizeof(uint32_t));
+  contentStream.skip(sizeof(uint32_t));
 
-  auto const namespaceStringIndex = readBytesAtIndex<int32_t>(contents, contentsOffset);
+  auto const namespaceStringIndex = contentStream.read<int32_t>();
   auto const namespaceString = namespaceStringIndex >= 0 ? strings[static_cast<uint32_t>(namespaceStringIndex)] : "";
 
-  auto const stringIndex = readBytesAtIndex<int32_t>(contents, contentsOffset);
+  auto const stringIndex = contentStream.read<int32_t>();
   auto const string = stringIndex >= 0 ? strings[static_cast<uint32_t>(stringIndex)] : "";
 
-  auto const attributes = handleAttributes(contents, strings, contentsOffset);
+  auto const attributes = handleAttributes(contentStream, strings);
 
   LOGI("start tag [{}] namespace [{}]", string.c_str(), namespaceString.c_str());
 
   StartXmlTagElement(string, attributes).accept(visitor);
 }
 
-auto handleEndElementTag(bytes const &contents, strings const &strings, uint64_t &contentsOffset, BinaryXmlVisitor const &visitor) -> void {
-  readBytesAtIndex<uint32_t>(contents, contentsOffset);
-  readBytesAtIndex<uint32_t>(contents, contentsOffset);
+auto handleEndElementTag(DataInputStream &contentStream, strings const &strings, BinaryXmlVisitor const &visitor) -> void {
+  contentStream.skip(sizeof(uint32_t));
+  contentStream.skip(sizeof(uint32_t));
 
-  auto const namespaceStringIndex = readBytesAtIndex<int32_t>(contents, contentsOffset);
+  auto const namespaceStringIndex = contentStream.read<int32_t>();
   auto const namespaceString = namespaceStringIndex >= 0 ? strings[static_cast<uint32_t>(namespaceStringIndex)] : "";
 
-  auto const stringIndex = readBytesAtIndex<int32_t>(contents, contentsOffset);
+  auto stringIndex = contentStream.read<int32_t>();
   auto const string = stringIndex >= 0 ? strings[static_cast<uint32_t>(stringIndex)] : "";
 
   LOGI("end tag [{}] namespace [{}]", string.c_str(), namespaceString.c_str());
@@ -181,15 +174,15 @@ auto handleEndElementTag(bytes const &contents, strings const &strings, uint64_t
   EndXmlTagElement(string).accept(visitor);
 }
 
-auto handleCDataTag(bytes const &contents, strings const &strings, uint64_t &contentsOffset) -> void {
-  readBytesAtIndex<uint32_t>(contents, contentsOffset);
-  readBytesAtIndex<uint32_t>(contents, contentsOffset);
+auto handleCDataTag(DataInputStream &contentStream, strings const &strings) -> void {
+  contentStream.skip(sizeof(uint32_t));
+  contentStream.skip(sizeof(uint32_t));
 
-  auto stringIndex = readBytesAtIndex<uint32_t>(contents, contentsOffset);
+  auto stringIndex = contentStream.read<uint32_t>();
   auto string = strings[stringIndex];
 
-  readBytesAtIndex<uint32_t>(contents, contentsOffset);
-  readBytesAtIndex<uint32_t>(contents, contentsOffset);
+  contentStream.skip(sizeof(uint32_t));
+  contentStream.skip(sizeof(uint32_t));
 
   LOGD("handling cdata tag [%s]", string.c_str());
 }
@@ -217,9 +210,10 @@ auto BinaryXml::getXmlHeader() const -> BinaryXmlHeader const * {
 
 auto BinaryXml::getStringOffsets() const -> std::vector<std::uint32_t> {
   auto stringOffsets = std::vector<uint32_t>();
+  auto stream = DataInputStream(content_->bytes);
+  stream.skip(sizeof(BinaryXmlHeader));
   for (size_t i = 0; i < content_->header->numStrings; i++) {
-    auto index = sizeof(BinaryXmlHeader) + i * (sizeof(uint32_t));
-    auto const offset = readBytesAtIndex<uint32_t>(content_->bytes, index);
+    auto const offset = stream.read<uint32_t>();
     stringOffsets.push_back(offset);
   }
   return stringOffsets;
@@ -238,20 +232,25 @@ auto BinaryXml::getStrings() const -> strings {
   //
   auto const stringOffsets = getStringOffsets();
   auto const stringOffsetsInBytes = stringOffsets.size() * sizeof(decltype(stringOffsets)::value_type);
-  auto const startStringsOffset = sizeof(BinaryXmlHeader) + stringOffsetsInBytes;
+  auto const startStringsOffset = static_cast<uint32_t>(sizeof(BinaryXmlHeader) + stringOffsetsInBytes);
   auto const isUtf8Encoded = isStringsUtf8Encoded();
+  auto contentStream = DataInputStream(content_->bytes);
 
   std::vector<std::string> strings;
   for (auto &offset : stringOffsets) {
     if (isUtf8Encoded) {
-      auto stringLengthOffset = startStringsOffset + offset;
-      auto stringLength = readBytesAtIndex<uint8_t>(content_->bytes, stringLengthOffset);
+      contentStream.reset();
+      contentStream.skip(startStringsOffset + offset);
+
+      auto stringLength = contentStream.read<uint8_t>();
       auto stringOffset = reinterpret_cast<const char *>(content_->bytes.data() + startStringsOffset + offset + 2);
       auto string = std::string(stringOffset, stringLength);
       strings.push_back(string);
     } else {
-      auto stringLengthOffset = startStringsOffset + offset;
-      auto stringLength = readBytesAtIndex<uint16_t>(content_->bytes, stringLengthOffset);
+      contentStream.reset();
+      contentStream.skip(startStringsOffset + offset);
+
+      auto stringLength = contentStream.read<uint16_t>();
       auto stringOffset = reinterpret_cast<const char16_t *>(content_->bytes.data() + startStringsOffset + offset + 2);
       auto string = std::u16string(stringOffset, stringLength);
       std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
@@ -277,12 +276,13 @@ auto BinaryXml::traverseXml(BinaryXmlVisitor const &visitor) const -> void {
     return;
   }
 
-  auto currentXmlChunkOffset = xmlChunkOffset;
-  auto tag = readBytesAtIndex<uint16_t>(content_->bytes, currentXmlChunkOffset);
+  auto contentStream = DataInputStream(content_->bytes);
+  contentStream.skip(static_cast<uint32_t>(xmlChunkOffset));
+  auto tag = contentStream.read<uint16_t>();
 
   do {
-    auto const headerSize = readBytesAtIndex<uint16_t>(content_->bytes, currentXmlChunkOffset);
-    auto const chunkSize = readBytesAtIndex<uint32_t>(content_->bytes, currentXmlChunkOffset);
+    auto const headerSize = contentStream.read<uint16_t>();
+    auto const chunkSize = contentStream.read<uint32_t>();
     auto const strings = getStrings();
 
     LOGV("makeApkDebuggable: tag = [{:d}], headerSize = [{:d}], chunkSize = [{:d}]", tag, headerSize, chunkSize);
@@ -291,29 +291,29 @@ auto BinaryXml::traverseXml(BinaryXmlVisitor const &visitor) const -> void {
 
     switch (tag) {
     case RES_XML_START_NAMESPACE_TYPE: {
-      currentXmlChunkOffset += chunkSize - 8;
+      contentStream.skip(chunkSize - 8);
       break;
     }
     case RES_XML_RESOURCE_MAP_TYPE: {
-      currentXmlChunkOffset += chunkSize - 8;
+      contentStream.skip(chunkSize - 8);
       break;
     }
     case RES_XML_START_ELEMENT_TYPE: {
-      handleStartElementTag(content_->bytes, strings, currentXmlChunkOffset, visitor);
+      handleStartElementTag(contentStream, strings, visitor);
       break;
     }
     case RES_XML_END_ELEMENT_TYPE: {
-      handleEndElementTag(content_->bytes, strings, currentXmlChunkOffset, visitor);
+      handleEndElementTag(contentStream, strings, visitor);
       break;
     }
     case RES_XML_CDATA_TYPE: {
-      handleCDataTag(content_->bytes, strings, currentXmlChunkOffset);
+      handleCDataTag(contentStream, strings);
       break;
     }
     default: {
       LOGW("skipping unknown tag [%d]", tag);
     }
     }
-    tag = readBytesAtIndex<uint16_t>(content_->bytes, currentXmlChunkOffset);
+    tag = contentStream.read<uint16_t>();
   } while (tag != RES_XML_END_NAMESPACE_TYPE);
 }
