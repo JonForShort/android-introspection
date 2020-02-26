@@ -69,6 +69,11 @@ ai_build_web_app_host()
     popd
 )}
 
+ai_update_submodules()
+{(
+    git submodule update --recursive --remote
+)}
+
 ai_setup_environment
 
 "$@"
