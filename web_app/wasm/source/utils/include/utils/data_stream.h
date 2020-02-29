@@ -21,15 +21,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#ifndef ANDROID_INTROSPECTION_UTILS_DATA_INPUT_STREAM_H_
-#define ANDROID_INTROSPECTION_UTILS_DATA_INPUT_STREAM_H_
+#ifndef ANDROID_INTROSPECTION_UTILS_DATA_STREAM_H_
+#define ANDROID_INTROSPECTION_UTILS_DATA_STREAM_H_
 
 #include <cstdint>
 #include <vector>
 
-class DataInputStream final {
+class DataStream final {
 public:
-  DataInputStream(std::vector<std::byte> const &data) : data_(data) {}
+  DataStream(std::vector<std::byte> const &data) : data_(data) {}
 
   template <typename T> auto read() -> T {
     static_assert(std::is_integral<T>::value, "type must be integral");
@@ -49,4 +49,4 @@ private:
   std::vector<std::byte> data_;
 };
 
-#endif // ANDROID_INTROSPECTION_UTILS_DATA_INPUT_STREAM_H_
+#endif // ANDROID_INTROSPECTION_UTILS_DATA_STREAM_H_

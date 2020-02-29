@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright 2019
+// Copyright 2019-2020
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@
 #include "binary_xml.h"
 #include "binary_xml_visitor.h"
 #include "resource_types.h"
-#include "utils/data_input_stream.h"
+#include "utils/data_stream.h"
 #include "utils/log.h"
 #include "utils/utils.h"
 
@@ -61,7 +61,7 @@ using strings = std::vector<std::string>;
 
 namespace {
 
-auto handleAttributes(DataInputStream &contentStream, strings const &strings) -> std::map<std::string, std::string> {
+auto handleAttributes(DataStream &contentStream, strings const &strings) -> std::map<std::string, std::string> {
   std::map<std::string, std::string> attributes;
   auto const attributeMarker = contentStream.read<uint32_t>();
   if (attributeMarker != XML_ATTRS_MARKER) {
@@ -142,7 +142,7 @@ auto handleAttributes(DataInputStream &contentStream, strings const &strings) ->
   return attributes;
 }
 
-auto handleStartElementTag(DataInputStream &contentStream, strings const &strings, BinaryXmlVisitor const &visitor) -> void {
+auto handleStartElementTag(DataStream &contentStream, strings const &strings, BinaryXmlVisitor const &visitor) -> void {
   contentStream.skip(sizeof(uint32_t));
   contentStream.skip(sizeof(uint32_t));
 
@@ -159,7 +159,7 @@ auto handleStartElementTag(DataInputStream &contentStream, strings const &string
   StartXmlTagElement(string, attributes).accept(visitor);
 }
 
-auto handleEndElementTag(DataInputStream &contentStream, strings const &strings, BinaryXmlVisitor const &visitor) -> void {
+auto handleEndElementTag(DataStream &contentStream, strings const &strings, BinaryXmlVisitor const &visitor) -> void {
   contentStream.skip(sizeof(uint32_t));
   contentStream.skip(sizeof(uint32_t));
 
@@ -174,7 +174,7 @@ auto handleEndElementTag(DataInputStream &contentStream, strings const &strings,
   EndXmlTagElement(string).accept(visitor);
 }
 
-auto handleCDataTag(DataInputStream &contentStream, strings const &strings) -> void {
+auto handleCDataTag(DataStream &contentStream, strings const &strings) -> void {
   contentStream.skip(sizeof(uint32_t));
   contentStream.skip(sizeof(uint32_t));
 
@@ -210,7 +210,7 @@ auto BinaryXml::getXmlHeader() const -> BinaryXmlHeader const * {
 
 auto BinaryXml::getStringOffsets() const -> std::vector<std::uint32_t> {
   auto stringOffsets = std::vector<uint32_t>();
-  auto stream = DataInputStream(content_->bytes);
+  auto stream = DataStream(content_->bytes);
   stream.skip(sizeof(BinaryXmlHeader));
   for (size_t i = 0; i < content_->header->numStrings; i++) {
     auto const offset = stream.read<uint32_t>();
@@ -234,7 +234,7 @@ auto BinaryXml::getStrings() const -> strings {
   auto const stringOffsetsInBytes = stringOffsets.size() * sizeof(decltype(stringOffsets)::value_type);
   auto const startStringsOffset = static_cast<uint32_t>(sizeof(BinaryXmlHeader) + stringOffsetsInBytes);
   auto const isUtf8Encoded = isStringsUtf8Encoded();
-  auto contentStream = DataInputStream(content_->bytes);
+  auto contentStream = DataStream(content_->bytes);
 
   std::vector<std::string> strings;
   for (auto &offset : stringOffsets) {
@@ -276,7 +276,7 @@ auto BinaryXml::traverseXml(BinaryXmlVisitor const &visitor) const -> void {
     return;
   }
 
-  auto contentStream = DataInputStream(content_->bytes);
+  auto contentStream = DataStream(content_->bytes);
   contentStream.skip(static_cast<uint32_t>(xmlChunkOffset));
   auto tag = contentStream.read<uint16_t>();
 

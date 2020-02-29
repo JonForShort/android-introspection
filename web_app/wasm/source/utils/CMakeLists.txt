@@ -6,8 +6,8 @@ set(source
         include/utils/log.h
         include/utils/utils.h
         include/utils/v8_wrapper.h
-        include/utils/data_input_stream.h
-	data_input_stream.cpp
+        include/utils/data_stream.h
+        data_stream.cpp
         test.cpp)
 
 add_library(utils STATIC ${source})

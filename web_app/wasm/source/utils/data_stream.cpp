@@ -21,14 +21,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#include "utils/data_input_stream.h"
+#include "utils/data_stream.h"
 #include <stdexcept>
 
-auto DataInputStream::skip(uint32_t const bytes) -> void {
+auto DataStream::skip(uint32_t const bytes) -> void {
   if (index_ + bytes > data_.size()) {
     throw std::logic_error("skipped past data boundry");
   }
   index_ += bytes;
 }
 
-auto DataInputStream::reset() -> void { index_ = 0; }
+auto DataStream::reset() -> void { index_ = 0; }
