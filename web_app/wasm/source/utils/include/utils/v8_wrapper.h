@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#ifndef V8_WRAPPER_H
-#define V8_WRAPPER_H
+#ifndef ANDROID_INTROSPECTION_UTILS_V8_WRAPPER_H_
+#define ANDROID_INTROSPECTION_UTILS_V8_WRAPPER_H_
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -32,4 +32,4 @@
 
 #pragma GCC diagnostic pop
 
-#endif // V8_WRAPPER_H
+#endif // ANDROID_INTROSPECTION_UTILS_V8_WRAPPER_H_

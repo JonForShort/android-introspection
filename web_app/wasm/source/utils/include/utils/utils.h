@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright 2019
+// Copyright 2019-2020
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#ifndef ANDROID_INTROSPECTION_UTILS_H_
-#define ANDROID_INTROSPECTION_UTILS_H_
+#ifndef ANDROID_INTROSPECTION_UTILS_UTILS_H_
+#define ANDROID_INTROSPECTION_UTILS_UTILS_H_
 
 #include <cstdint>
 #include <fstream>
@@ -47,4 +47,4 @@ template <typename... Args> std::string formatString(const char *format, Args...
 
 } // namespace ai::utils
 
-#endif /* ANDROID_INTROSPECTION_UTILS_H_ */
+#endif /* ANDROID_INTROSPECTION_UTILS_UTILS_H_ */
