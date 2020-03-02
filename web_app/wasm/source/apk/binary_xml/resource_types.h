@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright 2019
+// Copyright 2019-2020
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,8 +43,8 @@ enum : uint16_t {
   RES_NULL_TYPE = 0x0000,
   RES_STRING_POOL_TYPE = 0x0001,
   RES_TABLE_TYPE = 0x0002,
-
   RES_XML_TYPE = 0x0003,
+
   RES_XML_FIRST_CHUNK_TYPE = 0x0100,
   RES_XML_START_NAMESPACE_TYPE = 0x0100,
   RES_XML_END_NAMESPACE_TYPE = 0x0101,
@@ -80,13 +80,13 @@ enum : uint8_t {
   TYPE_INT_DEC = 0x10,
   TYPE_INT_HEX = 0x11,
   TYPE_INT_BOOLEAN = 0x12,
-  TYPE_FIRST_COLOR_INT = 0x1c,
-  TYPE_INT_COLOR_ARGB8 = 0x1c,
-  TYPE_INT_COLOR_RGB8 = 0x1d,
-  TYPE_INT_COLOR_ARGB4 = 0x1e,
-  TYPE_INT_COLOR_RGB4 = 0x1f,
-  TYPE_LAST_COLOR_INT = 0x1f,
-  TYPE_LAST_INT = 0x1f
+  TYPE_FIRST_COLOR_INT = 0x1C,
+  TYPE_INT_COLOR_ARGB8 = 0x1C,
+  TYPE_INT_COLOR_RGB8 = 0x1D,
+  TYPE_INT_COLOR_ARGB4 = 0x1E,
+  TYPE_INT_COLOR_RGB4 = 0x1F,
+  TYPE_LAST_COLOR_INT = 0x1F,
+  TYPE_LAST_INT = 0x1F
 };
 
 //
@@ -94,7 +94,7 @@ enum : uint8_t {
 //
 enum : uint32_t {
 
-  RES_VALUE_TRUE = 0xffffffff,
+  RES_VALUE_TRUE = 0xFFFFFFFF,
   RES_VALUE_FALSE = 0x00000000
 };
 

@@ -31,13 +31,6 @@
 #include "utils/log.h"
 #include "utils/utils.h"
 
-using namespace ai;
-
-using ai::utils::formatString;
-
-using bytes = std::vector<std::byte>;
-using strings = std::vector<std::string>;
-
 //
 // Implementation used the following resources.
 //
@@ -60,6 +53,13 @@ using strings = std::vector<std::string>;
 //
 
 namespace {
+
+using namespace ai;
+
+using ai::utils::formatString;
+
+using bytes = std::vector<std::byte>;
+using strings = std::vector<std::string>;
 
 auto handleAttributes(DataStream &contentStream, strings const &strings) -> std::map<std::string, std::string> {
   std::map<std::string, std::string> attributes;
@@ -212,7 +212,7 @@ auto BinaryXml::getStringOffsets() const -> std::vector<std::uint32_t> {
   auto stringOffsets = std::vector<uint32_t>();
   auto stream = DataStream(content_->bytes);
   stream.skip(sizeof(BinaryXmlHeader));
-  for (size_t i = 0; i < content_->header->numStrings; i++) {
+  for (size_t i{0}; i < content_->header->numStrings; i++) {
     auto const offset = stream.read<uint32_t>();
     stringOffsets.push_back(offset);
   }
@@ -225,11 +225,6 @@ auto BinaryXml::isStringsUtf8Encoded() const -> bool {
 }
 
 auto BinaryXml::getStrings() const -> strings {
-
-  //
-  // TODO: Figure out why we can't just use xmlheader->stringsOffset.  Using
-  // this will make us 8 bytes short of where strings really start.
-  //
   auto const stringOffsets = getStringOffsets();
   auto const stringOffsetsInBytes = stringOffsets.size() * sizeof(decltype(stringOffsets)::value_type);
   auto const startStringsOffset = static_cast<uint32_t>(sizeof(BinaryXmlHeader) + stringOffsetsInBytes);
@@ -237,7 +232,7 @@ auto BinaryXml::getStrings() const -> strings {
   auto contentStream = DataStream(content_->bytes);
 
   std::vector<std::string> strings;
-  for (auto &offset : stringOffsets) {
+  for (auto const &offset : stringOffsets) {
     if (isUtf8Encoded) {
       contentStream.reset();
       contentStream.skip(startStringsOffset + offset);

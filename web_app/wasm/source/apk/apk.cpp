@@ -25,7 +25,7 @@
 
 #include "apk/apk.h"
 #include "apk_parser.h"
-#include "binary_xml.h"
+#include "binary_xml/binary_xml.h"
 #include "utils/log.h"
 
 using namespace ai;

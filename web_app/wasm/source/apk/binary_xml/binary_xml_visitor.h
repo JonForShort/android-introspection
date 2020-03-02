@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright 2019
+// Copyright 2019-2020
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,7 @@ public:
 
 class BinaryXmlElement {
 public:
-  virtual ~BinaryXmlElement() = default;
+  virtual ~BinaryXmlElement();
 };
 
 class StartXmlTagElement final : public BinaryXmlElement {
@@ -59,13 +59,13 @@ class StartXmlTagElement final : public BinaryXmlElement {
 public:
   StartXmlTagElement(std::string const tag, std::map<std::string, std::string> attributes) : tag_(tag), attributes_(attributes) {}
 
-  ~StartXmlTagElement() override = default;
+  ~StartXmlTagElement() override;
 
-  auto tag() const -> std::string { return tag_; }
+  auto tag() const -> std::string;
 
-  auto attributes() const -> std::map<std::string, std::string> { return attributes_; }
+  auto attributes() const -> std::map<std::string, std::string>;
 
-  auto accept(BinaryXmlVisitor const &visitor) const -> void { visitor.visit(*this); }
+  auto accept(BinaryXmlVisitor const &visitor) const -> void;
 };
 
 class EndXmlTagElement final : public BinaryXmlElement {
@@ -74,11 +74,11 @@ class EndXmlTagElement final : public BinaryXmlElement {
 public:
   EndXmlTagElement(std::string const tag) : tag_(tag) {}
 
-  ~EndXmlTagElement() override = default;
+  ~EndXmlTagElement() override;
 
-  auto tag() const -> std::string { return tag_; }
+  auto tag() const -> std::string;
 
-  auto accept(BinaryXmlVisitor const &visitor) const -> void { visitor.visit(*this); }
+  auto accept(BinaryXmlVisitor const &visitor) const -> void;
 };
 
 class InvalidXmlTagElement final : public BinaryXmlElement {
@@ -87,11 +87,11 @@ class InvalidXmlTagElement final : public BinaryXmlElement {
 public:
   InvalidXmlTagElement(std::string const error) : error_(error) {}
 
-  ~InvalidXmlTagElement() override = default;
+  ~InvalidXmlTagElement() override;
 
-  auto error() const -> std::string { return error_; }
+  auto error() const -> std::string;
 
-  auto accept(BinaryXmlVisitor const &visitor) const -> void { visitor.visit(*this); }
+  auto accept(BinaryXmlVisitor const &visitor) const -> void;
 };
 
 } // namespace ai
