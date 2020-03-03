@@ -33,6 +33,8 @@ class StartXmlTagElement;
 
 class EndXmlTagElement;
 
+class CDataTagElement;
+
 class InvalidXmlTagElement;
 
 class BinaryXmlVisitor {
@@ -42,6 +44,8 @@ public:
   virtual auto visit(StartXmlTagElement const &element) const -> void = 0;
 
   virtual auto visit(EndXmlTagElement const &element) const -> void = 0;
+
+  virtual auto visit(CDataTagElement const &element) const -> void = 0;
 
   virtual auto visit(InvalidXmlTagElement const &element) const -> void = 0;
 };
@@ -75,6 +79,19 @@ public:
   EndXmlTagElement(std::string const tag) : tag_(tag) {}
 
   ~EndXmlTagElement() override;
+
+  auto tag() const -> std::string;
+
+  auto accept(BinaryXmlVisitor const &visitor) const -> void;
+};
+
+class CDataTagElement final : public BinaryXmlElement {
+  std::string const tag_;
+
+public:
+  CDataTagElement(std::string const tag) : tag_(tag) {}
+
+  ~CDataTagElement() override;
 
   auto tag() const -> std::string;
 

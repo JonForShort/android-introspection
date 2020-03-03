@@ -36,6 +36,10 @@
   TypeName() = delete;                                                                                                                                         \
   DISALLOW_COPY_AND_ASSIGN(TypeName)
 
-template <typename T> inline void ignore_result(const T &) {}
+namespace ai::utils {
+
+template <typename T> inline void ignore(const T &) {}
+
+} // namespace ai::utils
 
 #endif // ANDROID_INTROSPECTION_UTILS_MACROS_H_

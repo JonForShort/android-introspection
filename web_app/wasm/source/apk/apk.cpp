@@ -27,6 +27,7 @@
 #include "apk_parser.h"
 #include "binary_xml/binary_xml.h"
 #include "utils/log.h"
+#include "utils/macros.h"
 
 using namespace ai;
 
@@ -94,6 +95,11 @@ public:
       auto visit(InvalidXmlTagElement const &element) const -> void override {
         LOGW("traverse invalid element [%s]", element.error());
         throw MalformedAndroidManifestException(apkPath_);
+      }
+
+      auto visit(CDataTagElement const &element) const -> void override {
+        utils::ignore(element);
+        LOGD("traverse cdata element [%s]", element.tag());
       }
 
     } visitor(apkPath_);

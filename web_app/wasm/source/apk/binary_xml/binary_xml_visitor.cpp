@@ -46,3 +46,9 @@ auto StartXmlTagElement::attributes() const -> std::map<std::string, std::string
 auto StartXmlTagElement::accept(BinaryXmlVisitor const &visitor) const -> void { visitor.visit(*this); }
 
 StartXmlTagElement::~StartXmlTagElement() = default;
+
+auto CDataTagElement::tag() const -> std::string { return tag_; }
+
+auto CDataTagElement::accept(BinaryXmlVisitor const &visitor) const -> void { visitor.visit(*this); }
+
+CDataTagElement::~CDataTagElement() = default;

@@ -29,6 +29,7 @@
 #include "resource_types.h"
 #include "utils/data_stream.h"
 #include "utils/log.h"
+#include "utils/macros.h"
 #include "utils/utils.h"
 
 //
@@ -166,7 +167,7 @@ auto handleEndElementTag(DataStream &contentStream, strings const &strings, Bina
   auto const namespaceStringIndex = contentStream.read<int32_t>();
   auto const namespaceString = namespaceStringIndex >= 0 ? strings[static_cast<uint32_t>(namespaceStringIndex)] : "";
 
-  auto stringIndex = contentStream.read<int32_t>();
+  auto const stringIndex = contentStream.read<int32_t>();
   auto const string = stringIndex >= 0 ? strings[static_cast<uint32_t>(stringIndex)] : "";
 
   LOGI("end tag [{}] namespace [{}]", string.c_str(), namespaceString.c_str());
@@ -174,17 +175,19 @@ auto handleEndElementTag(DataStream &contentStream, strings const &strings, Bina
   EndXmlTagElement(string).accept(visitor);
 }
 
-auto handleCDataTag(DataStream &contentStream, strings const &strings) -> void {
+auto handleCDataTag(DataStream &contentStream, strings const &strings, BinaryXmlVisitor const &visitor) -> void {
   contentStream.skip(sizeof(uint32_t));
   contentStream.skip(sizeof(uint32_t));
 
-  auto stringIndex = contentStream.read<uint32_t>();
-  auto string = strings[stringIndex];
+  auto const stringIndex = contentStream.read<uint32_t>();
+  auto const string = strings[stringIndex];
 
   contentStream.skip(sizeof(uint32_t));
   contentStream.skip(sizeof(uint32_t));
 
-  LOGD("handling cdata tag [%s]", string.c_str());
+  LOGI("cdata tag [{}]", string.c_str());
+
+  CDataTagElement(string).accept(visitor);
 }
 
 } // namespace
@@ -273,16 +276,15 @@ auto BinaryXml::traverseXml(BinaryXmlVisitor const &visitor) const -> void {
 
   auto contentStream = DataStream(content_->bytes);
   contentStream.skip(static_cast<uint32_t>(xmlChunkOffset));
-  auto tag = contentStream.read<uint16_t>();
 
-  do {
+  for (auto const tag = contentStream.read<uint16_t>(); tag != RES_XML_END_NAMESPACE_TYPE;) {
     auto const headerSize = contentStream.read<uint16_t>();
     auto const chunkSize = contentStream.read<uint32_t>();
     auto const strings = getStrings();
 
-    LOGV("makeApkDebuggable: tag = [{:d}], headerSize = [{:d}], chunkSize = [{:d}]", tag, headerSize, chunkSize);
+    LOGV("traverseXml: tag = [{:d}], headerSize = [{:d}], chunkSize = [{:d}]", tag, headerSize, chunkSize);
 
-    (void)headerSize;
+    utils::ignore(headerSize);
 
     switch (tag) {
     case RES_XML_START_NAMESPACE_TYPE: {
@@ -302,13 +304,12 @@ auto BinaryXml::traverseXml(BinaryXmlVisitor const &visitor) const -> void {
       break;
     }
     case RES_XML_CDATA_TYPE: {
-      handleCDataTag(contentStream, strings);
+      handleCDataTag(contentStream, strings, visitor);
       break;
     }
     default: {
       LOGW("skipping unknown tag [%d]", tag);
     }
     }
-    tag = contentStream.read<uint16_t>();
-  } while (tag != RES_XML_END_NAMESPACE_TYPE);
+  }
 }
