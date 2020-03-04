@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright 2019-2020
+// Copyright 2020
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,26 +21,35 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#ifndef ANDROID_INTROSPECTION_APK_BINARY_XML_VISITOR_H_
-#define ANDROID_INTROSPECTION_APK_BINARY_XML_VISITOR_H_
-
 #include "binary_xml_element.h"
+#include "binary_xml_visitor.h"
 
-namespace ai {
+using namespace ai;
 
-class BinaryXmlVisitor {
-public:
-  virtual ~BinaryXmlVisitor() = default;
+BinaryXmlElement::~BinaryXmlElement() = default;
 
-  virtual auto visit(StartXmlTagElement const &element) const -> void = 0;
+auto InvalidXmlTagElement::accept(BinaryXmlVisitor const &visitor) const -> void { visitor.visit(*this); }
 
-  virtual auto visit(EndXmlTagElement const &element) const -> void = 0;
+auto InvalidXmlTagElement::error() const -> std::string { return error_; }
 
-  virtual auto visit(CDataTagElement const &element) const -> void = 0;
+InvalidXmlTagElement::~InvalidXmlTagElement() = default;
 
-  virtual auto visit(InvalidXmlTagElement const &element) const -> void = 0;
-};
+auto EndXmlTagElement::tag() const -> std::string { return tag_; }
 
-} // namespace ai
+auto EndXmlTagElement::accept(BinaryXmlVisitor const &visitor) const -> void { visitor.visit(*this); }
 
-#endif /* ANDROID_INTROSPECTION_APK_BINARY_XML_VISITOR_H_ */
+EndXmlTagElement::~EndXmlTagElement() = default;
+
+auto StartXmlTagElement::tag() const -> std::string { return tag_; }
+
+auto StartXmlTagElement::attributes() const -> std::map<std::string, std::string> { return attributes_; }
+
+auto StartXmlTagElement::accept(BinaryXmlVisitor const &visitor) const -> void { visitor.visit(*this); }
+
+StartXmlTagElement::~StartXmlTagElement() = default;
+
+auto CDataTagElement::tag() const -> std::string { return tag_; }
+
+auto CDataTagElement::accept(BinaryXmlVisitor const &visitor) const -> void { visitor.visit(*this); }
+
+CDataTagElement::~CDataTagElement() = default;

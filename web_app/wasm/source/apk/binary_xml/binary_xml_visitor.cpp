@@ -22,33 +22,3 @@
 // SOFTWARE.
 //
 #include "binary_xml_visitor.h"
-
-using namespace ai;
-
-BinaryXmlElement::~BinaryXmlElement() = default;
-
-auto InvalidXmlTagElement::accept(BinaryXmlVisitor const &visitor) const -> void { visitor.visit(*this); }
-
-auto InvalidXmlTagElement::error() const -> std::string { return error_; }
-
-InvalidXmlTagElement::~InvalidXmlTagElement() = default;
-
-auto EndXmlTagElement::tag() const -> std::string { return tag_; }
-
-auto EndXmlTagElement::accept(BinaryXmlVisitor const &visitor) const -> void { visitor.visit(*this); }
-
-EndXmlTagElement::~EndXmlTagElement() = default;
-
-auto StartXmlTagElement::tag() const -> std::string { return tag_; }
-
-auto StartXmlTagElement::attributes() const -> std::map<std::string, std::string> { return attributes_; }
-
-auto StartXmlTagElement::accept(BinaryXmlVisitor const &visitor) const -> void { visitor.visit(*this); }
-
-StartXmlTagElement::~StartXmlTagElement() = default;
-
-auto CDataTagElement::tag() const -> std::string { return tag_; }
-
-auto CDataTagElement::accept(BinaryXmlVisitor const &visitor) const -> void { visitor.visit(*this); }
-
-CDataTagElement::~CDataTagElement() = default;
