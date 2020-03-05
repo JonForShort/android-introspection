@@ -26,10 +26,9 @@
 #include <fstream>
 #include <mz.h>
 
-#include "utils/log.h"
-
 #include "apk_parser.h"
 #include "scoped_minizip.h"
+#include "utils/log.h"
 #include "zip_archiver.h"
 
 using namespace ai;

@@ -61,9 +61,10 @@ using ai::utils::formatString;
 
 using bytes = std::vector<std::byte>;
 using strings = std::vector<std::string>;
+using stringPairs = std::map<std::string, std::string>;
 
-auto handleAttributes(DataStream &contentStream, strings const &strings) -> std::map<std::string, std::string> {
-  std::map<std::string, std::string> attributes;
+auto handleAttributes(DataStream &contentStream, strings const &strings) -> stringPairs {
+  stringPairs attributes;
   auto const attributeMarker = contentStream.read<uint32_t>();
   if (attributeMarker != XML_ATTRS_MARKER) {
     LOGW("unexpected attributes marker");
@@ -73,10 +74,12 @@ auto handleAttributes(DataStream &contentStream, strings const &strings) -> std:
   auto const attributesCount = contentStream.read<uint32_t>();
   contentStream.skip(sizeof(uint32_t));
 
-  for (auto i = 0U; i < attributesCount; i++) {
-    /* auto const attributeNamespaceIndex = */ contentStream.skip(sizeof(uint32_t));
+  for (auto i{0U}; i < attributesCount; i++) {
+    auto const attributeNamespaceIndex = contentStream.read<uint32_t>();
     auto const attributeNameIndex = contentStream.read<uint32_t>();
     auto const attributeValueIndex = contentStream.read<uint32_t>();
+
+    utils::ignore(attributeNamespaceIndex);
 
     contentStream.skip(sizeof(uint16_t));
     contentStream.skip(sizeof(uint8_t));
@@ -274,13 +277,13 @@ auto BinaryXml::traverseXml(BinaryXmlVisitor const &visitor) const -> void {
     return;
   }
 
+  auto const strings = getStrings();
   auto contentStream = DataStream(content_->bytes);
   contentStream.skip(static_cast<uint32_t>(xmlChunkOffset));
 
   for (auto const tag = contentStream.read<uint16_t>(); tag != RES_XML_END_NAMESPACE_TYPE;) {
     auto const headerSize = contentStream.read<uint16_t>();
     auto const chunkSize = contentStream.read<uint32_t>();
-    auto const strings = getStrings();
 
     LOGV("traverseXml: tag = [{:d}], headerSize = [{:d}], chunkSize = [{:d}]", tag, headerSize, chunkSize);
 
