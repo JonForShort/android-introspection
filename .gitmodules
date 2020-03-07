@@ -36,3 +36,8 @@
 	path = external/spdlog/source
 	url = https://github.com/gabime/spdlog.git
 	ignore = dirty
+
+[submodule "external/pugixml/source"]
+	path = external/pugixml/source
+	url = https://github.com/zeux/pugixml.git
+        ignore = dirty
