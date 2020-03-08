@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright 2019
+// Copyright 2019-2020
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -59,14 +59,7 @@ public:
     }
 
     auto const binaryXml = BinaryXml(contents);
-    auto const strings = binaryXml.getStrings();
-    if (strings.empty()) {
-      LOGW("unable to parse strings in [%s]", apkPath_);
-      throw MalformedAndroidManifestException(apkPath_);
-    }
-
-    auto const hasApplicationTag = std::find(strings.cbegin(), strings.cend(), ANDROID_MANIFEST_TAG_APPLICATION) != strings.end();
-    if (!hasApplicationTag) {
+    if (!binaryXml.hasElement(ANDROID_MANIFEST_TAG_APPLICATION)) {
       LOGW("unable to find application tag in [%s]", apkPath_);
       throw MalformedAndroidManifestException(apkPath_);
     }
@@ -104,7 +97,7 @@ public:
 
     } visitor(apkPath_);
 
-    binaryXml.traverseXml(visitor);
+    binaryXml.traverseElements(visitor);
   }
 
   auto isDebuggable() const -> bool { return false; }

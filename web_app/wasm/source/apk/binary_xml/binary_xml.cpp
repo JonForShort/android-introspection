@@ -203,6 +203,11 @@ BinaryXml::BinaryXml(std::vector<std::byte> const &bytes) : content_(std::make_u
   content_->utf8Encoded = isStringsUtf8Encoded();
 }
 
+auto BinaryXml::hasElement(std::string_view elementTag) const -> bool {
+  auto const strings = getStrings();
+  return std::find(strings.cbegin(), strings.cend(), elementTag) != strings.end();
+}
+
 auto BinaryXml::getXmlHeader() const -> BinaryXmlHeader const * {
   auto xmlHeader = reinterpret_cast<BinaryXmlHeader const *>(content_->bytes.data());
   if (xmlHeader->magicNumber != XML_IDENTIFIER) {
@@ -270,7 +275,7 @@ auto BinaryXml::getXmlChunkOffset() const -> uint64_t {
   return bytes.size() - (bytes.size() - header->chunkSize);
 }
 
-auto BinaryXml::traverseXml(BinaryXmlVisitor const &visitor) const -> void {
+auto BinaryXml::traverseElements(BinaryXmlVisitor const &visitor) const -> void {
   auto const xmlChunkOffset = getXmlChunkOffset();
   if (xmlChunkOffset == 0) {
     InvalidXmlTagElement("chunk offset is zero").accept(visitor);
@@ -285,7 +290,7 @@ auto BinaryXml::traverseXml(BinaryXmlVisitor const &visitor) const -> void {
     auto const headerSize = contentStream.read<uint16_t>();
     auto const chunkSize = contentStream.read<uint32_t>();
 
-    LOGV("traverseXml: tag = [{:d}], headerSize = [{:d}], chunkSize = [{:d}]", tag, headerSize, chunkSize);
+    LOGV("traverseElements: tag = [{:d}], headerSize = [{:d}], chunkSize = [{:d}]", tag, headerSize, chunkSize);
 
     utils::ignore(headerSize);
 

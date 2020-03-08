@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright 2019
+// Copyright 2019-2020
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,9 +37,11 @@ class BinaryXml {
 public:
   explicit BinaryXml(std::vector<std::byte> const &bytes);
 
-  auto getStrings() const -> std::vector<std::string>;
+  auto hasElement(std::string_view elementTag) const -> bool;
 
-  auto traverseXml(BinaryXmlVisitor const &visitor) const -> void;
+  auto traverseElements(BinaryXmlVisitor const &visitor) const -> void;
+
+  auto toStringXml() const -> std::string;
 
 private:
   struct BinaryXmlHeader {
@@ -81,6 +83,8 @@ private:
   auto getXmlHeader() const -> BinaryXmlHeader const *;
 
   auto getXmlChunkOffset() const -> uint64_t;
+
+  auto getStrings() const -> std::vector<std::string>;
 
   auto getStringOffsets() const -> std::vector<std::uint32_t>;
 
