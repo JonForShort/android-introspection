@@ -208,6 +208,32 @@ auto BinaryXml::hasElement(std::string_view elementTag) const -> bool {
   return std::find(strings.cbegin(), strings.cend(), elementTag) != strings.end();
 }
 
+auto BinaryXml::toStringXml() const -> std::string {
+
+  std::string xml;
+
+  class MyBinaryXmlVisitor final : public BinaryXmlVisitor {
+
+    std::string &xml_;
+
+  public:
+    MyBinaryXmlVisitor(std::string &xml) : xml_(xml) { utils::ignore(xml_); }
+
+    auto visit(StartXmlTagElement const &element) const -> void override { utils::ignore(element); }
+
+    auto visit(EndXmlTagElement const &element) const -> void override { utils::ignore(element); }
+
+    auto visit(InvalidXmlTagElement const &element) const -> void override { utils::ignore(element); }
+
+    auto visit(CDataTagElement const &element) const -> void override { utils::ignore(element); }
+
+  } visitor(xml);
+
+  traverseElements(visitor);
+
+  return xml;
+}
+
 auto BinaryXml::getXmlHeader() const -> BinaryXmlHeader const * {
   auto xmlHeader = reinterpret_cast<BinaryXmlHeader const *>(content_->bytes.data());
   if (xmlHeader->magicNumber != XML_IDENTIFIER) {
