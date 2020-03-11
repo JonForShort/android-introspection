@@ -39,7 +39,7 @@ public:
 
   auto hasElement(std::string_view elementTag) const -> bool;
 
-  auto traverseElements(BinaryXmlVisitor const &visitor) const -> void;
+  auto traverseElements(BinaryXmlVisitor &visitor) const -> void;
 
   auto toStringXml() const -> std::string;
 

@@ -39,31 +39,41 @@ public:
 class StartXmlTagElement final : public BinaryXmlElement {
   std::string const tag_;
 
+  std::string const nameSpace_;
+
   std::map<std::string, std::string> attributes_;
 
 public:
-  StartXmlTagElement(std::string const tag, std::map<std::string, std::string> attributes) : tag_(tag), attributes_(attributes) {}
+  StartXmlTagElement(std::string const tag, std::string const nameSpace, std::map<std::string, std::string> attributes)
+      : tag_(tag), nameSpace_(nameSpace), attributes_(attributes) {}
 
   ~StartXmlTagElement() override;
 
   auto tag() const -> std::string;
 
+  auto nameSpace() const -> std::string;
+
   auto attributes() const -> std::map<std::string, std::string>;
 
-  auto accept(BinaryXmlVisitor const &visitor) const -> void;
+  auto accept(BinaryXmlVisitor &visitor) const -> void;
 };
 
 class EndXmlTagElement final : public BinaryXmlElement {
+
   std::string const tag_;
 
+  std::string const nameSpace_;
+
 public:
-  EndXmlTagElement(std::string const tag) : tag_(tag) {}
+  EndXmlTagElement(std::string const tag, std::string const nameSpace) : tag_(tag), nameSpace_(nameSpace) {}
 
   ~EndXmlTagElement() override;
 
   auto tag() const -> std::string;
 
-  auto accept(BinaryXmlVisitor const &visitor) const -> void;
+  auto nameSpace() const -> std::string;
+
+  auto accept(BinaryXmlVisitor &visitor) const -> void;
 };
 
 class CDataTagElement final : public BinaryXmlElement {
@@ -76,7 +86,7 @@ public:
 
   auto tag() const -> std::string;
 
-  auto accept(BinaryXmlVisitor const &visitor) const -> void;
+  auto accept(BinaryXmlVisitor &visitor) const -> void;
 };
 
 class InvalidXmlTagElement final : public BinaryXmlElement {
@@ -89,7 +99,7 @@ public:
 
   auto error() const -> std::string;
 
-  auto accept(BinaryXmlVisitor const &visitor) const -> void;
+  auto accept(BinaryXmlVisitor &visitor) const -> void;
 };
 
 } // namespace ai

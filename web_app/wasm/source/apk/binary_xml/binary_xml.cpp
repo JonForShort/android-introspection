@@ -146,7 +146,7 @@ auto handleAttributes(DataStream &contentStream, strings const &strings) -> stri
   return attributes;
 }
 
-auto handleStartElementTag(DataStream &contentStream, strings const &strings, BinaryXmlVisitor const &visitor) -> void {
+auto handleStartElementTag(DataStream &contentStream, strings const &strings, BinaryXmlVisitor &visitor) -> void {
   contentStream.skip(sizeof(uint32_t));
   contentStream.skip(sizeof(uint32_t));
 
@@ -160,10 +160,10 @@ auto handleStartElementTag(DataStream &contentStream, strings const &strings, Bi
 
   LOGI("start tag [{}] namespace [{}]", string.c_str(), namespaceString.c_str());
 
-  StartXmlTagElement(string, attributes).accept(visitor);
+  StartXmlTagElement(string, namespaceString, attributes).accept(visitor);
 }
 
-auto handleEndElementTag(DataStream &contentStream, strings const &strings, BinaryXmlVisitor const &visitor) -> void {
+auto handleEndElementTag(DataStream &contentStream, strings const &strings, BinaryXmlVisitor &visitor) -> void {
   contentStream.skip(sizeof(uint32_t));
   contentStream.skip(sizeof(uint32_t));
 
@@ -175,10 +175,10 @@ auto handleEndElementTag(DataStream &contentStream, strings const &strings, Bina
 
   LOGI("end tag [{}] namespace [{}]", string.c_str(), namespaceString.c_str());
 
-  EndXmlTagElement(string).accept(visitor);
+  EndXmlTagElement(string, namespaceString).accept(visitor);
 }
 
-auto handleCDataTag(DataStream &contentStream, strings const &strings, BinaryXmlVisitor const &visitor) -> void {
+auto handleCDataTag(DataStream &contentStream, strings const &strings, BinaryXmlVisitor &visitor) -> void {
   contentStream.skip(sizeof(uint32_t));
   contentStream.skip(sizeof(uint32_t));
 
@@ -215,17 +215,28 @@ auto BinaryXml::toStringXml() const -> std::string {
   class MyBinaryXmlVisitor final : public BinaryXmlVisitor {
 
     std::string &xml_;
+    uint32_t depth_ = 0;
 
   public:
-    MyBinaryXmlVisitor(std::string &xml) : xml_(xml) { utils::ignore(xml_); }
+    MyBinaryXmlVisitor(std::string &xml) : xml_(xml) {}
 
-    auto visit(StartXmlTagElement const &element) const -> void override { utils::ignore(element); }
+    auto visit(StartXmlTagElement const &element) -> void override {
+      utils::ignore(element);
+      depth_++;
+    }
 
-    auto visit(EndXmlTagElement const &element) const -> void override { utils::ignore(element); }
+    auto visit(EndXmlTagElement const &element) -> void override {
+      utils::ignore(element);
+      assert(depth_ > 0);
+      depth_--;
+    }
 
-    auto visit(InvalidXmlTagElement const &element) const -> void override { utils::ignore(element); }
+    auto visit(InvalidXmlTagElement const &element) -> void override { utils::ignore(element); }
 
-    auto visit(CDataTagElement const &element) const -> void override { utils::ignore(element); }
+    auto visit(CDataTagElement const &element) -> void override { utils::ignore(element); }
+
+  private:
+    auto setXmlHeader() { xml_ += "<?xml version=\"1.0\" encoding=\"utf-8\"?>"; }
 
   } visitor(xml);
 
@@ -301,7 +312,7 @@ auto BinaryXml::getXmlChunkOffset() const -> uint64_t {
   return bytes.size() - (bytes.size() - header->chunkSize);
 }
 
-auto BinaryXml::traverseElements(BinaryXmlVisitor const &visitor) const -> void {
+auto BinaryXml::traverseElements(BinaryXmlVisitor &visitor) const -> void {
   auto const xmlChunkOffset = getXmlChunkOffset();
   if (xmlChunkOffset == 0) {
     InvalidXmlTagElement("chunk offset is zero").accept(visitor);

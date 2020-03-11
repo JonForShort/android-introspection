@@ -30,25 +30,29 @@ BinaryXmlElement::~BinaryXmlElement() = default;
 
 auto StartXmlTagElement::tag() const -> std::string { return tag_; }
 
+auto StartXmlTagElement::nameSpace() const -> std::string { return nameSpace_; }
+
 auto StartXmlTagElement::attributes() const -> std::map<std::string, std::string> { return attributes_; }
 
-auto StartXmlTagElement::accept(BinaryXmlVisitor const &visitor) const -> void { visitor.visit(*this); }
+auto StartXmlTagElement::accept(BinaryXmlVisitor &visitor) const -> void { visitor.visit(*this); }
 
 StartXmlTagElement::~StartXmlTagElement() = default;
 
 auto EndXmlTagElement::tag() const -> std::string { return tag_; }
 
-auto EndXmlTagElement::accept(BinaryXmlVisitor const &visitor) const -> void { visitor.visit(*this); }
+auto EndXmlTagElement::nameSpace() const -> std::string { return nameSpace_; }
+
+auto EndXmlTagElement::accept(BinaryXmlVisitor &visitor) const -> void { visitor.visit(*this); }
 
 EndXmlTagElement::~EndXmlTagElement() = default;
 
 auto CDataTagElement::tag() const -> std::string { return tag_; }
 
-auto CDataTagElement::accept(BinaryXmlVisitor const &visitor) const -> void { visitor.visit(*this); }
+auto CDataTagElement::accept(BinaryXmlVisitor &visitor) const -> void { visitor.visit(*this); }
 
 CDataTagElement::~CDataTagElement() = default;
 
-auto InvalidXmlTagElement::accept(BinaryXmlVisitor const &visitor) const -> void { visitor.visit(*this); }
+auto InvalidXmlTagElement::accept(BinaryXmlVisitor &visitor) const -> void { visitor.visit(*this); }
 
 auto InvalidXmlTagElement::error() const -> std::string { return error_; }
 

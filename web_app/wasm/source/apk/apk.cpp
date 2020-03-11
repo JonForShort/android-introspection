@@ -69,7 +69,7 @@ public:
 
       MyBinaryXmlVisitor(std::string const &apkPath) noexcept : apkPath_(apkPath) {}
 
-      auto visit(StartXmlTagElement const &element) const -> void override {
+      auto visit(StartXmlTagElement const &element) -> void override {
         auto const tag = element.tag();
         LOGD("traverse start tag element [%s]", tag);
         if (tag == ANDROID_MANIFEST_TAG_APPLICATION) {
@@ -77,7 +77,7 @@ public:
         }
       }
 
-      auto visit(EndXmlTagElement const &element) const -> void override {
+      auto visit(EndXmlTagElement const &element) -> void override {
         auto const tag = element.tag();
         LOGD("traverse end tag element [%s]", tag);
         if (tag == ANDROID_MANIFEST_TAG_APPLICATION) {
@@ -85,12 +85,12 @@ public:
         }
       }
 
-      auto visit(InvalidXmlTagElement const &element) const -> void override {
+      auto visit(InvalidXmlTagElement const &element) -> void override {
         LOGW("traverse invalid element [%s]", element.error());
         throw MalformedAndroidManifestException(apkPath_);
       }
 
-      auto visit(CDataTagElement const &element) const -> void override {
+      auto visit(CDataTagElement const &element) -> void override {
         utils::ignore(element);
         LOGD("traverse cdata element [%s]", element.tag());
       }

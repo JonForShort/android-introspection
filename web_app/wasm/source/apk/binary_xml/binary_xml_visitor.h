@@ -32,13 +32,13 @@ class BinaryXmlVisitor {
 public:
   virtual ~BinaryXmlVisitor() = default;
 
-  virtual auto visit(StartXmlTagElement const &element) const -> void = 0;
+  virtual auto visit(StartXmlTagElement const &element) -> void = 0;
 
-  virtual auto visit(EndXmlTagElement const &element) const -> void = 0;
+  virtual auto visit(EndXmlTagElement const &element) -> void = 0;
 
-  virtual auto visit(CDataTagElement const &element) const -> void = 0;
+  virtual auto visit(CDataTagElement const &element) -> void = 0;
 
-  virtual auto visit(InvalidXmlTagElement const &element) const -> void = 0;
+  virtual auto visit(InvalidXmlTagElement const &element) -> void = 0;
 };
 
 } // namespace ai
