@@ -27,6 +27,7 @@
 #include "binary_xml.h"
 #include "binary_xml_visitor.h"
 #include "resource_types.h"
+#include "string_xml_visitor.h"
 #include "utils/data_stream.h"
 #include "utils/log.h"
 #include "utils/macros.h"
@@ -209,39 +210,9 @@ auto BinaryXml::hasElement(std::string_view elementTag) const -> bool {
 }
 
 auto BinaryXml::toStringXml() const -> std::string {
-
   std::string xml;
-
-  class MyBinaryXmlVisitor final : public BinaryXmlVisitor {
-
-    std::string &xml_;
-    uint32_t depth_ = 0;
-
-  public:
-    MyBinaryXmlVisitor(std::string &xml) : xml_(xml) {}
-
-    auto visit(StartXmlTagElement const &element) -> void override {
-      utils::ignore(element);
-      depth_++;
-    }
-
-    auto visit(EndXmlTagElement const &element) -> void override {
-      utils::ignore(element);
-      assert(depth_ > 0);
-      depth_--;
-    }
-
-    auto visit(InvalidXmlTagElement const &element) -> void override { utils::ignore(element); }
-
-    auto visit(CDataTagElement const &element) -> void override { utils::ignore(element); }
-
-  private:
-    auto setXmlHeader() { xml_ += "<?xml version=\"1.0\" encoding=\"utf-8\"?>"; }
-
-  } visitor(xml);
-
+  auto visitor = StringXmlVisitor(xml);
   traverseElements(visitor);
-
   return xml;
 }
 

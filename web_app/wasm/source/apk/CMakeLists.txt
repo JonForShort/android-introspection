@@ -5,6 +5,7 @@ set(
   binary_xml/binary_xml.cpp
   binary_xml/binary_xml_element.cpp
   binary_xml/binary_xml_visitor.cpp
+  binary_xml/string_xml_visitor.cpp
   apk_parser.cpp
   zip_archiver.cpp
 )
