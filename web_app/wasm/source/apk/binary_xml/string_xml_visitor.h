@@ -30,14 +30,10 @@ namespace ai {
 
 class StringXmlVisitor : public BinaryXmlVisitor {
 
-  std::string &xml_;
-
-  uint32_t depth_ = 0;
-
 public:
-  StringXmlVisitor(std::string &xml) : xml_(xml) {}
+  StringXmlVisitor(std::string &xml, bool const isStringsUtf8Encoded);
 
-  ~StringXmlVisitor() = default;
+  ~StringXmlVisitor() override = default;
 
   auto visit(StartXmlTagElement const &element) -> void override;
 
@@ -46,6 +42,15 @@ public:
   auto visit(CDataTagElement const &element) -> void override;
 
   auto visit(InvalidXmlTagElement const &element) -> void override;
+
+private:
+  auto getAndroidManifestHeader() const -> char const *;
+
+  bool const isStringsUtf8Encoded_;
+
+  std::string &xml_;
+
+  uint32_t depth_ = 0;
 };
 
 } // namespace ai

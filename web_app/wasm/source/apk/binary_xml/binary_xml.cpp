@@ -211,7 +211,7 @@ auto BinaryXml::hasElement(std::string_view elementTag) const -> bool {
 
 auto BinaryXml::toStringXml() const -> std::string {
   std::string xml;
-  auto visitor = StringXmlVisitor(xml);
+  auto visitor = StringXmlVisitor(xml, isStringsUtf8Encoded());
   traverseElements(visitor);
   return xml;
 }

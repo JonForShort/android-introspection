@@ -26,6 +26,8 @@
 
 using namespace ai;
 
+StringXmlVisitor::StringXmlVisitor(std::string &xml, bool const isStringsUtf8Encoded) : xml_(xml), isStringsUtf8Encoded_(isStringsUtf8Encoded) {}
+
 auto StringXmlVisitor::visit(StartXmlTagElement const &element) -> void {
   utils::ignore(element);
   depth_++;
@@ -39,3 +41,7 @@ auto StringXmlVisitor::visit(EndXmlTagElement const &element) -> void {
 auto StringXmlVisitor::visit(InvalidXmlTagElement const &element) -> void { utils::ignore(element); }
 
 auto StringXmlVisitor::visit(CDataTagElement const &element) -> void { utils::ignore(element); }
+
+auto StringXmlVisitor::getAndroidManifestHeader() const -> char const * {
+  return isStringsUtf8Encoded_ ? "<?xml version=\"1.0\" encoding=\"utf-8\"?>" : "<?xml version=\"1.0\" encoding=\"utf-16\"?>";
+}
