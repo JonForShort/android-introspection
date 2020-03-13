@@ -25,6 +25,7 @@
 #define ANDROID_INTROSPECTION_APK_BINARY_XML_H_
 
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -35,9 +36,13 @@ namespace ai {
 
 class BinaryXml {
 public:
+  using ElementAttributes = std::map<std::string, std::string>;
+
   explicit BinaryXml(std::vector<std::byte> const &bytes);
 
   auto hasElement(std::string_view elementTag) const -> bool;
+
+  auto getElementAttributes(std::vector<std::string> elementPath) const -> ElementAttributes;
 
   auto traverseElements(BinaryXmlVisitor &visitor) const -> void;
 

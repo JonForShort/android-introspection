@@ -40,6 +40,8 @@ public:
 
   auto isDebuggable() const -> bool;
 
+  auto dump(std::string_view destinationDirectory) const -> void;
+
 private:
   class ApkImpl;
 

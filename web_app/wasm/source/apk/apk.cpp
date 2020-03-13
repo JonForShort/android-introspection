@@ -35,7 +35,27 @@ namespace {
 
 static constexpr char const *const ANDROID_MANIFEST = "AndroidManifest.xml";
 
-static constexpr char const *const ANDROID_MANIFEST_TAG_APPLICATION = "application";
+static constexpr auto ANDROID_MANIFEST_TAG_APPLICATION = "application";
+
+static constexpr auto ANDROID_MANIFEST_ATTRIBUTE_DEBUGGABLE = "debuggable";
+
+auto getBinaryXml(std::string const apkPath) -> BinaryXml {
+  auto const apkParser = ai::ApkParser(apkPath);
+  auto const files = apkParser.getFiles();
+  auto const hasAndroidManifest = std::find(files.cbegin(), files.cend(), ANDROID_MANIFEST) != files.end();
+  if (!hasAndroidManifest) {
+    LOGW("unable to find manifest in [%s]", apkPath);
+    throw MissingAndroidManifestException(apkPath);
+  }
+
+  auto const contents = apkParser.getFileContents(ANDROID_MANIFEST);
+  if (contents.empty()) {
+    LOGW("unable to read [%s]", apkPath);
+    throw MissingAndroidManifestException(apkPath);
+  }
+
+  return BinaryXml(contents);
+}
 
 } // namespace
 
@@ -44,21 +64,7 @@ public:
   ApkImpl(std::string_view apkPath) : apkPath_(apkPath) {}
 
   auto makeDebuggable() const -> void {
-    auto const apkParser = ai::ApkParser(apkPath_);
-    auto const files = apkParser.getFiles();
-    auto const hasAndroidManifest = std::find(files.cbegin(), files.cend(), ANDROID_MANIFEST) != files.end();
-    if (!hasAndroidManifest) {
-      LOGW("unable to find manifest in [%s]", apkPath_);
-      throw MissingAndroidManifestException(apkPath_);
-    }
-
-    auto const contents = apkParser.getFileContents(ANDROID_MANIFEST);
-    if (contents.empty()) {
-      LOGW("unable to read [%s]", apkPath_);
-      throw MissingAndroidManifestException(apkPath_);
-    }
-
-    auto const binaryXml = BinaryXml(contents);
+    auto const binaryXml = getBinaryXml(apkPath_);
     if (!binaryXml.hasElement(ANDROID_MANIFEST_TAG_APPLICATION)) {
       LOGW("unable to find application tag in [%s]", apkPath_);
       throw MalformedAndroidManifestException(apkPath_);
@@ -100,7 +106,20 @@ public:
     binaryXml.traverseElements(visitor);
   }
 
-  auto isDebuggable() const -> bool { return false; }
+  auto isDebuggable() const -> bool {
+    auto binaryXml = getBinaryXml(apkPath_);
+    if (!binaryXml.hasElement(ANDROID_MANIFEST_TAG_APPLICATION)) {
+      LOGW("unable to find application tag in [%s]", apkPath_);
+      throw MalformedAndroidManifestException(apkPath_);
+    }
+
+    std::vector<std::string> const elementPath = {ANDROID_MANIFEST_TAG_APPLICATION};
+    auto const attributes = binaryXml.getElementAttributes(elementPath);
+    auto const debuggableAttribute = attributes.find(ANDROID_MANIFEST_ATTRIBUTE_DEBUGGABLE);
+    return debuggableAttribute != attributes.end() ? debuggableAttribute->second == "true" : false;
+  }
+
+  auto dump(std::string_view destinationDirectory) const -> void { utils::ignore(destinationDirectory); }
 
 private:
   std::string const apkPath_;
@@ -113,3 +132,5 @@ Apk::~Apk() = default;
 auto Apk::makeDebuggable() const -> void { return pimpl_->makeDebuggable(); }
 
 auto Apk::isDebuggable() const -> bool { return pimpl_->isDebuggable(); }
+
+auto Apk::dump(std::string_view destinationDirectory) const -> void { return pimpl_->dump(destinationDirectory); }

@@ -209,6 +209,11 @@ auto BinaryXml::hasElement(std::string_view elementTag) const -> bool {
   return std::find(strings.cbegin(), strings.cend(), elementTag) != strings.end();
 }
 
+auto BinaryXml::getElementAttributes(std::vector<std::string> elementPath) const -> ElementAttributes {
+  utils::ignore(elementPath);
+  return ElementAttributes();
+}
+
 auto BinaryXml::toStringXml() const -> std::string {
   std::string xml;
   auto visitor = StringXmlVisitor(xml, isStringsUtf8Encoded());

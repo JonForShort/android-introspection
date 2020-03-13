@@ -26,7 +26,9 @@
 
 using namespace ai;
 
-StringXmlVisitor::StringXmlVisitor(std::string &xml, bool const isStringsUtf8Encoded) : xml_(xml), isStringsUtf8Encoded_(isStringsUtf8Encoded) {}
+StringXmlVisitor::StringXmlVisitor(std::string &xml, bool const isStringsUtf8Encoded) : isStringsUtf8Encoded_(isStringsUtf8Encoded), xml_(xml) {
+  xml_ += getAndroidManifestHeader();
+}
 
 auto StringXmlVisitor::visit(StartXmlTagElement const &element) -> void {
   utils::ignore(element);
