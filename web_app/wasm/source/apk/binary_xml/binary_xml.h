@@ -44,7 +44,7 @@ public:
 
   auto getElementAttributes(std::vector<std::string> elementPath) const -> ElementAttributes;
 
-  auto traverseElements(BinaryXmlVisitor &visitor) const -> void;
+  auto setElementAttribute(std::vector<std::string> elementPath, std::string_view attributeName, std::string_view attributeValue) const -> void;
 
   auto toStringXml() const -> std::string;
 
@@ -84,6 +84,8 @@ private:
 
     bool utf8Encoded;
   };
+
+  auto traverseXml(BinaryXmlVisitor &visitor) const -> void;
 
   auto getXmlHeader() const -> BinaryXmlHeader const *;
 

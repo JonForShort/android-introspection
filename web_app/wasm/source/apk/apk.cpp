@@ -69,41 +69,8 @@ public:
       LOGW("unable to find application tag in [%s]", apkPath_);
       throw MalformedAndroidManifestException(apkPath_);
     }
-
-    struct MyBinaryXmlVisitor final : public BinaryXmlVisitor {
-      std::string const &apkPath_;
-
-      MyBinaryXmlVisitor(std::string const &apkPath) noexcept : apkPath_(apkPath) {}
-
-      auto visit(StartXmlTagElement const &element) -> void override {
-        auto const tag = element.tag();
-        LOGD("traverse start tag element [%s]", tag);
-        if (tag == ANDROID_MANIFEST_TAG_APPLICATION) {
-          LOGD("found application tag");
-        }
-      }
-
-      auto visit(EndXmlTagElement const &element) -> void override {
-        auto const tag = element.tag();
-        LOGD("traverse end tag element [%s]", tag);
-        if (tag == ANDROID_MANIFEST_TAG_APPLICATION) {
-          LOGD("found application tag");
-        }
-      }
-
-      auto visit(InvalidXmlTagElement const &element) -> void override {
-        LOGW("traverse invalid element [%s]", element.error());
-        throw MalformedAndroidManifestException(apkPath_);
-      }
-
-      auto visit(CDataTagElement const &element) -> void override {
-        utils::ignore(element);
-        LOGD("traverse cdata element [%s]", element.tag());
-      }
-
-    } visitor(apkPath_);
-
-    binaryXml.traverseElements(visitor);
+    std::vector<std::string> const elementPath = {ANDROID_MANIFEST_TAG_APPLICATION};
+    binaryXml.setElementAttribute(elementPath, ANDROID_MANIFEST_ATTRIBUTE_DEBUGGABLE, "true");
   }
 
   auto isDebuggable() const -> bool {
@@ -112,7 +79,6 @@ public:
       LOGW("unable to find application tag in [%s]", apkPath_);
       throw MalformedAndroidManifestException(apkPath_);
     }
-
     std::vector<std::string> const elementPath = {ANDROID_MANIFEST_TAG_APPLICATION};
     auto const attributes = binaryXml.getElementAttributes(elementPath);
     auto const debuggableAttribute = attributes.find(ANDROID_MANIFEST_ATTRIBUTE_DEBUGGABLE);

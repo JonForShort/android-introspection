@@ -52,6 +52,8 @@ auto CDataTagElement::accept(BinaryXmlVisitor &visitor) const -> void { visitor.
 
 CDataTagElement::~CDataTagElement() = default;
 
+auto InvalidXmlTagElement::tag() const -> std::string { return ""; }
+
 auto InvalidXmlTagElement::accept(BinaryXmlVisitor &visitor) const -> void { visitor.visit(*this); }
 
 auto InvalidXmlTagElement::error() const -> std::string { return error_; }
