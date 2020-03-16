@@ -166,7 +166,7 @@ auto handleAttributes(DataStream &contentStream, Strings const &strings) {
   return attributes;
 }
 
-auto handleStartElementTag(TraverseContext &context) {
+auto handleStartElementTag(TraverseContext &context, BinaryXmlVisitor &visitor) {
   auto &contentStream = context.contentStream();
   auto const &strings = context.strings();
 
@@ -183,10 +183,12 @@ auto handleStartElementTag(TraverseContext &context) {
 
   LOGI("start tag [{}] namespace [{}]", string.c_str(), namespaceString.c_str());
 
-  return std::make_shared<StartXmlTagElement>(string, namespaceString, attributes);
+  auto element = std::make_shared<StartXmlTagElement>(string, namespaceString, attributes);
+  element->accept(visitor);
+  context.elements().push_back(element);
 }
 
-auto handleEndElementTag(TraverseContext &context) {
+auto handleEndElementTag(TraverseContext &context, BinaryXmlVisitor &visitor) {
   auto &contentStream = context.contentStream();
   auto const &strings = context.strings();
 
@@ -201,10 +203,12 @@ auto handleEndElementTag(TraverseContext &context) {
 
   LOGI("end tag [{}] namespace [{}]", string.c_str(), namespaceString.c_str());
 
-  return std::make_shared<EndXmlTagElement>(string, namespaceString);
+  auto element = std::make_shared<EndXmlTagElement>(string, namespaceString);
+  element->accept(visitor);
+  context.elements().pop_back();
 }
 
-auto handleCDataTag(TraverseContext &context) {
+auto handleCDataTag(TraverseContext &context, BinaryXmlVisitor &visitor) {
   auto &contentStream = context.contentStream();
   auto const &strings = context.strings();
 
@@ -219,7 +223,8 @@ auto handleCDataTag(TraverseContext &context) {
 
   LOGI("cdata tag [{}]", string.c_str());
 
-  return std::make_shared<CDataTagElement>(string);
+  auto element = std::make_shared<CDataTagElement>(string);
+  element->accept(visitor);
 }
 
 } // namespace
@@ -351,20 +356,15 @@ auto BinaryXml::traverseXml(BinaryXmlVisitor &visitor) const -> void {
       break;
     }
     case RES_XML_START_ELEMENT_TYPE: {
-      auto element = handleStartElementTag(context);
-      element->accept(visitor);
-      context.elements().push_back(element);
+      handleStartElementTag(context, visitor);
       break;
     }
     case RES_XML_END_ELEMENT_TYPE: {
-      auto element = handleEndElementTag(context);
-      element->accept(visitor);
-      context.elements().pop_back();
+      handleEndElementTag(context, visitor);
       break;
     }
     case RES_XML_CDATA_TYPE: {
-      auto element = handleCDataTag(context);
-      element->accept(visitor);
+      handleCDataTag(context, visitor);
       break;
     }
     default: {
