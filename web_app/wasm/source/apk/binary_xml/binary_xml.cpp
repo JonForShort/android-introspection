@@ -60,12 +60,31 @@ using namespace ai;
 
 using ai::utils::formatString;
 
-using bytes = std::vector<std::byte>;
-using strings = std::vector<std::string>;
-using stringPairs = std::map<std::string, std::string>;
+using Bytes = std::vector<std::byte>;
+using Strings = std::vector<std::string>;
+using StringPairs = std::map<std::string, std::string>;
+using ElementPointers = std::vector<std::shared_ptr<BinaryXmlElement>>;
 
-auto handleAttributes(DataStream &contentStream, strings const &strings) {
-  stringPairs attributes;
+struct TraverseContext {
+
+  TraverseContext(Bytes const &content, Strings const &strings) : contentStream_(DataStream(content)), strings_(strings) {}
+
+  auto contentStream() -> DataStream & { return contentStream_; }
+
+  auto strings() -> Strings & { return strings_; }
+
+  auto elements() -> ElementPointers & { return elements_; }
+
+private:
+  DataStream contentStream_;
+
+  Strings strings_;
+
+  ElementPointers elements_;
+};
+
+auto handleAttributes(DataStream &contentStream, Strings const &strings) {
+  StringPairs attributes;
   auto const attributeMarker = contentStream.read<uint32_t>();
   if (attributeMarker != XML_ATTRS_MARKER) {
     LOGW("unexpected attributes marker");
@@ -147,7 +166,10 @@ auto handleAttributes(DataStream &contentStream, strings const &strings) {
   return attributes;
 }
 
-auto handleStartElementTag(DataStream &contentStream, strings const &strings) {
+auto handleStartElementTag(TraverseContext &context) {
+  auto &contentStream = context.contentStream();
+  auto const &strings = context.strings();
+
   contentStream.skip(sizeof(uint32_t));
   contentStream.skip(sizeof(uint32_t));
 
@@ -164,7 +186,10 @@ auto handleStartElementTag(DataStream &contentStream, strings const &strings) {
   return std::make_shared<StartXmlTagElement>(string, namespaceString, attributes);
 }
 
-auto handleEndElementTag(DataStream &contentStream, strings const &strings) {
+auto handleEndElementTag(TraverseContext &context) {
+  auto &contentStream = context.contentStream();
+  auto const &strings = context.strings();
+
   contentStream.skip(sizeof(uint32_t));
   contentStream.skip(sizeof(uint32_t));
 
@@ -179,7 +204,10 @@ auto handleEndElementTag(DataStream &contentStream, strings const &strings) {
   return std::make_shared<EndXmlTagElement>(string, namespaceString);
 }
 
-auto handleCDataTag(DataStream &contentStream, strings const &strings) {
+auto handleCDataTag(TraverseContext &context) {
+  auto &contentStream = context.contentStream();
+  auto const &strings = context.strings();
+
   contentStream.skip(sizeof(uint32_t));
   contentStream.skip(sizeof(uint32_t));
 
@@ -254,7 +282,7 @@ auto BinaryXml::isStringsUtf8Encoded() const -> bool {
   return (xmlHeader->flags & RES_FLAG_UTF8) == RES_FLAG_UTF8;
 }
 
-auto BinaryXml::getStrings() const -> strings {
+auto BinaryXml::getStrings() const -> Strings {
   auto const stringOffsets = getStringOffsets();
   auto const stringOffsetsInBytes = stringOffsets.size() * sizeof(decltype(stringOffsets)::value_type);
   auto const startStringsOffset = static_cast<uint32_t>(sizeof(BinaryXmlHeader) + stringOffsetsInBytes);
@@ -301,11 +329,10 @@ auto BinaryXml::traverseXml(BinaryXmlVisitor &visitor) const -> void {
     return;
   }
 
-  auto const strings = getStrings();
-  auto contentStream = DataStream(content_->bytes);
+  auto context = TraverseContext(content_->bytes, getStrings());
+  auto &contentStream = context.contentStream();
   contentStream.skip(static_cast<uint32_t>(xmlChunkOffset));
 
-  std::vector<std::shared_ptr<BinaryXmlElement>> elements;
   for (auto const tag = contentStream.read<uint16_t>(); tag != RES_XML_END_NAMESPACE_TYPE;) {
     auto const headerSize = contentStream.read<uint16_t>();
     auto const chunkSize = contentStream.read<uint32_t>();
@@ -324,19 +351,19 @@ auto BinaryXml::traverseXml(BinaryXmlVisitor &visitor) const -> void {
       break;
     }
     case RES_XML_START_ELEMENT_TYPE: {
-      auto const element = handleStartElementTag(contentStream, strings);
+      auto element = handleStartElementTag(context);
       element->accept(visitor);
-      elements.push_back(element);
+      context.elements().push_back(element);
       break;
     }
     case RES_XML_END_ELEMENT_TYPE: {
-      auto const element = handleEndElementTag(contentStream, strings);
+      auto element = handleEndElementTag(context);
       element->accept(visitor);
-      elements.pop_back();
+      context.elements().pop_back();
       break;
     }
     case RES_XML_CDATA_TYPE: {
-      auto const element = handleCDataTag(contentStream, strings);
+      auto element = handleCDataTag(context);
       element->accept(visitor);
       break;
     }
