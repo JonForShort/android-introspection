@@ -33,9 +33,14 @@ using namespace std;
 
 namespace ai::utils {
 
-inline auto fileExists(const char *path) -> bool {
-  ifstream infile(path);
+inline auto fileExists(std::string_view path) -> bool {
+  ifstream infile(path.data());
   return infile.good();
+}
+
+inline auto writeToFile(std::string const &path, std::string const &contents) {
+  ofstream outfile(path.data());
+  outfile << contents;
 }
 
 template <typename... Args> std::string formatString(const char *format, Args... args) {

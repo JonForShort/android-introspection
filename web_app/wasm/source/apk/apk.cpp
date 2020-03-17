@@ -21,6 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
+#include <filesystem>
 #include <string>
 
 #include "apk/apk.h"
@@ -28,8 +29,11 @@
 #include "binary_xml/binary_xml.h"
 #include "utils/log.h"
 #include "utils/macros.h"
+#include "utils/utils.h"
 
 using namespace ai;
+
+namespace fs = std::filesystem;
 
 namespace {
 
@@ -85,7 +89,13 @@ public:
     return debuggableAttribute != attributes.end() ? debuggableAttribute->second == "true" : false;
   }
 
-  auto dump(std::string_view destinationDirectory) const -> void { utils::ignore(destinationDirectory); }
+  auto dump(std::string_view destinationDirectory) const -> void {
+    fs::create_directories(destinationDirectory);
+    auto const binaryXml = getBinaryXml(apkPath_);
+    auto const stringXml = binaryXml.toStringXml();
+    fs::path androidManifestFile = fs::path(destinationDirectory) / ANDROID_MANIFEST;
+    utils::writeToFile(androidManifestFile, stringXml);
+  }
 
 private:
   std::string const apkPath_;

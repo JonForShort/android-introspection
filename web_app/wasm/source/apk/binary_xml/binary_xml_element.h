@@ -35,7 +35,7 @@ class BinaryXmlElement {
 public:
   virtual ~BinaryXmlElement();
 
-  virtual auto tag() const -> std::string;
+  virtual auto tag() const -> std::string = 0;
 };
 
 class StartXmlTagElement final : public BinaryXmlElement {
