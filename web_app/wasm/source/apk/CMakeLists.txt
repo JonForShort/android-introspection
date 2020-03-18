@@ -1,12 +1,14 @@
 cmake_minimum_required(VERSION 3.10.2)
 
-set(
-  source apk.cpp
+set(source
+  apk.cpp
+  apk_parser.cpp
   binary_xml/binary_xml.cpp
   binary_xml/binary_xml_element.cpp
   binary_xml/binary_xml_visitor.cpp
   binary_xml/string_xml_visitor.cpp
-  apk_parser.cpp
+  binary_xml/attributes_getter_visitor.cpp
+  binary_xml/attributes_setter_visitor.cpp
   zip_archiver.cpp
 )
 
