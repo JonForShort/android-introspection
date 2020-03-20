@@ -22,3 +22,16 @@
 // SOFTWARE.
 //
 #include "attributes_getter_visitor.h"
+#include "utils/macros.h"
+
+using namespace ai;
+
+AttributesGetterVisitor::AttributesGetterVisitor() {}
+
+auto AttributesGetterVisitor::visit(StartXmlTagElement const &element) -> void { utils::ignore(element); }
+
+auto AttributesGetterVisitor::visit(EndXmlTagElement const &element) -> void { utils::ignore(element); }
+
+auto AttributesGetterVisitor::visit(InvalidXmlTagElement const &element) -> void { utils::ignore(element); }
+
+auto AttributesGetterVisitor::visit(CDataTagElement const &element) -> void { utils::ignore(element); }
