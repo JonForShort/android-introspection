@@ -1,0 +1,11 @@
+version: '3'
+services:
+  ai:
+    build:
+      dockerfile: 'cm/Dockerfile'
+      context: .
+    volumes:
+      - '.:/ai'
+    working_dir: '/ai'
+    tty: true
+    user: $AI_UID

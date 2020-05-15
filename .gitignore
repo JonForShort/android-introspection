@@ -1,0 +1,7 @@
+# ides
+.vscode
+.idea
+.devcontainer
+
+# docker
+.env

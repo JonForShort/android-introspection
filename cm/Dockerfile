@@ -1,5 +1,7 @@
 FROM ubuntu:20.04
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update && \
     apt-get install -y build-essential openjdk-8-jdk wget unzip && \
     apt -y autoclean && apt -y autoremove && apt clean

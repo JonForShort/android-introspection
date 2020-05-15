@@ -25,6 +25,8 @@ ai_setup_environment()
     then
         export AI_TESTS_DIR=${ROOT_DIR}/web_app/wasm/test
     fi
+
+    echo AI_UID=$(id -u $USER):$(id -g $USER) > .env
 }
 
 ai_build()
