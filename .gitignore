@@ -3,5 +3,8 @@
 .idea
 .devcontainer
 
+# build
+.gradle
+
 # docker
 .env
