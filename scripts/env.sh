@@ -31,17 +31,34 @@ ai_setup_environment()
 
 ai_build()
 {
-    ai_build_android && ai_build_wasm && ai_build_host
+    ai_build_android && ai_build_web_app && ai_build_web_app_host
 }
 
 ai_build_android()
 {(
-    ${ROOT_DIR}/android/gradlew clean build
+    pushd ${ROOT_DIR}/android
+
+    ./gradlew clean build
+
+    popd
 )}
 
 ai_build_web_app()
 {(
-    source ${ROOT_DIR}/external/wasm/emsdk/emsdk_env.sh
+    pushd ${ROOT_DIR}/external/wasm/emsdk
+
+    EMSDK_TOOL=latest-fastcomp
+    
+    ./emsdk activate ${EMSDK_TOOL}
+
+    if [ $? -ne 0 ]
+    then
+	./emsdk install ${EMSDK_TOOL} && ./emsdk activate ${EMSDK_TOOL}
+    fi
+
+    source ./emsdk_env.sh
+
+    popd
 
     BUILD_DIR=${ROOT_DIR}/web_app/build/wasm
 
@@ -49,7 +66,7 @@ ai_build_web_app()
 
     pushd ${BUILD_DIR}
 
-    emconfigure cmake -DWASM=True --build ${ROOT_DIR}/web_app/wasm
+    emcmake cmake -DWASM=True --build ${ROOT_DIR}/web_app/wasm
 
     emmake make "$@"
 
