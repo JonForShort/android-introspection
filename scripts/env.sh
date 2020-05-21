@@ -31,7 +31,7 @@ ai_setup_environment()
 
 ai_build()
 {
-    ai_build_android && ai_build_web_app && ai_build_web_app_host
+    ai_build_android && ai_build_web_app && ai_build_web_app_host && ai_dist
 }
 
 ai_build_android()
@@ -86,6 +86,17 @@ ai_build_web_app_host()
     make "$@" && make test
 
     popd
+)}
+
+ai_dist()
+{(
+    cp ${ROOT_DIR}/web_app/wasm/out/wasm/wasm/bin/* ${ROOT_DIR}/web_app/public
+
+    echo ""
+    echo "copied successfuly; files can be found at the following path"
+    echo ""
+    echo $(readlink -m ${ROOT_DIR}/web_app/public)
+    echo ""
 )}
 
 ai_update_submodules()
