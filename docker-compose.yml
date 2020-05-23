@@ -9,3 +9,10 @@ services:
     working_dir: '/ai'
     tty: true
     user: $AI_UID
+
+  webserver:
+    image: httpd:2.4
+    volumes:
+      - './web_app/public:/usr/local/apache2/htdocs/'
+    ports:
+      - 8080:80
