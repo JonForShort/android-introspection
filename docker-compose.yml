@@ -1,8 +1,8 @@
 version: '3'
 services:
-  ai:
+  android:
     build:
-      dockerfile: 'cm/Dockerfile'
+      dockerfile: 'cm/android/Dockerfile'
       context: .
     volumes:
       - '.:/ai'
@@ -10,9 +10,15 @@ services:
     tty: true
     user: $AI_UID
 
-  webserver:
-    image: httpd:2.4
+  web_app:
+    build:
+      dockerfile: 'cm/web_app/Dockerfile'
+      context: .
     volumes:
-      - './web_app/public:/usr/local/apache2/htdocs/'
+      - '.:/ai'
     ports:
-      - 8080:80
+      - "8080:4200"
+    tty: true
+    user: $AI_UID
+    working_dir: '/ai/web_app/app'
+    command: npm start
