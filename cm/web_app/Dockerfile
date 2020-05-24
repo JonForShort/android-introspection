@@ -4,9 +4,15 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
     apt-get -y install nodejs npm && \
-    apt -y autoclean && apt -y autoremove && apt clean
+    apt -y autoclean && \
+    apt -y autoremove && \
+    apt clean
 
-RUN useradd -ms /bin/bash user
+RUN groupadd --gid 1000 user && \
+    useradd --uid 1000 --gid user --groups sudo --shell /bin/bash --create-home user && \
+    echo "user:user" | chpasswd
+
+ENV HOME /home/user
 
 USER user
 
