@@ -17,7 +17,8 @@ services:
     volumes:
       - '.:/ai'
     ports:
-      - "8080:4200"
+      - "4200:4200"
+      - "9876:9876"
     tty: true
     user: $AI_UID
     working_dir: '/ai/web_app/app'
