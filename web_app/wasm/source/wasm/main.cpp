@@ -26,15 +26,22 @@
 #include "emscripten.h"
 
 EMSCRIPTEN_KEEPALIVE
-auto main() {
+auto main() {}
 
-}
+EMSCRIPTEN_KEEPALIVE
+auto initialize() {}
+
+EMSCRIPTEN_KEEPALIVE
+auto uninitialize() {}
+
+EMSCRIPTEN_KEEPALIVE
+auto getApkName() { return "test"; }
 
 #else
 
 auto main(int argc, char *argv[]) -> int {
-    (void) argc;
-    (void) argv;
+  (void)argc;
+  (void)argv;
 }
 
 #endif
