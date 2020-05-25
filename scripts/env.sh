@@ -31,7 +31,7 @@ ai_setup_environment()
 
 ai_build()
 {
-    ai_build_android && ai_build_web_app && ai_build_web_app_host && ai_dist
+    ai_build_android && ai_build_wasm && ai_build_wasm_host && ai_dist
 }
 
 ai_build_android()
@@ -43,7 +43,7 @@ ai_build_android()
     popd
 )}
 
-ai_build_web_app()
+ai_build_wasm()
 {(
     pushd ${ROOT_DIR}/external/wasm/emsdk
 
@@ -73,7 +73,7 @@ ai_build_web_app()
     popd
 )}
 
-ai_build_web_app_host()
+ai_build_wasm_host()
 {(
     BUILD_DIR=${ROOT_DIR}/web_app/build/host
 
@@ -90,12 +90,16 @@ ai_build_web_app_host()
 
 ai_dist()
 {(
-    cp ${ROOT_DIR}/web_app/wasm/out/wasm/wasm/bin/* ${ROOT_DIR}/web_app/public
+    DIST_DIR=${ROOT_DIR}/web_app/app/src/assets/js/wasm
+
+    mkdir -p ${DIST_DIR}
+
+    cp ${ROOT_DIR}/web_app/wasm/out/wasm/wasm/bin/* ${DIST_DIR}
 
     echo ""
     echo "copied successfuly; files can be found at the following path"
     echo ""
-    echo $(readlink -m ${ROOT_DIR}/web_app/public)
+    echo $(readlink -m ${DIST_DIR})
     echo ""
 )}
 

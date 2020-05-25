@@ -10,4 +10,4 @@
 .env
 
 # output
-/web_app/public
+/web_app/app/src/assets/js/wasm
