@@ -6,7 +6,11 @@ RUN apt-get update && \
     apt-get install -y build-essential openjdk-8-jdk wget unzip python git pkg-config && \
     apt -y autoclean && apt -y autoremove && apt clean
 
-RUN useradd -ms /bin/bash user
+RUN groupadd --gid 1000 user && \
+    useradd --uid 1000 --gid user --groups sudo --shell /bin/bash --create-home user && \
+    echo "user:user" | chpasswd
+
+ENV HOME /home/user
 
 USER user
 
