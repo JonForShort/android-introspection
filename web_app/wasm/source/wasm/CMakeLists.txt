@@ -10,6 +10,6 @@ if (WASM)
 
   target_include_directories(wasm PRIVATE ${DIR_ROOT_EXTERNAL}/wasm/emscripten/system/include)
 
-  set_target_properties(wasm PROPERTIES LINK_FLAGS "-s WASM=1 -s ENVIRONMENT='web'")
+  set_target_properties(wasm PROPERTIES LINK_FLAGS "-s WASM=1 -s MODULARIZE=1 -s ENVIRONMENT='web'")
 
 endif()

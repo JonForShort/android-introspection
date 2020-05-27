@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core'
 import { Observable, BehaviorSubject } from 'rxjs'
 import { filter, map } from 'rxjs/operators'
-import WasmModule from './../assets/js/wasm/wasm.wasm.js'
+
+import * as Module from './../assets/js/wasm/wasm.wasm.js'
 
 @Injectable()
 export class WasmService {
@@ -10,7 +11,7 @@ export class WasmService {
   wasmReady = new BehaviorSubject<boolean>(false)
 
   constructor() {
-    this.instantiateWasm('assets/js/wasm/wasm.wasm.wasm')
+    this.instantiateWasm('/assets/js/wasm/wasm.wasm.wasm')
   }
 
   private async instantiateWasm(url: string) {
@@ -23,7 +24,7 @@ export class WasmService {
         this.wasmReady.next(true)
       },
     }
-    this.module = WasmModule(moduleArgs)
+    this.module = Module(moduleArgs)
   }
 
   public getApkName(): Observable<string> {

@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
+import { WasmService } from './wasm.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  providers: [WasmService]
 })
 
 export class AppComponent {
@@ -12,7 +14,11 @@ export class AppComponent {
 
   changeMessage = '';
 
+  constructor(private wasm: WasmService) { }
+
   onInputChanged() {
-    this.changeMessage = 'Input has changed';
+    this.wasm.getApkName().subscribe(([apkName]) => {
+      this.changeMessage = apkName;
+    });
   }
 }
