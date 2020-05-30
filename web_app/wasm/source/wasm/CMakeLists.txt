@@ -6,6 +6,8 @@ add_executable(wasm ${source})
 
 if (WASM)
 
+  add_definitions(-DWASM)
+
   set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")
 
   target_include_directories(wasm PRIVATE ${DIR_ROOT_EXTERNAL}/wasm/emscripten/system/include)
