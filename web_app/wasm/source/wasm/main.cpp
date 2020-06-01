@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright 2019
+// Copyright 2019-2020
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,19 +23,25 @@
 //
 #ifdef WASM
 
-#include "emscripten.h"
+#include <string>
+#include <emscripten/bind.h>
 
-EMSCRIPTEN_KEEPALIVE
-auto main() {}
+using namespace emscripten;
 
-EMSCRIPTEN_KEEPALIVE
 auto initialize() {}
 
-EMSCRIPTEN_KEEPALIVE
 auto uninitialize() {}
 
-EMSCRIPTEN_KEEPALIVE
-auto getApkName() { return "test"; }
+auto getApkName() { return std::string("test"); }
+
+EMSCRIPTEN_BINDINGS(wasm) {
+
+  function("initialize", &initialize);
+
+  function("uninitialize", &uninitialize);
+
+  function("getApkName", &getApkName);
+}
 
 #else
 
