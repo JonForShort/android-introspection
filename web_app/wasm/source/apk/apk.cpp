@@ -67,6 +67,11 @@ class Apk::ApkImpl final {
 public:
   ApkImpl(std::string_view apkPath) : apkPath_(apkPath) {}
 
+  auto isValid() const -> bool {
+    auto const binaryXml = getBinaryXml(apkPath_);
+    return binaryXml.hasElement(ANDROID_MANIFEST_TAG_APPLICATION);
+  }
+
   auto makeDebuggable() const -> void {
     auto const binaryXml = getBinaryXml(apkPath_);
     if (!binaryXml.hasElement(ANDROID_MANIFEST_TAG_APPLICATION)) {
@@ -104,6 +109,8 @@ private:
 Apk::Apk(std::string_view apkPath) : pimpl_(std::make_unique<Apk::ApkImpl>(apkPath)) {}
 
 Apk::~Apk() = default;
+
+auto Apk::isValid() const -> bool { return pimpl_->isValid(); }
 
 auto Apk::makeDebuggable() const -> void { return pimpl_->makeDebuggable(); }
 

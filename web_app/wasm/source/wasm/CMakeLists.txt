@@ -4,6 +4,10 @@ set(source main.cpp)
 
 add_executable(wasm ${source})
 
+target_link_libraries(wasm apk)
+
+target_include_directories(wasm PRIVATE apk)
+
 if (WASM)
 
   add_definitions(-DWASM)

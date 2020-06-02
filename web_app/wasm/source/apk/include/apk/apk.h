@@ -25,6 +25,7 @@
 #define ANDROID_INTROSPECTION_APK_APK_H_
 
 #include <memory>
+#include <string_view>
 
 #include "apk_exception.h"
 
@@ -35,6 +36,8 @@ public:
   explicit Apk(std::string_view apkPath);
 
   ~Apk();
+
+  auto isValid() const -> bool;
 
   auto makeDebuggable() const -> void;
 

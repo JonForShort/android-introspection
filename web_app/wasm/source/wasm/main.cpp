@@ -21,10 +21,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
+#define WASM
+
 #ifdef WASM
 
-#include <string>
 #include <emscripten/bind.h>
+#include <string>
+
+#include "apk/apk.h"
 
 using namespace emscripten;
 
@@ -34,6 +38,11 @@ auto uninitialize() {}
 
 auto getApkName() { return std::string("test"); }
 
+auto isValidApk(std::string const pathToApk) {
+  auto const apk = ai::Apk(pathToApk);
+  return apk.isValid();
+}
+
 EMSCRIPTEN_BINDINGS(wasm) {
 
   function("initialize", &initialize);
@@ -41,6 +50,8 @@ EMSCRIPTEN_BINDINGS(wasm) {
   function("uninitialize", &uninitialize);
 
   function("getApkName", &getApkName);
+
+  function("isValidApk", &isValidApk);
 }
 
 #else
