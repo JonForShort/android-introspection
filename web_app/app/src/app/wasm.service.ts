@@ -30,7 +30,7 @@ export class WasmService {
   public getApkName(): Observable<string> {
     return this.wasmReady.pipe(filter(value => value === true)).pipe(
       map(() => {
-        return this.module.getApkName();
+        return this.module.getName();
       })
     )
   }

@@ -27,6 +27,7 @@
 
 #include <emscripten/bind.h>
 #include <string>
+#include <vector>
 
 #include "apk/apk.h"
 
@@ -36,22 +37,28 @@ auto initialize() {}
 
 auto uninitialize() {}
 
-auto getApkName() { return std::string("test"); }
+auto getName() { return std::string("test"); }
 
-auto isValidApk(std::string const pathToApk) {
+auto isValid(std::string const pathToApk) {
   auto const apk = ai::Apk(pathToApk);
   return apk.isValid();
 }
 
-EMSCRIPTEN_BINDINGS(wasm) {
+auto getFilePaths() { return std::vector<std::string>{"test_file_one", "test_file_two", "test_file_three"}; }
+
+EMSCRIPTEN_BINDINGS(ApkModule) {
 
   function("initialize", &initialize);
 
   function("uninitialize", &uninitialize);
 
-  function("getApkName", &getApkName);
+  function("getName", &getName);
 
-  function("isValidApk", &isValidApk);
+  function("isValid", &isValid);
+
+  function("getFilePaths", &getFilePaths);
+
+  register_vector<std::string>("vector<string>");
 }
 
 #else
