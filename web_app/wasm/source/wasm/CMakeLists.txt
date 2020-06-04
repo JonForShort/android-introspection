@@ -5,8 +5,10 @@ set(source main.cpp)
 add_executable(wasm ${source})
 
 target_link_libraries(wasm apk)
+target_link_libraries(wasm utils)
 
 target_include_directories(wasm PRIVATE apk)
+target_include_directories(wasm PRIVATE utils)
 
 if (WASM)
 

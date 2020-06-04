@@ -21,7 +21,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#define WASM
 
 #ifdef WASM
 
@@ -30,21 +29,25 @@
 #include <vector>
 
 #include "apk/apk.h"
+#include "utils/log.h"
 
 using namespace emscripten;
 
-auto initialize() {}
+auto initialize() { LOGV("wasm::initialize"); }
 
-auto uninitialize() {}
-
-auto getName() { return std::string("test"); }
+auto uninitialize() { LOGV("wasm::uninitialize"); }
 
 auto isValid(std::string const pathToApk) {
+  LOGV("wasm::isValid");
   auto const apk = ai::Apk(pathToApk);
   return apk.isValid();
 }
 
-auto getFilePaths() { return std::vector<std::string>{"test_file_one", "test_file_two", "test_file_three"}; }
+auto getFiles(std::string const apkPath) {
+  LOGV("wasm::getFiles apkPath [%s]", apkPath);
+  auto const apk = ai::Apk(apkPath);
+  return apk.getFiles();
+}
 
 EMSCRIPTEN_BINDINGS(ApkModule) {
 
@@ -52,11 +55,9 @@ EMSCRIPTEN_BINDINGS(ApkModule) {
 
   function("uninitialize", &uninitialize);
 
-  function("getName", &getName);
-
   function("isValid", &isValid);
 
-  function("getFilePaths", &getFilePaths);
+  function("getFiles", &getFiles);
 
   register_vector<std::string>("vector<string>");
 }

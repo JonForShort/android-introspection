@@ -25,7 +25,8 @@
 #define ANDROID_INTROSPECTION_APK_APK_H_
 
 #include <memory>
-#include <string_view>
+#include <string>
+#include <vector>
 
 #include "apk_exception.h"
 
@@ -42,6 +43,8 @@ public:
   auto makeDebuggable() const -> void;
 
   auto isDebuggable() const -> bool;
+
+  auto getFiles() const -> std::vector<std::string>;
 
   auto dump(std::string_view destinationDirectory) const -> void;
 

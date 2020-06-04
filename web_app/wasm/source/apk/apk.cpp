@@ -94,6 +94,11 @@ public:
     return debuggableAttribute != attributes.end() ? debuggableAttribute->second == "true" : false;
   }
 
+  auto getFiles() const -> std::vector<std::string> {
+    auto const apkParser = ai::ApkParser(apkPath_);
+    return apkParser.getFiles();
+  }
+
   auto dump(std::string_view destinationDirectory) const -> void {
     fs::create_directories(destinationDirectory);
     auto const binaryXml = getBinaryXml(apkPath_);
@@ -115,5 +120,7 @@ auto Apk::isValid() const -> bool { return pimpl_->isValid(); }
 auto Apk::makeDebuggable() const -> void { return pimpl_->makeDebuggable(); }
 
 auto Apk::isDebuggable() const -> bool { return pimpl_->isDebuggable(); }
+
+auto Apk::getFiles() const -> std::vector<std::string> { return pimpl_->getFiles(); }
 
 auto Apk::dump(std::string_view destinationDirectory) const -> void { return pimpl_->dump(destinationDirectory); }
