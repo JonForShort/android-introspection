@@ -28,25 +28,31 @@ export class WasmService {
   }
 
   public isApkValid(filePath: String): Observable<string> {
-    return this.wasmReady.pipe(filter(value => value === true)).pipe(
-      map(() => {
+    return this.wasmReady
+      .pipe(filter(value => value === true))
+      .pipe(map(() => {
         return this.module.isValid(filePath)
-      })
-    )
+      }))
   }
 
-  public writeFile(fileName: String, fileContent: Blob): Observable<String> {
-    return this.wasmReady.pipe(filter(value => value === true)).pipe(
-      map(() => {
-        const fileReader = new FileReader();
+  public readFile = (blob: Blob): Observable<Uint8Array> => {
+    return Observable.create(obs => {
+      const reader = new FileReader();
+      reader.onerror = err => obs.error(err);
+      reader.onabort = err => obs.error(err);
+      reader.onload = () => obs.next(reader.result);
+      reader.onloadend = () => obs.complete();
+      reader.readAsArrayBuffer(blob);
+    });
+  }
+
+  public createDataFile(fileName: String, fileContent: Uint8Array): Observable<String> {
+    return this.wasmReady
+      .pipe(filter(value => value === true))
+      .pipe(map(() => {
         const filePath = "/" + fileName
-        fileReader.onload = function () {
-          //          const data = new Uint8Array(fileReader.result);
-          //          Module['FS_createDataFile']('/', fileName, data, true, true, true);
-        };
-        fileReader.readAsArrayBuffer(fileContent)
+        this.module.FS.createDataFile('/', fileName, fileContent, true, true, true);
         return filePath
-      })
-    )
+      }))
   }
 }

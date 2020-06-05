@@ -17,10 +17,13 @@ export class AppComponent {
   constructor(private wasm: WasmService) { }
 
   onInputChanged(event: Event) {
-    const file = event.target.files[0];
-    this.wasm.writeFile(file.name, file).subscribe(([filePath]) => {
-      this.wasm.isApkValid(filePath).subscribe(([isApkValid]) => {
-        this.changeMessage = isApkValid;
+    const inputElement = (<HTMLInputElement>event.target)
+    const file = inputElement.files[0];
+    this.wasm.readFile(file).subscribe(([fileContent]) => {
+      this.wasm.createDataFile(file.name, new Uint8Array(fileContent)).subscribe(([filePath]) => {
+        this.wasm.isApkValid(filePath).subscribe(([isApkValid]) => {
+          this.changeMessage = isApkValid;
+        })
       })
     })
   }
