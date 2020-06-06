@@ -1,0 +1,17 @@
+trigger:
+- master
+
+resources:
+ containers:
+   - container: build_container
+     image: thejunkjon/android-introspection
+
+container: build_container
+
+steps:
+- checkout: self
+  submodules: true
+
+- script: |
+    ./scripts/env.sh ai_build
+  displayName: 'Build'
