@@ -36,14 +36,17 @@ export class WasmService {
   }
 
   public readFile = (blob: Blob): Observable<Uint8Array> => {
-    return Observable.create(obs => {
-      const reader = new FileReader();
-      reader.onerror = err => obs.error(err);
-      reader.onabort = err => obs.error(err);
-      reader.onload = () => obs.next(reader.result);
-      reader.onloadend = () => obs.complete();
-      reader.readAsArrayBuffer(blob);
-    });
+    const reader = new FileReader();
+    reader.readAsArrayBuffer(blob);
+    return Observable.create(observer => {
+      reader.onerror = err => observer.error(err)
+      reader.onabort = err => observer.error(err)
+      reader.onloadend = () => observer.complete()
+      reader.onload = ((_: ProgressEvent): void => {
+        let data = new Uint8Array((<ArrayBuffer>reader.result))
+        observer.next(data);
+      });
+    })
   }
 
   public createDataFile(fileName: String, fileContent: Uint8Array): Observable<String> {
