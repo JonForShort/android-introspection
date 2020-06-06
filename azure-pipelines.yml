@@ -5,7 +5,7 @@ resources:
  containers:
    - container: build_container
      image: thejunkjon/android-introspection
-     options: --user 1001:1000
+     options: --user root:root
 
 container: build_container
 
