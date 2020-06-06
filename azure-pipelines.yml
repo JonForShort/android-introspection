@@ -1,18 +1,26 @@
 trigger:
-- master
+  - master
 
 resources:
- containers:
-   - container: build_container
-     image: thejunkjon/android-introspection
-     options: --user root:root
+  containers:
+    - container: wasm_container
+      image: thejunkjon/android-introspection
+      options: --user root:root
 
-container: build_container
+    - container: webapp_container
+      image: thejunkjon/android-introspection-webapp
+      options: --user root:root
+
+container: wasm_container
 
 steps:
-- checkout: self
-  submodules: true
+  - checkout: self
+    submodules: true
 
-- script: |
-    ./scripts/env.sh ai_build
-  displayName: 'Build'
+  - script: |
+      ./scripts/env.sh ai_build
+    displayName: 'Build Android and WASM'
+
+  - script: |
+      ./scripts/env.sh ai_dist
+    displayName: 'Distribute Android and WASM'
