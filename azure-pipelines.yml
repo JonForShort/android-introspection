@@ -13,8 +13,8 @@ resources:
 
 jobs:
 
-  - job: BuildAndroidAndWasm
-    displayName: Build Android and WASM projects
+  - job: BuildWasm
+    displayName: Build WASM
     container: wasm_container
 
     steps:
@@ -22,17 +22,33 @@ jobs:
       submodules: true
 
     - script: |
-        ./scripts/env.sh ai_build
-      displayName: 'Build Android and WASM'
+        ./scripts/env.sh ai_build_wasm
+      displayName: 'Build WASM'
+
+    - script: |
+        ./scripts/env.sh ai_build_wasm_host
+      displayName: 'Build WASM Host'
 
     - script: |
         ./scripts/env.sh ai_dist
-      displayName: 'Distribute Android and WASM'
+      displayName: 'Publish WASM artifacts'
+
+  - job: BuildAndroid
+    displayName: Build Android
+    container: wasm_container
+
+    steps:
+    - checkout: self
+      submodules: true
+
+    - script: |
+        ./scripts/env.sh ai_build_android
+      displayName: 'Build Android'
 
   - job: BuildWebApp
     displayName: Build Web App
     container: webapp_container
-    dependsOn: BuildAndroidAndWasm
+    dependsOn: BuildWasm
     condition: succeeded()
 
     steps:
