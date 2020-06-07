@@ -10,7 +10,7 @@ services:
     tty: true
     user: $AI_UID
 
-  web_app_dev:
+  web_app:
     build:
       dockerfile: 'cm/web_app/Dockerfile'
       context: .
@@ -22,16 +22,4 @@ services:
     working_dir: '/ai'
     tty: true
     user: $AI_UID
-
-  web_app:
-    build:
-      dockerfile: 'cm/web_app/Dockerfile'
-      context: .
-    volumes:
-      - '.:/ai'
-    ports:
-      - "80:4200"
-    working_dir: '/ai/web_app/app'
-    tty: true
-    user: $AI_UID
-    command: npm start
+    command: npm --prefix=./web_app/app start
