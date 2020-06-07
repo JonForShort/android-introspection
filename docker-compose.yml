@@ -19,7 +19,6 @@ services:
     ports:
       - "4200:4200"
       - "9876:9876"
+    working_dir: '/ai'
     tty: true
     user: $AI_UID
-    working_dir: '/ai/web_app/app'
-    command: npm start

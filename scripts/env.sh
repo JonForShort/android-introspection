@@ -88,6 +88,17 @@ ai_build_wasm_host()
     popd
 )}
 
+ai_build_webapp()
+{(
+    BUILD_DIR=${ROOT_DIR}/web_app/app
+
+    pushd ${BUILD_DIR}
+
+    ng build
+
+    popd
+)}
+
 ai_dist()
 {(
     DIST_DIR=${ROOT_DIR}/web_app/app/src/assets/js/wasm

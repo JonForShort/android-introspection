@@ -40,5 +40,5 @@ jobs:
       submodules: true
 
     - script: |
-        cd ./web_app/app && ng build
+        ./scripts/env.sh ai_build_webapp
       displayName: 'Build Web App'
