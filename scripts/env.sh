@@ -94,6 +94,8 @@ ai_build_webapp()
 
     pushd ${BUILD_DIR}
 
+    npm install
+    
     ng build
 
     popd
