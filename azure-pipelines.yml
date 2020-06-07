@@ -5,11 +5,11 @@ resources:
   containers:
     - container: wasm_container
       image: thejunkjon/android-introspection
-      options: --user root:root --env HOME=/root
+      options: --group-add root
 
     - container: webapp_container
       image: thejunkjon/android-introspection-webapp
-      options: --user root:root --env HOME=/root
+      options: --group-add root
 
 jobs:
 
