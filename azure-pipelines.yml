@@ -11,26 +11,34 @@ resources:
       image: thejunkjon/android-introspection-webapp
       options: --user root:root
 
-steps:
-  - checkout: self
-    submodules: true
+jobs:
 
-container: wasm_container
+  - job: BuildAndroidAndWasm
+    displayName: Build Android and WASM projects
+    container: wasm_container
 
-steps:
+    steps:
+    - checkout: self
+      submodules: true
 
-  - script: |
-      ./scripts/env.sh ai_build
-    displayName: 'Build Android and WASM'
+    - script: |
+        ./scripts/env.sh ai_build
+      displayName: 'Build Android and WASM'
 
-  - script: |
-      ./scripts/env.sh ai_dist
-    displayName: 'Distribute Android and WASM'
+    - script: |
+        ./scripts/env.sh ai_dist
+      displayName: 'Distribute Android and WASM'
 
-container: webapp_container
+  - job: BuildWebApp
+    displayName: Build Web App
+    container: webapp_container
+    dependsOn: BuildAndroidAndWasm
+    condition: succeeded()
 
-steps:
+    steps:
+    - checkout: self
+      submodules: true
 
-  - script: |
-      cd ./web_app/app && ng build
-    displayName: 'Build Web App'
+    - script: |
+        cd ./web_app/app && ng build
+      displayName: 'Build Web App'
