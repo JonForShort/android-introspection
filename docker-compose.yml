@@ -8,6 +8,7 @@ services:
       - '.:/ai'
     working_dir: '/ai'
     tty: true
+    privileged: true
     user: $AI_UID
 
   web_app:
@@ -21,5 +22,6 @@ services:
       - "9876:9876"
     working_dir: '/ai'
     tty: true
+    privileged: true
     user: $AI_UID
     command: npm --prefix=./web_app/app start
