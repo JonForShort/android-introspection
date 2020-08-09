@@ -41,9 +41,9 @@ ai_build()
 
     docker-compose build                                           &> ${LOGS_DIR}/build.txt && \
     docker-compose run android ./scripts/env.sh ai_build_android   &> ${LOGS_DIR}/build_android.txt && \
-    docker-compose run android ./scripts/env.sh ai_build_wasm      &> ${LOGS_DIR}/build_wasm.txt && \
-    docker-compose run android ./scripts/env.sh ai_build_wasm_host &> ${LOGS_DIR}/build_wasm_host.txt && \
-    docker-compose run android ./scripts/env.sh ai_dist            &> ${LOGS_DIR}/dist.txt && \
+    docker-compose run web_app ./scripts/env.sh ai_build_wasm      &> ${LOGS_DIR}/build_wasm.txt && \
+    docker-compose run web_app ./scripts/env.sh ai_build_wasm_host &> ${LOGS_DIR}/build_wasm_host.txt && \
+    docker-compose run web_app ./scripts/env.sh ai_dist_wasm       &> ${LOGS_DIR}/dist_wasm.txt && \
     docker-compose run web_app ./scripts/env.sh ai_build_webapp    &> ${LOGS_DIR}/build_webapp.txt
 
     popd
@@ -116,7 +116,7 @@ ai_build_webapp()
     popd
 )}
 
-ai_dist()
+ai_dist_wasm()
 {(
     DIST_DIR=${ROOT_DIR}/web_app/app/src/assets/js/wasm
 
