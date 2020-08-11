@@ -44,7 +44,7 @@ auto isValid(std::string const pathToApk) {
 }
 
 auto getFiles(std::string const apkPath) {
-  LOGV("wasm::getFiles apkPath [%s]", apkPath);
+  LOGV("wasm::getFiles apkPath [{}]", apkPath);
   auto const apk = ai::Apk(apkPath);
   return apk.getFiles();
 }

@@ -368,7 +368,7 @@ auto BinaryXml::traverseXml(BinaryXmlVisitor &visitor) const -> void {
       break;
     }
     default: {
-      LOGW("skipping unknown tag [%d]", tag);
+      LOGW("skipping unknown tag [{}]", tag);
     }
     }
   }

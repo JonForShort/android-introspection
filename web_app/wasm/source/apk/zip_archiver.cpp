@@ -68,7 +68,7 @@ auto getAllEntriesInZipFile(std::string const &pathToArchive) {
   auto entries = std::vector<PathAndFileInfo>();
   auto openedZipFile = ScopedUnzOpenFile(pathToArchive.c_str());
   if (openedZipFile.get() == nullptr) {
-    LOGW("getAllEntriesInZipFile, pathToArchive [%s]", pathToArchive.c_str());
+    LOGW("getAllEntriesInZipFile, pathToArchive [{}]", pathToArchive.c_str());
     return entries;
   }
   if (auto result = unzGoToFirstFile(openedZipFile.get()); result == UNZ_OK) {
@@ -88,7 +88,7 @@ auto getAllEntriesInZipFile(std::string const &pathToArchive) {
 } // namespace
 
 auto ZipArchiver::add(std::istream &source, std::string_view const pathInArchive) const -> void {
-  LOGD("add, pathInArchive [%s]", pathInArchive);
+  LOGD("add, pathInArchive [{}]", pathInArchive);
   auto const zipFile = openZipFile(zipPath_);
   auto const pathInArchiveString = std::string(pathInArchive);
   if (auto result = zipOpenNewFileInZip_64(zipFile->get(), pathInArchiveString.c_str(), nullptr, nullptr, 0, nullptr, 0, nullptr, 0, 0, false);
@@ -107,7 +107,7 @@ auto ZipArchiver::files() const -> std::vector<std::string> {
 }
 
 auto ZipArchiver::contains(std::string_view pathInArchive) const -> bool {
-  LOGD("contains, pathInArchive [%s]", pathInArchive);
+  LOGD("contains, pathInArchive [{}]", pathInArchive);
   if (auto const zipFile = ScopedUnzOpenFile(zipPath_.c_str()); zipFile.get() != nullptr) {
     auto const pathInArchiveString = std::string(pathInArchive);
     return unzLocateFile(zipFile.get(), pathInArchiveString.c_str(), nullptr) == UNZ_OK;
@@ -117,7 +117,7 @@ auto ZipArchiver::contains(std::string_view pathInArchive) const -> bool {
 }
 
 auto ZipArchiver::extractAll(std::string_view destinationDirectory) const -> void {
-  LOGD("extractAll, destinationDirectory [%s]", destinationDirectory);
+  LOGD("extractAll, destinationDirectory [{}]", destinationDirectory);
   namespace fs = std::filesystem;
   if (!fs::exists(destinationDirectory)) {
     LOGD("extractAll, destinationDirectory does not exist; creating directory");
@@ -134,7 +134,7 @@ auto ZipArchiver::extractAll(std::string_view destinationDirectory) const -> voi
 }
 
 auto ZipArchiver::extract(std::string_view pathInArchive, std::string_view destinationDirectory) const -> void {
-  LOGD("extract, pathInArchive [%s] destinationDirectory [%s]", pathInArchive, destinationDirectory);
+  LOGD("extract, pathInArchive [{}] destinationDirectory [{}]", pathInArchive, destinationDirectory);
   namespace fs = std::filesystem;
   if (!fs::exists(destinationDirectory)) {
     LOGD("extractAll, destinationDirectory does not exist; creating directory");
@@ -153,7 +153,7 @@ auto ZipArchiver::extract(std::string_view pathInArchive, std::string_view desti
 }
 
 auto ZipArchiver::extract(std::string_view pathInArchive) const -> std::vector<std::byte> {
-  LOGD("extract, pathInArchive [%s]", pathInArchive);
+  LOGD("extract, pathInArchive [{}]", pathInArchive);
   auto const entries = getAllEntriesInZipFile(zipPath_);
   auto pathInZip = std::find_if(entries.cbegin(), entries.cend(),
                                 [&pathInArchive = std::as_const(pathInArchive)](auto const &entry) { return entry.first == pathInArchive; });

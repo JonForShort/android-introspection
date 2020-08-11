@@ -54,7 +54,7 @@ auto ApkParser::getFiles() const -> std::vector<std::string> {
 }
 
 auto ApkParser::getFileContents(char const *szFileInArchive) const -> std::vector<std::byte> {
-  LOGD("getFileContents, szFileInArchive [%s]", szFileInArchive);
+  LOGD("getFileContents, szFileInArchive [{}]", szFileInArchive);
   if (szFileInArchive == nullptr) {
     throw std::invalid_argument("file is null");
   }
@@ -62,7 +62,7 @@ auto ApkParser::getFileContents(char const *szFileInArchive) const -> std::vecto
 }
 
 auto ApkParser::setFileContents(char const *szFileInArchive, std::vector<std::byte> const &contents) const -> void {
-  LOGD("setFileContents, szFileInArchive [%s] contents [%d]", szFileInArchive, contents.size());
+  LOGD("setFileContents, szFileInArchive [{}] contents [{}]", szFileInArchive, contents.size());
   if (szFileInArchive == nullptr) {
     throw std::invalid_argument("file is null");
   }

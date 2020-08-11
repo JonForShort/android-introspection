@@ -48,13 +48,13 @@ auto getBinaryXml(std::string const apkPath) -> BinaryXml {
   auto const files = apkParser.getFiles();
   auto const hasAndroidManifest = std::find(files.cbegin(), files.cend(), ANDROID_MANIFEST) != files.end();
   if (!hasAndroidManifest) {
-    LOGW("unable to find manifest in [%s]", apkPath);
+    LOGW("unable to find manifest in [{}]", apkPath);
     throw MissingAndroidManifestException(apkPath);
   }
 
   auto const contents = apkParser.getFileContents(ANDROID_MANIFEST);
   if (contents.empty()) {
-    LOGW("unable to read [%s]", apkPath);
+    LOGW("unable to read [{}]", apkPath);
     throw MissingAndroidManifestException(apkPath);
   }
 
@@ -75,7 +75,7 @@ public:
   auto makeDebuggable() const -> void {
     auto const binaryXml = getBinaryXml(apkPath_);
     if (!binaryXml.hasElement(ANDROID_MANIFEST_TAG_APPLICATION)) {
-      LOGW("unable to find application tag in [%s]", apkPath_);
+      LOGW("unable to find application tag in [{}]", apkPath_);
       throw MalformedAndroidManifestException(apkPath_);
     }
     std::vector<std::string> const elementPath = {ANDROID_MANIFEST_TAG_APPLICATION};
@@ -85,7 +85,7 @@ public:
   auto isDebuggable() const -> bool {
     auto binaryXml = getBinaryXml(apkPath_);
     if (!binaryXml.hasElement(ANDROID_MANIFEST_TAG_APPLICATION)) {
-      LOGW("unable to find application tag in [%s]", apkPath_);
+      LOGW("unable to find application tag in [{}]", apkPath_);
       throw MalformedAndroidManifestException(apkPath_);
     }
     std::vector<std::string> const elementPath = {ANDROID_MANIFEST_TAG_APPLICATION};
