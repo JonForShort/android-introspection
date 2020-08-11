@@ -81,7 +81,7 @@ ai_build_wasm()
 
     pushd ${BUILD_DIR}
 
-    emcmake cmake -DWASM=True --build ${ROOT_DIR}/web_app/wasm
+    emcmake cmake -DWASM=True -DCMAKE_BUILD_TYPE=Debug --build ${ROOT_DIR}/web_app/wasm
 
     emmake make "$@"
 
