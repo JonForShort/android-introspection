@@ -2,7 +2,7 @@
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-ROOT_DIR=${SCRIPT_DIR}/..
+ROOT_DIR=${SCRIPT_DIR}/../..
 
 LOGS_DIR=${ROOT_DIR}/logs
 
@@ -28,7 +28,7 @@ ai_setup_environment()
         export AI_TESTS_DIR=${ROOT_DIR}/web_app/wasm/test
     fi
 
-    echo AI_UID=$(id -u $USER):$(id -g $USER) > .env
+    echo AI_UID=$(id -u $USER):$(id -g $USER) > ${ROOT_DIR}/.env
 }
 
 ai_build()
@@ -39,12 +39,14 @@ ai_build()
 
     mkdir ${LOGS_DIR}
 
-    docker-compose build                                           &> ${LOGS_DIR}/build.txt && \
-    docker-compose run android ./scripts/env.sh ai_build_android   &> ${LOGS_DIR}/build_android.txt && \
-    docker-compose run web_app ./scripts/env.sh ai_build_wasm      &> ${LOGS_DIR}/build_wasm.txt && \
-    docker-compose run web_app ./scripts/env.sh ai_build_wasm_host &> ${LOGS_DIR}/build_wasm_host.txt && \
-    docker-compose run web_app ./scripts/env.sh ai_dist_wasm       &> ${LOGS_DIR}/dist_wasm.txt && \
-    docker-compose run web_app ./scripts/env.sh ai_build_webapp    &> ${LOGS_DIR}/build_webapp.txt
+    ENV_SCRIPT=./dev/scripts/env.sh
+
+    docker-compose build                                        &> ${LOGS_DIR}/build.txt && \
+    docker-compose run android ${ENV_SCRIPT} ai_build_android   &> ${LOGS_DIR}/build_android.txt && \
+    docker-compose run web_app ${ENV_SCRIPT} ai_build_wasm      &> ${LOGS_DIR}/build_wasm.txt && \
+    docker-compose run web_app ${ENV_SCRIPT} ai_build_wasm_host &> ${LOGS_DIR}/build_wasm_host.txt && \
+    docker-compose run web_app ${ENV_SCRIPT} ai_dist_wasm       &> ${LOGS_DIR}/dist_wasm.txt && \
+    docker-compose run web_app ${ENV_SCRIPT} ai_build_webapp    &> ${LOGS_DIR}/build_webapp.txt
 
     popd
 }
@@ -133,7 +135,11 @@ ai_dist_wasm()
 
 ai_update_submodules()
 {(
+    pushd ${ROOT_DIR}
+
     git submodule update --recursive --remote
+
+    popd
 )}
 
 ai_setup_environment
