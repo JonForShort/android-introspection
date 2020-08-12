@@ -64,8 +64,8 @@ ai_build_wasm()
 {(
     pushd ${ROOT_DIR}/external/wasm/emsdk
 
-    EMSDK_TOOL=latest-fastcomp
-    
+    EMSDK_TOOL=latest
+
     ./emsdk activate ${EMSDK_TOOL}
 
     if [ $? -ne 0 ]
