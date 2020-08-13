@@ -3,7 +3,7 @@ FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
-    apt-get install -y build-essential openjdk-8-jdk wget unzip python git pkg-config && \
+    apt-get install -y build-essential openjdk-8-jdk wget unzip python git pkg-config sudo && \
     apt -y autoclean && apt -y autoremove && apt clean
 
 RUN groupadd --gid 1000 user && \
