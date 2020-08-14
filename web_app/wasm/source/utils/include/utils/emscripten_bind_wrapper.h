@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright 2019-2020
+// Copyright 2020
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,52 +21,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
+#ifndef ANDROID_INTROSPECTION_UTILS_EMSCRIPTEN_BIND_WRAPPER_H_
+#define ANDROID_INTROSPECTION_UTILS_EMSCRIPTEN_BIND_WRAPPER_H_
 
-#ifdef WASM
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-local-typedef"
 
-#include <string>
-#include <vector>
+#include <emscripten/bind.h>
 
-#include "apk/apk.h"
-#include "utils/emscripten_bind_wrapper.h"
-#include "utils/log.h"
+#pragma GCC diagnostic pop
 
-using namespace emscripten;
-
-auto initialize() { LOGV("wasm::initialize"); }
-
-auto uninitialize() { LOGV("wasm::uninitialize"); }
-
-auto isValid(std::string const pathToApk) {
-  LOGV("wasm::isValid");
-  auto const apk = ai::Apk(pathToApk);
-  return apk.isValid();
-}
-
-auto getFiles(std::string const apkPath) {
-  LOGV("wasm::getFiles apkPath [{}]", apkPath);
-  auto const apk = ai::Apk(apkPath);
-  return apk.getFiles();
-}
-
-EMSCRIPTEN_BINDINGS(ApkModule) {
-
-  function("initialize", &initialize);
-
-  function("uninitialize", &uninitialize);
-
-  function("isValid", &isValid);
-
-  function("getFiles", &getFiles);
-
-  register_vector<std::string>("vector<string>");
-}
-
-#else
-
-auto main(int argc, char *argv[]) -> int {
-  (void)argc;
-  (void)argv;
-}
-
-#endif
+#endif // ANDROID_INTROSPECTION_UTILS_EMSCRIPTEN_BIND_WRAPPER_H_
