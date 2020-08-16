@@ -5,12 +5,26 @@
 {{isApkValid}}
 
 <mat-tab-group>
-    <mat-tab label="One">
-        <h1>Some tab content</h1>
-        <p>...</p>
-    </mat-tab>
-    <mat-tab label="Two">
-        <h1>Some more tab content</h1>
-        <p>...</p>
+    <mat-tab label="Contents">
+
+        <mat-table [dataSource]="filePaths" class="mat-elevation-z8">
+
+            <!-- File Path Column -->
+            <ng-container matColumnDef="path">
+                <mat-header-cell *matHeaderCellDef>path</mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.path}} </mat-cell>
+            </ng-container>
+
+            <!-- File Type Column -->
+            <ng-container matColumnDef="type">
+                <mat-header-cell *matHeaderCellDef>type</mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.type}} </mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+
+        </mat-table>
+
     </mat-tab>
 </mat-tab-group>

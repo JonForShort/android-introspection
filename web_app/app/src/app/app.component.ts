@@ -1,5 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
+import { MatTable } from '@angular/material/table';
 import { WasmService } from './wasm.service';
+
+export interface FilePathElement {
+  path: String,
+  type: String
+}
 
 @Component({
   selector: 'app-root',
@@ -7,12 +13,17 @@ import { WasmService } from './wasm.service';
   styleUrls: ['./app.component.css'],
   providers: [WasmService]
 })
-
 export class AppComponent {
 
   title = 'app';
 
   isApkValid = '';
+
+  filePaths: FilePathElement[] = [];
+
+  displayedColumns: string[] = ['path', 'type'];
+
+  @ViewChild(MatTable) table: MatTable<Element>;
 
   constructor(private wasm: WasmService) { }
 
@@ -23,6 +34,15 @@ export class AppComponent {
       this.wasm.createDataFile(file.name, fileContent).subscribe((filePath) => {
         this.wasm.isApkValid(filePath).subscribe((isApkValid) => {
           this.isApkValid = isApkValid;
+          if (this.isApkValid) {
+            this.wasm.getFilePathsInApk(filePath).subscribe((filePaths) => {
+              this.filePaths = []
+              for (var i = 0; i < filePaths.size(); i++) {
+                this.filePaths.push({ path: filePaths.get(i), type: "txt" })
+              }
+              this.table.renderRows
+            })
+          }
         })
       })
     })

@@ -33,6 +33,14 @@ export class WasmService {
       }))
   }
 
+  public getFilePathsInApk(filePath: String): Observable<Array<String>> {
+    return this.wasmReady
+      .pipe(filter(value => value === true))
+      .pipe(map(() => {
+        return this.module.getFiles(filePath)
+      }))
+  }
+
   public readFile = (blob: Blob): Observable<Uint8Array> => {
     const reader = new FileReader();
     reader.readAsArrayBuffer(blob);

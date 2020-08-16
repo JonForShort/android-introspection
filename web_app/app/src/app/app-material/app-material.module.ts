@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { CommonModule } from '@angular/common';
 
@@ -6,10 +7,13 @@ import { CommonModule } from '@angular/common';
   declarations: [],
   imports: [
     CommonModule,
-    MatTabsModule
+    MatTabsModule,
+    MatTableModule
   ],
   exports: [
-    MatTabsModule
+    MatTabsModule,
+    MatTableModule
   ]
 })
+
 export class AppMaterialModule { }
