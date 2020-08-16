@@ -31,6 +31,17 @@ ai_setup_environment()
     echo AI_UID=$(id -u $USER):$(id -g $USER) > ${ROOT_DIR}/.env
 }
 
+ai_setup_vscode()
+{
+    mkdir -p ${ROOT_DIR}/web_app/app/.vscode
+
+    pushd ${ROOT_DIR}/web_app/app/.vscode
+
+    ln -s $(realpath --relative-to=${ROOT_DIR}/web_app/app/.vscode ${ROOT_DIR}/dev/vscode)/launch.json launch.json
+
+    popd
+}
+
 ai_build()
 {
     pushd ${ROOT_DIR}
