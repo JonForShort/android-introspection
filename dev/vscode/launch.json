@@ -11,7 +11,7 @@
             "pathMappings": [
                 {
                     "url": "webpack:///src",
-                    "path": "${workspaceFolder}/web_app/app/src"
+                    "path": "${workspaceFolder}/src"
                 }
             ]
         }
