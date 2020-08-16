@@ -18,13 +18,11 @@ export class WasmService {
     const wasmFile = await fetch(url)
     const buffer = await wasmFile.arrayBuffer()
     const binary = new Uint8Array(buffer)
-    const moduleArgs = {
-      wasmBinary: binary,
-      onRuntimeInitialized: () => {
-        this.wasmReady.next(true)
-      },
-    }
-    this.module = Module(moduleArgs)
+    const moduleArgs = { wasmBinary: binary }
+    Module(moduleArgs).then((result: Module) =>
+      this.module = result,
+      this.wasmReady.next(true)
+    )
   }
 
   public isApkValid(filePath: String): Observable<string> {
