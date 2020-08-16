@@ -30,7 +30,7 @@ jobs:
       displayName: 'Build WASM Host'
 
     - script: |
-        ./dev/scripts/env.sh ai_dist
+        ./dev/scripts/env.sh ai_dist_wasm
       displayName: 'Publish WASM artifacts'
 
   - job: BuildAndroid
