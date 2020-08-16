@@ -3,7 +3,7 @@ trigger:
 
 resources:
   containers:
-    - container: wasm_container
+    - container: android_container
       image: thejunkjon/android-introspection
       options: '--group-add root --user root'
 
@@ -15,34 +15,35 @@ jobs:
 
   - job: BuildWasm
     displayName: Build WASM
-    container: wasm_container
+    container: webapp_container
 
     steps:
     - checkout: self
       submodules: true
 
     - script: |
-        ./dev/scripts/env.sh ai_build_wasm
+        sudo chown -R 1001:1001 "/home/user/.npm"
+        sudo ./dev/scripts/env.sh ai_build_wasm
       displayName: 'Build WASM'
 
     - script: |
-        ./dev/scripts/env.sh ai_build_wasm_host
+        sudo ./dev/scripts/env.sh ai_build_wasm_host
       displayName: 'Build WASM Host'
 
     - script: |
-        ./dev/scripts/env.sh ai_dist_wasm
+        sudo ./dev/scripts/env.sh ai_dist_wasm
       displayName: 'Publish WASM artifacts'
 
   - job: BuildAndroid
     displayName: Build Android
-    container: wasm_container
+    container: android_container
 
     steps:
     - checkout: self
       submodules: true
 
     - script: |
-        ./dev/scripts/env.sh ai_build_android
+        sudo ./dev/scripts/env.sh ai_build_android
       displayName: 'Build Android'
 
   - job: BuildWebApp
@@ -56,5 +57,5 @@ jobs:
       submodules: true
 
     - script: |
-        ./dev/scripts/env.sh ai_build_webapp
+        sudo ./dev/scripts/env.sh ai_build_webapp
       displayName: 'Build Web App'
