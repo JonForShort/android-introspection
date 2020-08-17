@@ -5,11 +5,11 @@ resources:
   containers:
     - container: android_container
       image: thejunkjon/android-introspection
-      options: '--group-add root --user user'
+      options: '--group-add root --user root'
 
     - container: webapp_container
       image: thejunkjon/android-introspection-webapp
-      options: '--group-add root --user user'
+      options: '--group-add root --user root'
 
 jobs:
 
@@ -40,6 +40,10 @@ jobs:
     steps:
     - checkout: self
       submodules: true
+
+    - script: |
+        su - user
+      displayName: 'Switch User'
 
     - script: |
         ./dev/scripts/env.sh ai_build_android
