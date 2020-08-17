@@ -25,7 +25,9 @@
 #define ANDROID_INTROSPECTION_UTILS_EMSCRIPTEN_BIND_WRAPPER_H_
 
 #pragma GCC diagnostic push
+
 #pragma GCC diagnostic ignored "-Wunused-local-typedef"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 
 #include <emscripten/bind.h>
 
