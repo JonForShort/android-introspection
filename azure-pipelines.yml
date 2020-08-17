@@ -5,11 +5,11 @@ resources:
   containers:
     - container: android_container
       image: thejunkjon/android-introspection
-      options: '--group-add root'
+      options: '--group-add root --user root'
 
     - container: webapp_container
       image: thejunkjon/android-introspection-webapp
-      options: '--group-add root'
+      options: '--group-add root --user root'
 
 jobs:
 
@@ -42,7 +42,7 @@ jobs:
       submodules: true
 
     - script: |
-        ./dev/scripts/env.sh ai_build_android
+        sudo -H -u user bash -c "./dev/scripts/env.sh ai_build_android"
       displayName: 'Build Android'
 
   - job: BuildWebApp
