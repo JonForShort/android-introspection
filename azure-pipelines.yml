@@ -22,15 +22,15 @@ jobs:
       submodules: true
 
     - script: |
-        ./dev/scripts/env.sh ai_build_wasm
+        sudo ./dev/scripts/env.sh ai_build_wasm
       displayName: 'Build WASM'
 
     - script: |
-        ./dev/scripts/env.sh ai_build_wasm_host
+        sudo ./dev/scripts/env.sh ai_build_wasm_host
       displayName: 'Build WASM Host'
 
     - script: |
-        ./dev/scripts/env.sh ai_dist_wasm
+        sudo ./dev/scripts/env.sh ai_dist_wasm
       displayName: 'Publish WASM artifacts'
 
   - job: BuildAndroid
@@ -42,7 +42,7 @@ jobs:
       submodules: true
 
     - script: |
-        ./dev/scripts/env.sh ai_build_android
+        sudo ./dev/scripts/env.sh ai_build_android
       displayName: 'Build Android'
 
   - job: BuildWebApp
@@ -56,5 +56,5 @@ jobs:
       submodules: true
 
     - script: |
-        ./dev/scripts/env.sh ai_build_webapp
+        sudo ./dev/scripts/env.sh ai_build_webapp
       displayName: 'Build Web App'
