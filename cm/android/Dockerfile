@@ -3,20 +3,12 @@ FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
-    apt-get install -y build-essential openjdk-8-jdk wget unzip python git pkg-config sudo && \
+    apt-get install -y build-essential openjdk-8-jdk wget unzip python git pkg-config && \
     apt -y autoclean && apt -y autoremove && apt clean
 
-RUN groupadd --gid 1000 user && \
-    useradd --uid 1000 --gid user --groups sudo --shell /bin/bash --create-home user && \
-    echo "user:user" | chpasswd
+WORKDIR /root
 
-ENV HOME /home/user
-
-USER user
-
-WORKDIR /home/user
-
-ENV ANDROID_SDK_ROOT /home/user/android-sdk
+ENV ANDROID_SDK_ROOT /opt/android-sdk
 ENV ANDROID_SDK_HOME ${ANDROID_SDK_ROOT}
 ENV ANDROID_HOME     ${ANDROID_SDK_ROOT}
 ENV ANDROID_SDK      ${ANDROID_SDK_ROOT}
