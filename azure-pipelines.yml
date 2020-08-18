@@ -42,7 +42,7 @@ jobs:
       submodules: true
 
     - script: |
-        sudo ./dev/scripts/env.sh ai_build_android
+        sudo -u user ./dev/scripts/env.sh ai_build_android
       displayName: 'Build Android'
 
   - job: BuildWebApp
