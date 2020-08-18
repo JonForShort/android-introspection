@@ -42,6 +42,10 @@ jobs:
       submodules: true
 
     - script: |
+        export; ls -alh; echo $(pwd)
+      displayName: 'Print Environment'
+
+    - script: |
         sudo -u user ./dev/scripts/env.sh ai_build_android
       displayName: 'Build Android'
 
