@@ -5,11 +5,9 @@ resources:
   containers:
     - container: android_container
       image: thejunkjon/android-introspection
-      options: --user root
 
     - container: webapp_container
       image: thejunkjon/android-introspection-webapp
-      options: --user root
 
 jobs:
 
@@ -22,15 +20,15 @@ jobs:
       submodules: true
 
     - script: |
-        sudo ./dev/scripts/env.sh ai_build_wasm
+        ./dev/scripts/env.sh ai_build_wasm
       displayName: 'Build WASM'
 
     - script: |
-        sudo ./dev/scripts/env.sh ai_build_wasm_host
+        ./dev/scripts/env.sh ai_build_wasm_host
       displayName: 'Build WASM Host'
 
     - script: |
-        sudo ./dev/scripts/env.sh ai_dist_wasm
+        ./dev/scripts/env.sh ai_dist_wasm
       displayName: 'Publish WASM artifacts'
 
   - job: BuildAndroid
@@ -42,11 +40,7 @@ jobs:
       submodules: true
 
     - script: |
-        export; ls -alh; echo $(pwd)
-      displayName: 'Print Environment'
-
-    - script: |
-        sudo -u user ./dev/scripts/env.sh ai_build_android
+        ./dev/scripts/env.sh ai_build_android
       displayName: 'Build Android'
 
   - job: BuildWebApp
@@ -60,5 +54,5 @@ jobs:
       submodules: true
 
     - script: |
-        sudo ./dev/scripts/env.sh ai_build_webapp
+        ./dev/scripts/env.sh ai_build_webapp
       displayName: 'Build Web App'
