@@ -5,9 +5,11 @@ resources:
   containers:
     - container: android_container
       image: thejunkjon/android-introspection
+      options: --user user
 
     - container: webapp_container
       image: thejunkjon/android-introspection-webapp
+      options: --user user
 
 jobs:
 
