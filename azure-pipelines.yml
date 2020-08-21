@@ -19,12 +19,8 @@ jobs:
     - checkout: self
       submodules: true
 
-    - task: Bash@3
-      displayName: Build WASM
-      inputs:
-        filePath: ./dev/scripts/env.sh ai_build_wasm
-        noProfile: false
-        noRc: false
+    - bash: ./dev/scripts/env.sh ai_build_wasm
+      displayName: 'Build WASM'
 
     - bash: ./dev/scripts/env.sh ai_build_wasm_host
       displayName: 'Build WASM Host'
@@ -54,4 +50,4 @@ jobs:
       submodules: true
 
     - bash: ./dev/scripts/env.sh ai_build_webapp
-      displayName: Build Web App
+      displayName: 'Build Web App'
