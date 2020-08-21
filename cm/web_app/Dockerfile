@@ -25,8 +25,8 @@ RUN echo "user ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/user && \
 #
 # Work-around for CM machine since it requires users to be added without root or sudo.
 #
-COPY cm/scripts/useradd /usr/local/bin/useradd
-RUN chmod +x /usr/local/bin/useradd
+COPY cm/scripts /usr/local/bin
+RUN chmod +x /usr/local/bin/*
 
 ENV HOME /home/user
 
