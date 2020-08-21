@@ -22,6 +22,12 @@ RUN groupadd --gid 1000 user && \
 RUN echo "user ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/user && \
     chmod 0440 /etc/sudoers.d/user
 
+#
+# Work-around for CM machine since it requires users to be added without root or sudo.
+#
+COPY cm/scripts/useradd /usr/local/bin/useradd
+RUN chmod +x /usr/local/bin/useradd
+
 ENV HOME /home/user
 
 USER user
@@ -31,8 +37,3 @@ WORKDIR /home/user
 RUN npm update -g && npm install --save @angular/cli
 
 ENV PATH="${PATH}:/home/user/node_modules/.bin"
-
-#
-# Work-around for CM machine since it requires users to be added at run-time.
-#
-RUN echo 'alias useradd="sudo useradd"' >> ~/.bashrc

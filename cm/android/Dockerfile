@@ -13,6 +13,12 @@ RUN groupadd --gid 1000 user && \
 RUN echo "user ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/user && \
     chmod 0440 /etc/sudoers.d/user
 
+#
+# Work-around for CM machine since it requires users to be added without root or sudo.
+#
+COPY cm/scripts/useradd /usr/local/bin/useradd
+RUN chmod +x /usr/local/bin/useradd
+
 ENV HOME /home/user
 
 USER user
@@ -33,8 +39,3 @@ ENV PATH ${PATH}:${ANDROID_SDK_ROOT}/tools/bin:${ANDROID_SDK_ROOT}/cmake/3.10.2.
 
 RUN yes | sdkmanager --update && \
     yes | sdkmanager "platforms;android-28" "platform-tools" "build-tools;28.0.3" "ndk-bundle" "cmake;3.10.2.4988404"
-
-#
-# Work-around for CM machine since it requires users to be added at run-time.
-#
-RUN echo 'alias useradd="sudo useradd"' >> ~/.bashrc
