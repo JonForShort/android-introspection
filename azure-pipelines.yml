@@ -19,20 +19,18 @@ jobs:
     - checkout: self
       submodules: true
 
-    - bash: ./dev/scripts/env.sh ai_build_wasm
-      displayName: 'Build WASM'
-      noProfile: false
-      noRc: false
+    - task: Bash@3
+      displayName: Build WASM
+      inputs:
+        filePath: ./dev/scripts/env.sh ai_build_wasm
+        noProfile: false
+        noRc: false
 
     - bash: ./dev/scripts/env.sh ai_build_wasm_host
       displayName: 'Build WASM Host'
-      noProfile: false
-      noRc: false
 
     - bash: ./dev/scripts/env.sh ai_dist_wasm
       displayName: 'Publish WASM artifacts'
-      noProfile: false
-      noRc: false
 
   - job: BuildAndroid
     displayName: Build Android
@@ -44,8 +42,6 @@ jobs:
 
     - bash: ./dev/scripts/env.sh ai_build_android
       displayName: 'Build Android'
-      noProfile: false
-      noRc: false
 
   - job: BuildWebApp
     displayName: Build Web App
@@ -58,6 +54,4 @@ jobs:
       submodules: true
 
     - bash: ./dev/scripts/env.sh ai_build_webapp
-      displayName: 'Build Web App'
-      noProfile: false
-      noRc: false
+      displayName: Build Web App
