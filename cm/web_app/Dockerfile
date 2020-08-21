@@ -31,3 +31,8 @@ WORKDIR /home/user
 RUN npm update -g && npm install --save @angular/cli
 
 ENV PATH="${PATH}:/home/user/node_modules/.bin"
+
+#
+# Work-around for CM machine since it requires users to be added at run-time.
+#
+RUN echo 'alias useradd="sudo useradd"' >> ~/.bashrc
