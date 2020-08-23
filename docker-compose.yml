@@ -2,7 +2,7 @@ version: '3'
 services:
   android:
     build:
-      dockerfile: 'cm/android/Dockerfile'
+      dockerfile: './cm/android/Dockerfile'
       context: .
     volumes:
       - '.:/ai'
@@ -12,7 +12,7 @@ services:
 
   web_app:
     build:
-      dockerfile: 'cm/web_app/Dockerfile'
+      dockerfile: './cm/web_app/Dockerfile'
       context: .
     volumes:
       - '.:/ai'
