@@ -19,7 +19,7 @@ jobs:
     - checkout: self
       submodules: true
 
-    - bash: sudo chown -R 1001:1001 /home/user/.npm
+    - bash: chown -R 1001:1001 /home/user/.npm
       displayName: 'Adjust Permissions'
 
     - bash: ./dev/scripts/env.sh ai_build_wasm
@@ -39,7 +39,7 @@ jobs:
     - checkout: self
       submodules: true
 
-    - bash: sudo chown -R 1001:1001 /home/user/android-sdk
+    - bash: chown -R 1001:1001 /home/user/android-sdk
       displayName: 'Adjust Permissions'
 
     - bash: ./dev/scripts/env.sh ai_build_android
@@ -55,7 +55,7 @@ jobs:
     - checkout: self
       submodules: true
 
-    - bash: sudo chown -R 1001:1001 /home/user/.npm
+    - bash: chown -R 1001:1001 /home/user/.npm
       displayName: 'Adjust Permissions'
 
     - bash: ./dev/scripts/env.sh ai_build_webapp
