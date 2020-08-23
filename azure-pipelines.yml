@@ -5,9 +5,11 @@ resources:
   containers:
     - container: android_container
       image: thejunkjon/android-introspection
+      options: --user user:root
 
     - container: webapp_container
       image: thejunkjon/android-introspection-webapp
+      options: --user user:root
 
 jobs:
 
@@ -18,9 +20,6 @@ jobs:
     steps:
     - checkout: self
       submodules: true
-
-    - bash: chown -R 1001:1001 /home/user/.npm
-      displayName: 'Adjust Permissions'
 
     - bash: ./dev/scripts/env.sh ai_build_wasm
       displayName: 'Build WASM'
@@ -39,9 +38,6 @@ jobs:
     - checkout: self
       submodules: true
 
-    - bash: chown -R 1001:1001 /home/user/android-sdk
-      displayName: 'Adjust Permissions'
-
     - bash: ./dev/scripts/env.sh ai_build_android
       displayName: 'Build Android'
 
@@ -54,9 +50,6 @@ jobs:
     steps:
     - checkout: self
       submodules: true
-
-    - bash: chown -R 1001:1001 /home/user/.npm
-      displayName: 'Adjust Permissions'
 
     - bash: ./dev/scripts/env.sh ai_build_webapp
       displayName: 'Build Web App'
