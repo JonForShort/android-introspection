@@ -14,4 +14,4 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Build Android Introspection Project
-      run: ls -alh && docker-compose run android ./dev/scripts/env.sh ai_build_android
+      run: ls -alh cm/android && docker-compose run android ./dev/scripts/env.sh ai_build_android
