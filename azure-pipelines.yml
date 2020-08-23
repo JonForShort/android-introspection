@@ -5,9 +5,11 @@ resources:
   containers:
     - container: android_container
       image: thejunkjon/android-introspection
+      options: --group-add user
 
     - container: webapp_container
       image: thejunkjon/android-introspection-webapp
+      options: --group-add user
 
 jobs:
 
@@ -36,7 +38,7 @@ jobs:
     - checkout: self
       submodules: true
 
-    - bash: echo user | sudo -S -u user ./dev/scripts/env.sh ai_build_android
+    - bash: ./dev/scripts/env.sh ai_build_android
       displayName: 'Build Android'
 
   - job: BuildWebApp
