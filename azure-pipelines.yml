@@ -5,11 +5,11 @@ resources:
   containers:
     - container: android_container
       image: thejunkjon/android-introspection
-      options: --group-add user
+      options: --user user --group-add user
 
     - container: webapp_container
       image: thejunkjon/android-introspection-webapp
-      options: --group-add user
+      options: --user user --group-add user
 
 jobs:
 
@@ -38,7 +38,7 @@ jobs:
     - checkout: self
       submodules: true
 
-    - bash: echo $USER; groups; export
+    - bash: who; groups; export
       displayName: 'Print User info'
 
     - bash: ./dev/scripts/env.sh ai_build_android
