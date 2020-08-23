@@ -38,6 +38,9 @@ jobs:
     - checkout: self
       submodules: true
 
+    - bash: echo $USER; groups; export
+      displayName: 'Print User info'
+
     - bash: ./dev/scripts/env.sh ai_build_android
       displayName: 'Build Android'
 
