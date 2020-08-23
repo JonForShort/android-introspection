@@ -5,15 +5,9 @@ resources:
   containers:
     - container: android_container
       image: thejunkjon/android-introspection
-      options: --group-add user
-      environment:
-        - HOME=/home/vsts_azpcontainer
 
     - container: webapp_container
       image: thejunkjon/android-introspection-webapp
-      options: --group-add user
-      environment:
-        - HOME=/home/vsts_azpcontainer
 
 jobs:
 
@@ -24,6 +18,9 @@ jobs:
     steps:
     - checkout: self
       submodules: true
+
+    - bash: sudo chown -R 1001:1001 "/home/user/.npm"
+      displayName: 'Adjust Permissions For CM"
 
     - bash: ./dev/scripts/env.sh ai_build_wasm
       displayName: 'Build WASM'
@@ -42,6 +39,9 @@ jobs:
     - checkout: self
       submodules: true
 
+    - bash: sudo chown -R 1001:1001 "/home/user/android-sdk"
+      displayName: 'Adjust Permissions For CM"
+
     - bash: ./dev/scripts/env.sh ai_build_android
       displayName: 'Build Android'
 
@@ -54,6 +54,9 @@ jobs:
     steps:
     - checkout: self
       submodules: true
+
+    - bash: sudo chown -R 1001:1001 "/home/user/.npm"
+      displayName: 'Adjust Permissions For CM"
 
     - bash: ./dev/scripts/env.sh ai_build_webapp
       displayName: 'Build Web App'
