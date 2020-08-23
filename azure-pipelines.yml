@@ -5,11 +5,15 @@ resources:
   containers:
     - container: android_container
       image: thejunkjon/android-introspection
-      options: --user user --group-add user
+      options: --group-add user
+      environment:
+        - HOME=/home/vsts_azpcontainer
 
     - container: webapp_container
       image: thejunkjon/android-introspection-webapp
-      options: --user user --group-add user
+      options: --group-add user
+      environment:
+        - HOME=/home/vsts_azpcontainer
 
 jobs:
 
@@ -37,9 +41,6 @@ jobs:
     steps:
     - checkout: self
       submodules: true
-
-    - bash: who; groups; export
-      displayName: 'Print User info'
 
     - bash: ./dev/scripts/env.sh ai_build_android
       displayName: 'Build Android'
