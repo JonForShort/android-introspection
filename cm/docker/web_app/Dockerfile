@@ -22,7 +22,7 @@ RUN groupadd --gid 1000 user && \
 RUN echo "user ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/user && \
     chmod 0440 /etc/sudoers.d/user
 
-COPY cm/scripts /usr/local/bin
+COPY cm/docker/scripts /usr/local/bin
 
 RUN chmod +x /usr/local/bin/*
 
