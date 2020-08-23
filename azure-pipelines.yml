@@ -56,7 +56,7 @@ jobs:
       submodules: true
 
     - bash: sudo chown -R 1001:1001 /home/user/.npm
-      displayName: 'Adjust Permissions
+      displayName: 'Adjust Permissions'
 
     - bash: ./dev/scripts/env.sh ai_build_webapp
       displayName: 'Build Web App'
