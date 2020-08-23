@@ -33,7 +33,3 @@ ENV HOME /home/user
 USER user
 
 WORKDIR /home/user
-
-RUN npm update -g && npm install --save @angular/cli
-
-ENV PATH="${PATH}:/home/user/node_modules/.bin"

@@ -39,3 +39,5 @@ ENV PATH ${PATH}:${ANDROID_SDK_ROOT}/tools/bin:${ANDROID_SDK_ROOT}/cmake/3.10.2.
 
 RUN yes | sdkmanager --update && \
     yes | sdkmanager "platforms;android-28" "platform-tools" "build-tools;28.0.3" "ndk-bundle" "cmake;3.10.2.4988404"
+
+RUN chmod -R g+w ${ANDROID_SDK_ROOT}
