@@ -36,7 +36,7 @@ jobs:
     - checkout: self
       submodules: true
 
-    - bash: ./dev/scripts/env.sh ai_build_android
+    - bash: sudo -u user ./dev/scripts/env.sh ai_build_android
       displayName: 'Build Android'
 
   - job: BuildWebApp
