@@ -5,11 +5,9 @@ resources:
   containers:
     - container: android_container
       image: thejunkjon/android-introspection
-      options: --user root
 
     - container: webapp_container
       image: thejunkjon/android-introspection-webapp
-      options: --user root
 
 jobs:
 
@@ -38,8 +36,11 @@ jobs:
     - checkout: self
       submodules: true
 
-    - bash: ./dev/scripts/env.sh ai_build_android
-      displayName: 'Build Android'
+    - task: DockerCompose@0
+      inputs:
+        dockerComposeFile: '**/docker-compose.yml'
+        action: 'Build Android'
+        dockerComposeCommand: 'run ./dev/scripts/env.sh ai_build_android'
 
   - job: BuildWebApp
     displayName: Build Web App
