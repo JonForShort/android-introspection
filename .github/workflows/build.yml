@@ -17,8 +17,8 @@ jobs:
         submodules: true
 
     - name: Build Android Introspection Project
-      run: ./dev/scripts/env.sh ai_build
-    
+      run: . ./dev/scripts/env.sh && rm .env && ai_build
+
     - name: Archive Build Logs
       uses: actions/upload-artifact@v2
       with:
