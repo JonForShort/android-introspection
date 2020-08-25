@@ -2,7 +2,7 @@
 
 set -x
 
-chmod +rw /home/user/android-sdk
+chmod -R +rw /home/user/android-sdk
 
 ls -alh /home/user
 
