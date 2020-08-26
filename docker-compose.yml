@@ -1,19 +1,40 @@
 version: '3'
 services:
+
+  android-base:
+    build:
+      dockerfile: 'cm/docker/android-base/Dockerfile'
+      context: .
+    volumes:
+      - '.:/ai'
+    working_dir: '/ai'
+
   android:
     build:
       dockerfile: 'cm/docker/android/Dockerfile'
       context: .
+    depends_on:
+      - android-base
     volumes:
       - '.:/ai'
     working_dir: '/ai'
     tty: true
     user: $AI_UID
 
+  web_app-base:
+    build:
+      dockerfile: 'cm/docker/web_app-base/Dockerfile'
+      context: .
+    volumes:
+      - '.:/ai'
+    working_dir: '/ai'
+
   web_app:
     build:
       dockerfile: 'cm/docker/web_app/Dockerfile'
       context: .
+    depends_on:
+      - web_app-base
     volumes:
       - '.:/ai'
     ports:
