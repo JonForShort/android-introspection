@@ -1,4 +1,4 @@
-FROM android-introspection_web_app:latest
+FROM android-introspection_web_app-base:latest
 
 RUN groupadd --gid 1000 user && \
     useradd --uid 1000 --gid user --groups sudo --shell /bin/bash --create-home user && \
