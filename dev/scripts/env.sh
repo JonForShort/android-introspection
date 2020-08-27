@@ -126,9 +126,9 @@ ai_build_webapp()
 
     pushd ${BUILD_DIR}
 
-    npm install
-    
-    ng build
+    NG_CLI_ANALYTICS=false npm install @angular/cli
+
+    ./node_modules/.bin/ng build
 
     popd
 )}
