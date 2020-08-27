@@ -56,8 +56,8 @@ ai_build()
 
     docker-compose build                                             &> ${LOGS_DIR}/build.txt && \
     docker-compose run android-base ${ENV_SCRIPT} ai_build_android   &> ${LOGS_DIR}/build_android.txt && \
-    docker-compose run web_app-base ${ENV_SCRIPT} ai_build_wasm      &> ${LOGS_DIR}/build_wasm.txt && \
     docker-compose run web_app-base ${ENV_SCRIPT} ai_build_wasm_host &> ${LOGS_DIR}/build_wasm_host.txt && \
+    docker-compose run web_app-base ${ENV_SCRIPT} ai_build_wasm      &> ${LOGS_DIR}/build_wasm.txt && \
     docker-compose run web_app-base ${ENV_SCRIPT} ai_dist_wasm       &> ${LOGS_DIR}/dist_wasm.txt && \
     docker-compose run web_app-base ${ENV_SCRIPT} ai_build_webapp    &> ${LOGS_DIR}/build_webapp.txt
 
