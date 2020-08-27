@@ -50,7 +50,7 @@ ai_build()
 
     rm -rf ${LOGS_DIR}
 
-    mkdir ${LOGS_DIR}
+    mkdir -p ${LOGS_DIR}
 
     ENV_SCRIPT=./dev/scripts/env.sh
 
