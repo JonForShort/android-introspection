@@ -33,7 +33,7 @@ export class WasmService {
       }))
   }
 
-  public getFilePathsInApk(filePath: String): Observable<Array<String>> {
+  public getFilePathsInApk(filePath: String): Observable<any> {
     return this.wasmReady
       .pipe(filter(value => value === true))
       .pipe(map(() => {
