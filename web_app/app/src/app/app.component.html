@@ -1,10 +1,37 @@
-<h3>Select APK</h3>
+<div id="header">
 
-<input type="file" (change)="onInputChanged($event)" />
+    <div id="headerLeft">
+        <span class="title">Android Introspection</span>
+        <input style="margin-left: 30px;" type="file" (change)="onInputChanged($event)" />
+    </div>
 
-{{isApkValid}}
+    <div id="headerRight">
+        <a href="https://www.github.com/thejunkjon/android-introspection"><img src="assets/img/GitHub_Logo.png" /></a>
+    </div>
+</div>
+
+<div style="clear: both;"></div>
 
 <mat-tab-group>
+
+    <mat-tab label="Summary">
+
+        {{isApkValid}}
+
+    </mat-tab>
+
+    <mat-tab label="Manifest">
+
+    </mat-tab>
+
+    <mat-tab label="Permissions">
+
+    </mat-tab>
+
+    <mat-tab label="Assets">
+
+    </mat-tab>
+
     <mat-tab label="Contents">
 
         <mat-table [dataSource]="filePaths" class="mat-elevation-z8">

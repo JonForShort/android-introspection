@@ -1,0 +1,24 @@
+#header {
+	padding: 10px;
+}
+
+#headerLeft {
+	float: left;
+	height: 40px;
+}
+
+#headerRight {
+	float: right;
+	height: 40px;
+}
+
+#headerRight img {
+	height: 100%;
+	width: 100%;
+}
+
+.title {
+	margin-top: 10px;
+	font-weight: bold;
+	font-size: x-large;
+}
