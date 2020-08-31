@@ -1,24 +1,39 @@
 #header {
-	padding: 10px;
+	height: 50px;
+	margin-bottom: 50px;
 }
 
 #headerLeft {
 	float: left;
-	height: 40px;
+	width: 90%;
+	height: 100%;
 }
 
 #headerRight {
 	float: right;
-	height: 40px;
-}
-
-#headerRight img {
+	width: 10%;
 	height: 100%;
-	width: 100%;
 }
 
-.title {
-	margin-top: 10px;
-	font-weight: bold;
+#headerLogo {
+	float: left;
+	height: 100px;
+	margin: 0px 15px 15px 0px;
+}
+
+#githubLogo {
+	float: right;
+	height: 50px;
+}
+
+#titleText {
+	margin-left: 10px;
+	margin-right: 10px;
+	vertical-align: top;
 	font-size: x-large;
+	font-weight: bolder;
+}
+
+#inputFileButton {
+	vertical-align: top;
 }

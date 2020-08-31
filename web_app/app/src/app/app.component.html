@@ -1,12 +1,17 @@
 <div id="header">
 
     <div id="headerLeft">
-        <span class="title">Android Introspection</span>
-        <input style="margin-left: 30px;" type="file" (change)="onInputChanged($event)" />
+        <img id="headerLogo" src="assets/img/android-introspection-logo.png" />
+        <div style="padding-top: 10px;">
+            <p id="titleText">Android Introspection</p>
+            <input id="inputFileButton" type="file" (change)="onInputChanged($event)" />
+        </div>
     </div>
 
     <div id="headerRight">
-        <a href="https://www.github.com/thejunkjon/android-introspection"><img src="assets/img/github-logo.png" /></a>
+        <a href="https://www.github.com/thejunkjon/android-introspection">
+            <img id="githubLogo" src="assets/img/github-logo.png" />
+        </a>
     </div>
 </div>
 
