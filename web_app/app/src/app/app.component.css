@@ -23,7 +23,8 @@
 
 #githubLogo {
 	float: right;
-	height: 50px;
+	height: 32px;
+	padding: 10px;
 }
 
 #titleText {
