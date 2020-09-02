@@ -17,46 +17,50 @@
 
 <div style="clear: both;"></div>
 
-<mat-tab-group>
+<div [hidden]="!isApkValid">
 
-    <mat-tab label="Summary">
+    <mat-tab-group>
 
-        {{isApkValid}}
+        <mat-tab label="Summary">
 
-    </mat-tab>
+            {{isApkValid}}
 
-    <mat-tab label="Manifest">
+        </mat-tab>
 
-    </mat-tab>
+        <mat-tab label="Manifest">
 
-    <mat-tab label="Permissions">
+        </mat-tab>
 
-    </mat-tab>
+        <mat-tab label="Permissions">
 
-    <mat-tab label="Assets">
+        </mat-tab>
 
-    </mat-tab>
+        <mat-tab label="Assets">
 
-    <mat-tab label="Contents">
+        </mat-tab>
 
-        <mat-table [dataSource]="filePaths" class="mat-elevation-z8">
+        <mat-tab label="Contents">
 
-            <!-- File Path Column -->
-            <ng-container matColumnDef="path">
-                <mat-header-cell *matHeaderCellDef>path</mat-header-cell>
-                <mat-cell *matCellDef="let element"> {{element.path}} </mat-cell>
-            </ng-container>
+            <mat-table [dataSource]="filePaths" class="mat-elevation-z8">
 
-            <!-- File Type Column -->
-            <ng-container matColumnDef="type">
-                <mat-header-cell *matHeaderCellDef>type</mat-header-cell>
-                <mat-cell *matCellDef="let element"> {{element.type}} </mat-cell>
-            </ng-container>
+                <!-- File Path Column -->
+                <ng-container matColumnDef="path">
+                    <mat-header-cell *matHeaderCellDef>path</mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.path}} </mat-cell>
+                </ng-container>
 
-            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+                <!-- File Type Column -->
+                <ng-container matColumnDef="type">
+                    <mat-header-cell *matHeaderCellDef>type</mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.type}} </mat-cell>
+                </ng-container>
 
-        </mat-table>
+                <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
 
-    </mat-tab>
-</mat-tab-group>
+            </mat-table>
+
+        </mat-tab>
+    </mat-tab-group>
+
+</div>

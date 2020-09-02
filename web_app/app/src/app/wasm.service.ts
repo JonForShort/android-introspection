@@ -64,4 +64,19 @@ export class WasmService {
         return filePath
       }))
   }
+
+  public deleteDataFile(fileName: String): Observable<Boolean> {
+    return this.wasmReady
+      .pipe(filter(value => value === true))
+      .pipe(map(() => {
+        const filePath = "/" + fileName
+        const fileExists = this.module.FS.analyzePath(filePath, false).exists;
+        if (fileExists) {
+          this.module.FS.unlink(filePath);
+          return true;
+        } else {
+          return false;
+        }
+      }))
+  }
 }
