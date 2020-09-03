@@ -68,8 +68,13 @@ public:
   ApkImpl(std::string_view apkPath) : apkPath_(apkPath) {}
 
   auto isValid() const -> bool {
-    auto const binaryXml = getBinaryXml(apkPath_);
-    return binaryXml.hasElement(ANDROID_MANIFEST_TAG_APPLICATION);
+    try {
+      auto const binaryXml = getBinaryXml(apkPath_);
+      return binaryXml.hasElement(ANDROID_MANIFEST_TAG_APPLICATION);
+    } catch (MissingAndroidManifestException e) {
+      LOGW("apk is not valid; missing android manifest");
+      return false;
+    }
   }
 
   auto makeDebuggable() const -> void {
