@@ -78,6 +78,10 @@ public:
   }
 
   auto makeDebuggable() const -> void {
+    if (!isValid()) {
+      LOGW("apk is not valid; unable to make debuggable");
+      return;
+    }
     auto const binaryXml = getBinaryXml(apkPath_);
     if (!binaryXml.hasElement(ANDROID_MANIFEST_TAG_APPLICATION)) {
       LOGW("unable to find application tag in [{}]", apkPath_);
@@ -88,6 +92,10 @@ public:
   }
 
   auto isDebuggable() const -> bool {
+    if (!isValid()) {
+      LOGW("apk is not valid; unable to check is debuggable");
+      return false;
+    }
     auto binaryXml = getBinaryXml(apkPath_);
     if (!binaryXml.hasElement(ANDROID_MANIFEST_TAG_APPLICATION)) {
       LOGW("unable to find application tag in [{}]", apkPath_);
@@ -100,11 +108,19 @@ public:
   }
 
   auto getFiles() const -> std::vector<std::string> {
+    if (!isValid()) {
+      LOGW("apk is not valid; unable to get files");
+      return std::vector<std::string>();
+    }
     auto const apkParser = ai::ApkParser(apkPath_);
     return apkParser.getFiles();
   }
 
   auto dump(std::string_view destinationDirectory) const -> void {
+    if (!isValid()) {
+      LOGW("apk is not valid; unable to dump");
+      return;
+    }
     fs::create_directories(destinationDirectory);
     auto const binaryXml = getBinaryXml(apkPath_);
     auto const stringXml = binaryXml.toStringXml();
