@@ -26,11 +26,24 @@ target_include_directories(apk PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 target_include_directories(apk PRIVATE ${DIR_ROOT_EXTERNAL}/minizip/source)
 
+if (WASM)
+
+  #
+  # Adding Exception Support
+  #
+
+  set(WASM_EXCEPTION_FLAGS "-s EXCEPTION_DEBUG=1 -s DISABLE_EXCEPTION_CATCHING=0")
+
+  set_target_properties(apk PROPERTIES COMPILE_FLAGS ${WASM_EXCEPTION_FLAGS})
+
+endif()
+
 if (NOT WASM)
 
   #
-  # tests
+  # Adding Tests
   #
+
   add_executable(apk_test apk_test.cpp)
 
   target_link_libraries(apk_test apk)
