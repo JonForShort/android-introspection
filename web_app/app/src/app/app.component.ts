@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { MatTable } from '@angular/material/table';
 import { WasmService } from './wasm.service';
 
-export interface FilePathElement {
+export interface ContentElement {
   path: String,
   type: String
 }
@@ -15,11 +15,9 @@ export interface FilePathElement {
 })
 export class AppComponent {
 
-  title = 'app';
-
   isApkValid = '';
 
-  filePaths: FilePathElement[] = [];
+  contents: ContentElement[] = [];
 
   displayedColumns: string[] = ['path', 'type'];
 
@@ -37,9 +35,9 @@ export class AppComponent {
             this.isApkValid = isApkValid
             if (this.isApkValid) {
               this.wasm.getFilePathsInApk(filePath).subscribe((filePaths) => {
-                this.filePaths = []
+                this.contents = []
                 for (var i = 0; i < filePaths.size(); i++) {
-                  this.filePaths.push({ path: filePaths.get(i), type: "txt" })
+                  this.contents.push({ path: filePaths.get(i), type: "txt" })
                 }
                 this.table.renderRows
               })
