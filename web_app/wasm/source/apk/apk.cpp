@@ -22,6 +22,7 @@
 // SOFTWARE.
 //
 #include <filesystem>
+#include <map>
 #include <string>
 
 #include "apk/apk.h"
@@ -104,6 +105,13 @@ public:
     return apkParser.getFiles();
   }
 
+  auto getProperties() const -> std::map<std::string, std::string> {
+    auto properties = std::map<std::string, std::string>();
+    properties.insert({"valid", isValid() ? "true" : "false"});
+    properties.insert({"debuggable", isDebuggable() ? "true" : "false"});
+    return properties;
+  }
+
   auto dump(std::string_view destinationDirectory) const -> void {
     fs::create_directories(destinationDirectory);
     auto const binaryXml = getBinaryXml(apkPath_);
@@ -127,5 +135,7 @@ auto Apk::makeDebuggable() const -> void { return pimpl_->makeDebuggable(); }
 auto Apk::isDebuggable() const -> bool { return pimpl_->isDebuggable(); }
 
 auto Apk::getFiles() const -> std::vector<std::string> { return pimpl_->getFiles(); }
+
+auto Apk::getProperties() const -> std::map<std::string, std::string> { return pimpl_->getProperties(); }
 
 auto Apk::dump(std::string_view destinationDirectory) const -> void { return pimpl_->dump(destinationDirectory); }

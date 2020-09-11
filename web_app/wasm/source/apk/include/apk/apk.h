@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright 2019
+// Copyright 2019-2020
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@
 #ifndef ANDROID_INTROSPECTION_APK_APK_H_
 #define ANDROID_INTROSPECTION_APK_APK_H_
 
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -45,6 +46,8 @@ public:
   auto isDebuggable() const -> bool;
 
   auto getFiles() const -> std::vector<std::string>;
+
+  auto getProperties() const -> std::map<std::string, std::string>;
 
   auto dump(std::string_view destinationDirectory) const -> void;
 
