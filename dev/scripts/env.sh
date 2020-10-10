@@ -44,6 +44,28 @@ ai_setup_vscode()
     popd
 }
 
+ai_deploy()
+{
+    pushd ${ROOT_DIR}
+
+    docker-compose run web_app ./dev/scripts/env.sh ai_deploy_webapp
+
+    popd
+}
+
+ai_deploy_webapp()
+{(
+    echo "deploying web app"
+
+    pushd ${ROOT_DIR}/web_app/app
+
+    sudo npm install -g firebase-tools
+
+    popd
+
+    echo "done web app"
+)}
+
 ai_build()
 {
     pushd ${ROOT_DIR}

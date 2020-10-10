@@ -1,0 +1,42 @@
+name: Release Android Introspection
+
+on:
+  push:
+    branches: [ release/* ]
+  pull_request:
+    branches: [ release/* ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Source
+      uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Build Android Introspection Project
+      run:  ./dev/scripts/env.sh ai_build
+
+    - name: Archive Build Logs
+      uses: actions/upload-artifact@v2
+      with:
+        name: archive-build-logs
+        path: logs/*.*
+
+    - name: Archive Web App
+      uses: actions/upload-artifact@v2
+      with:
+        name: archive-web-app
+        path: web_app/app/dist/**/*.*
+
+    - name: Archive Android App
+      uses: actions/upload-artifact@v2
+      with:
+        name: archive-android-app
+        path: android/app/build/outputs/apk/**/*.apk
+
+    - name: Deploy Web App
+      run:  ./dev/scripts/env.sh ai_deploy
+
