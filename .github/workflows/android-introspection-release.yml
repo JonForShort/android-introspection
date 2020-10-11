@@ -1,4 +1,4 @@
-name: Deploy Release
+name: Release
 
 on:
   push:
@@ -36,9 +36,3 @@ jobs:
       with:
         name: archive-android-app
         path: android/app/build/outputs/apk/**/*.apk
-
-    - name: Deploy Web App
-      run:  |
-        echo "GOOGLE_APPLICATION_CREDENTIALS_ID=.token" &> .env
-        echo "${{ secrets.SERVICE_ACCOUNT_TOKEN }}" &> .token
-        ./dev/scripts/env.sh ai_deploy
