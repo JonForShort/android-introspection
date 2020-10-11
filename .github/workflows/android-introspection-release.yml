@@ -1,10 +1,6 @@
 name: Release
 
-on:
-  push:
-    branches: [ release/* ]
-  pull_request:
-    branches: [ release/* ]
+on: [ workflow_dispatch ]
 
 jobs:
   build:
@@ -36,3 +32,41 @@ jobs:
       with:
         name: archive-android-app
         path: android/app/build/outputs/apk/**/*.apk
+
+    - name: Download Android App Artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: archive-android-app
+
+    - name: Download Web App App Artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: archive-web-app
+
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+
+    - name: Upload Android App Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./archive-android-app.zip
+          asset_name: android-app.zip
+          asset_content_type: application/zip
+
+    - name: Upload Web App Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./archive-web-app.zip
+          asset_name: web-app.zip
+          asset_content_type: application/zip
