@@ -1,5 +1,4 @@
 ![Build Master](https://github.com/thejunkjon/android-introspection/workflows/Build%20Master/badge.svg)
-![Release](https://github.com/thejunkjon/android-introspection/workflows/Release/badge.svg)
 
 # android-introspection
 
