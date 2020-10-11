@@ -12,5 +12,8 @@
 # output
 /web_app/app/src/assets/js/wasm
 
+# archive
+/archive
+
 # logs
 /logs
