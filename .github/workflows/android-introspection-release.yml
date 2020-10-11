@@ -57,9 +57,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./archive-android-app.zip
-          asset_name: android-app.zip
-          asset_content_type: application/zip
+        asset_path: ./archive-android-app.zip
+        asset_name: android-app.zip
+        asset_content_type: application/zip
 
     - name: Upload Web App Release Asset
       uses: actions/upload-release-asset@v1
@@ -67,6 +67,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./archive-web-app.zip
-          asset_name: web-app.zip
-          asset_content_type: application/zip
+        asset_path: ./archive-web-app.zip
+        asset_name: web-app.zip
+        asset_content_type: application/zip
