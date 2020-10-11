@@ -38,5 +38,7 @@ jobs:
         path: android/app/build/outputs/apk/**/*.apk
 
     - name: Deploy Web App
-      run:  ./dev/scripts/env.sh ai_deploy
-
+      run:  |
+        echo "GOOGLE_APPLICATION_CREDENTIALS_ID=.token" &> .env
+	echo "${{ secrets.SERVICE_ACCOUNT_TOKEN }}" &> $GOOGLE_APPLICATION_CREDENTIALS_ID
+	./dev/scripts/env.sh ai_deploy

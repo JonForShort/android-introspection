@@ -61,6 +61,8 @@ ai_deploy_webapp()
 
     sudo npm install -g firebase-tools
 
+    firebase deploy
+
     popd
 
     echo "done web app"
