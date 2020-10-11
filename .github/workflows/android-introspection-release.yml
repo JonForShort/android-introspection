@@ -1,4 +1,4 @@
-name: Release Android Introspection
+name: Deploy Release
 
 on:
   push:
