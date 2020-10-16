@@ -1,18 +1,25 @@
 #header {
 	height: 50px;
+	width: 100%;
 	margin-bottom: 50px;
 }
 
 #headerLeft {
 	float: left;
-	width: 90%;
 	height: 100%;
+	width: 320px;
+}
+
+#headerMiddle {
+	height: 100%;
+	margin-left: 320px;
+	margin-right: 100px;
 }
 
 #headerRight {
 	float: right;
-	width: 10%;
 	height: 100%;
+	width: 100px;
 }
 
 #headerLogo {
@@ -27,14 +34,15 @@
 	padding: 10px;
 }
 
-#titleText {
+.titleText {
 	margin-left: 10px;
 	margin-right: 10px;
-	vertical-align: top;
-	font-size: x-large;
+	padding-top: 10px;
+	font-size: xx-large;
 	font-weight: bolder;
 }
 
-#inputFileButton {
-	vertical-align: top;
+hr {
+	border: none;
+	border-top: 1px dotted darkgray;
 }
