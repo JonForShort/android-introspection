@@ -25,9 +25,18 @@ export class AppComponent {
 
   constructor(private wasm: WasmService) { }
 
+  onFileDropped(files: Array<File>) {
+    const file = files[0]
+    this.handleFileInput(file)
+  }
+
   onInputChanged(event: Event) {
     const inputElement = (<HTMLInputElement>event.target)
     const file = inputElement.files[0]
+    this.handleFileInput(file)
+  }
+
+  private handleFileInput(file: File) {
     this.wasm.deleteDataFile(file.name).subscribe((isDeleted) => {
       this.wasm.readFile(file).subscribe((fileContent) => {
         this.wasm.createDataFile(file.name, fileContent).subscribe((filePath) => {

@@ -3,8 +3,8 @@
     <div id="headerLeft">
         <img id="headerLogo" src="assets/img/android-introspection-logo.png" />
         <div style="padding-top: 10px;">
-            <p class="titleText">Android</p>
-            <p class="titleText">Introspection</p>
+            <p id="titleTextAndroid">Android</p>
+            <p id="titleTextIntrospection">Introspection</p>
         </div>
     </div>
 
@@ -15,8 +15,10 @@
     </div>
 
     <div id="headerMiddle">
-        <input id="inputFileButton" type="file" accept="application/vnd.android.package-archive"
-            (change)="onInputChanged($event)" />
+        <div id="inputFileDropZone" (appDropZone)="onDrop($event)" appDropZone (fileDrop)="onFileDropped($event)">
+            <input id="inputFileButton" type="file" accept="application/vnd.android.package-archive"
+                (change)="onInputChanged($event)" />
+        </div>
     </div>
 
 </div>

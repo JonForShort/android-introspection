@@ -1,7 +1,6 @@
 #header {
-	height: 50px;
+	height: 100px;
 	width: 100%;
-	margin-bottom: 50px;
 }
 
 #headerLeft {
@@ -34,12 +33,27 @@
 	padding: 10px;
 }
 
-.titleText {
+#titleTextAndroid {
 	margin-left: 10px;
 	margin-right: 10px;
 	padding-top: 10px;
 	font-size: xx-large;
 	font-weight: bolder;
+	color: #1c1c1c;
+}
+
+#titleTextIntrospection {
+	margin-left: 10px;
+	margin-right: 10px;
+	padding-top: 10px;
+	font-size: xx-large;
+	font-weight: bolder;
+	color: #78c557;
+}
+
+#inputFileDropZone {
+	height: 100%;
+	width: 100%;
 }
 
 hr {
