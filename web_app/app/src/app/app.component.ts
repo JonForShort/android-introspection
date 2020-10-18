@@ -1,6 +1,6 @@
-import { Component, ViewChild } from '@angular/core';
-import { MatTable } from '@angular/material/table';
-import { WasmService } from './wasm.service';
+import { Component, ViewChild } from '@angular/core'
+import { MatTable } from '@angular/material/table'
+import { WasmService } from './wasm.service'
 
 export interface ContentElement {
   path: String,

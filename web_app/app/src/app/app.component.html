@@ -1,4 +1,4 @@
-<div id="header">
+<div id="header" appDropZone (fileDrop)="onFileDropped($event)">
 
     <div id="headerLeft">
         <img id="headerLogo" src="assets/img/android-introspection-logo.png" />
@@ -15,9 +15,11 @@
     </div>
 
     <div id="headerMiddle">
-        <div id="inputFileDropZone" (appDropZone)="onDrop($event)" appDropZone (fileDrop)="onFileDropped($event)">
-            <input id="inputFileButton" type="file" accept="application/vnd.android.package-archive"
-                (change)="onInputChanged($event)" />
+        <div id="headerButtons">
+            <input id="inputFileButton" type="file" accept="application/vnd.android.package-archive" (change)="onInputChanged($event)" />
+            <label headerButtonHover class="headerButton">Load APK</label>
+            <label headerButtonHover class="headerButton">Decompile</label>
+            <label headerButtonHover class="headerButton">Analyze</label>
         </div>
     </div>
 
