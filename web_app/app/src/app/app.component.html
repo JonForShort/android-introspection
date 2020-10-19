@@ -35,6 +35,25 @@
 
         <mat-tab label="Summary">
 
+            <mat-table [dataSource]="properties" class="mat-elevation-z8">
+
+                <!-- Property Key Column -->
+                <ng-container matColumnDef="key">
+                    <mat-header-cell *matHeaderCellDef>key</mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.key}} </mat-cell>
+                </ng-container>
+
+                <!-- Property Value Column -->
+                <ng-container matColumnDef="value">
+                    <mat-header-cell *matHeaderCellDef>value</mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.value}} </mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="propertiesDisplayedColumns"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: propertiesDisplayedColumns;"></mat-row>
+
+            </mat-table>
+
         </mat-tab>
 
         <mat-tab label="Manifest">
@@ -65,8 +84,8 @@
                     <mat-cell *matCellDef="let element"> {{element.type}} </mat-cell>
                 </ng-container>
 
-                <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-                <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+                <mat-header-row *matHeaderRowDef="contentsDisplayedColumns"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: contentsDisplayedColumns;"></mat-row>
 
             </mat-table>
 

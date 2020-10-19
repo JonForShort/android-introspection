@@ -41,6 +41,14 @@ export class WasmService {
       }))
   }
 
+  public getApkProperties(filePath: String): Observable<any> {
+    return this.wasmReady
+      .pipe(filter(value => value === true))
+      .pipe(map(() => {
+        return this.module.getProperties(filePath)
+      }))
+  }
+
   public readFile = (blob: Blob): Observable<Uint8Array> => {
     const reader = new FileReader();
     reader.readAsArrayBuffer(blob);

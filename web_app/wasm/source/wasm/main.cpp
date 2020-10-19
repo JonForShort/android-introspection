@@ -24,6 +24,7 @@
 
 #ifdef WASM
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -37,17 +38,27 @@ auto initialize() { LOGV("wasm::initialize"); }
 
 auto uninitialize() { LOGV("wasm::uninitialize"); }
 
+namespace apk {
+
 auto isValid(std::string const pathToApk) {
-  LOGV("wasm::isValid");
+  LOGV("wasm::apk::isValid pathToApk [{}]", pathToApk);
   auto const apk = ai::Apk(pathToApk);
   return apk.isValid();
 }
 
-auto getFiles(std::string const apkPath) {
-  LOGV("wasm::getFiles apkPath [{}]", apkPath);
-  auto const apk = ai::Apk(apkPath);
+auto getFiles(std::string const pathToApk) {
+  LOGV("wasm::apk::getFiles pathToApk [{}]", pathToApk);
+  auto const apk = ai::Apk(pathToApk);
   return apk.getFiles();
 }
+
+auto getProperties(std::string const pathToApk) {
+  LOGV("wasm::apk::getProperties pathToApk [{}]", pathToApk);
+  auto const apk = ai::Apk(pathToApk);
+  return apk.getProperties();
+}
+
+} // namespace apk
 
 EMSCRIPTEN_BINDINGS(ApkModule) {
 
@@ -55,11 +66,15 @@ EMSCRIPTEN_BINDINGS(ApkModule) {
 
   function("uninitialize", &uninitialize);
 
-  function("isValid", &isValid);
+  function("isValid", &apk::isValid);
 
-  function("getFiles", &getFiles);
+  function("getFiles", &apk::getFiles);
+
+  function("getProperties", &apk::getProperties);
 
   register_vector<std::string>("vector<string>");
+
+  register_map<std::string, std::string>("map<string, string>");
 }
 
 #else

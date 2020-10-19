@@ -7,6 +7,11 @@ export interface ContentElement {
   type: String
 }
 
+export interface PropertyElement {
+  key: String,
+  value: String
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -19,7 +24,11 @@ export class AppComponent {
 
   contents: ContentElement[] = [];
 
-  displayedColumns: string[] = ['path', 'type'];
+  contentsDisplayedColumns: string[] = ['path', 'type'];
+
+  properties: PropertyElement[] = [];
+
+  propertiesDisplayedColumns: string[] = ['key', 'value'];
 
   @ViewChild(MatTable) table: MatTable<Element>;
 
@@ -43,10 +52,22 @@ export class AppComponent {
           this.wasm.isApkValid(filePath).subscribe((isApkValid) => {
             this.isApkValid = isApkValid
             if (this.isApkValid) {
+
               this.wasm.getFilePathsInApk(filePath).subscribe((filePaths) => {
                 this.contents = []
                 for (var i = 0; i < filePaths.size(); i++) {
                   this.contents.push({ path: filePaths.get(i), type: "txt" })
+                }
+                this.table.renderRows
+              })
+
+              this.wasm.getApkProperties(filePath).subscribe((properties) => {
+                this.properties = []
+                const propertiesKeys = properties.keys()
+                for (var i = 0; i < propertiesKeys.size(); i++) {
+                  const key = propertiesKeys.get(i)
+                  const value = properties.get(key)
+                  this.properties.push({ key: key, value: value })
                 }
                 this.table.renderRows
               })
