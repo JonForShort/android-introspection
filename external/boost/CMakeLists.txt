@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.10.2)
 
-set (boost-modules --with-program_options)
+set (boost-modules --with-program_options --with-filesystem)
 
 add_custom_target (boost
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/source

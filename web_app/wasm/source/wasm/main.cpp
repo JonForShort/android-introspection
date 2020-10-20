@@ -79,9 +79,40 @@ EMSCRIPTEN_BINDINGS(ApkModule) {
 
 #else
 
+#include <boost/filesystem.hpp>
+#include <boost/program_options.hpp>
+
+#include <iostream>
+
+namespace fs = boost::filesystem;
+namespace po = boost::program_options;
+
 auto main(int argc, char *argv[]) -> int {
-  (void)argc;
-  (void)argv;
+
+  std::string file_argument;
+
+  try {
+    po::options_description desc{"Options"};
+    desc.add_options()("help,h", "Help screen")("file,f", po::value<std::string>(&file_argument)->required(), "file path to apk");
+
+    po::variables_map vm;
+    po::store(parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+  } catch (const po::error &ex) {
+    std::cerr << ex.what() << '\n';
+    return -1;
+  }
+
+  const fs::path file_path(file_argument);
+  if (!fs::exists(file_path)) {
+    std::cerr << "file path does not exist; please check path" << std::endl;
+    return -2;
+  }
+
+  if (fs::is_directory(file_path)) {
+    std::cerr << "file path is a directory; please check path" << std::endl;
+    return -3;
+  }
 }
 
 #endif

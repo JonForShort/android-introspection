@@ -28,10 +28,14 @@ if (WASM)
 
 else()
 
-  set(boost-include ${DIR_ROOT_OUT}/boost/include)
-
   add_dependencies(wasm boost)
 
-  target_include_directories (wasm PRIVATE ${boost-include})
+  set(boost-include ${DIR_ROOT_OUT}/external/boost/include)
+  set(boost-lib     ${DIR_ROOT_OUT}/external/boost/lib)
+
+  target_include_directories(wasm PRIVATE ${boost-include})
+
+  target_link_libraries(wasm ${boost-lib}/libboost_program_options.a)
+  target_link_libraries(wasm ${boost-lib}/libboost_filesystem.a)
 
 endif()
