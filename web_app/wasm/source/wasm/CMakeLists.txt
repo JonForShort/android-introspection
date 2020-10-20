@@ -26,4 +26,12 @@ if (WASM)
 
   set_target_properties(wasm PROPERTIES LINK_FLAGS "--bind -s WASM=1 -s MODULARIZE=1 -s ENVIRONMENT='web' ${WASM_EXCEPTION_FLAGS} ${WASM_EXTRA_EXPORTED_RUNTIME_METHODS}")
 
+else()
+
+  set(boost-include ${DIR_ROOT_OUT}/boost/include)
+
+  add_dependencies(wasm boost)
+
+  target_include_directories (wasm PRIVATE ${boost-include})
+
 endif()
