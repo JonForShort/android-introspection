@@ -72,7 +72,7 @@ public:
     try {
       auto const androidManifest = getAndroidManifestAsBinaryXml(apkPath_);
       return androidManifest.hasElement(ANDROID_MANIFEST_TAG_APPLICATION);
-    } catch (MissingAndroidManifestException e) {
+    } catch (MissingAndroidManifestException const &e) {
       LOGW("apk is not valid; missing application tag in android manifest");
       return false;
     }
@@ -100,6 +100,11 @@ public:
     return debuggableAttribute != attributes.end() ? debuggableAttribute->second == "true" : false;
   }
 
+  auto getAndroidManifest() const -> std::string {
+    auto const androidManifest = getAndroidManifestAsBinaryXml(apkPath_);
+    return androidManifest.toStringXml();
+  }
+
   auto getFiles() const -> std::vector<std::string> {
     auto const apkParser = ai::ApkParser(apkPath_);
     return apkParser.getFiles();
@@ -114,10 +119,9 @@ public:
 
   auto dump(std::string_view destinationDirectory) const -> void {
     fs::create_directories(destinationDirectory);
-    auto const binaryXml = getAndroidManifestAsBinaryXml(apkPath_);
-    auto const stringXml = binaryXml.toStringXml();
+    auto const androidManifest = getAndroidManifest();
     fs::path androidManifestFile = fs::path(destinationDirectory) / ANDROID_MANIFEST;
-    utils::writeToFile(androidManifestFile, stringXml);
+    utils::writeToFile(androidManifestFile, androidManifest);
   }
 
 private:
@@ -133,6 +137,8 @@ auto Apk::isValid() const -> bool { return pimpl_->isValid(); }
 auto Apk::makeDebuggable() const -> void { return pimpl_->makeDebuggable(); }
 
 auto Apk::isDebuggable() const -> bool { return pimpl_->isDebuggable(); }
+
+auto Apk::getAndroidManifest() const -> std::string { return pimpl_->getAndroidManifest(); }
 
 auto Apk::getFiles() const -> std::vector<std::string> { return pimpl_->getFiles(); }
 

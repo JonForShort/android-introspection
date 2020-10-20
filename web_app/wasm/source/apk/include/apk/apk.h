@@ -45,6 +45,8 @@ public:
 
   auto isDebuggable() const -> bool;
 
+  auto getAndroidManifest() const -> std::string;
+
   auto getFiles() const -> std::vector<std::string>;
 
   auto getProperties() const -> std::map<std::string, std::string>;
