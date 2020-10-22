@@ -81,8 +81,9 @@ EMSCRIPTEN_BINDINGS(ApkModule) {
 
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
-
 #include <iostream>
+
+#include "apk/apk.h"
 
 namespace fs = boost::filesystem;
 namespace po = boost::program_options;
@@ -90,10 +91,14 @@ namespace po = boost::program_options;
 auto main(int argc, char *argv[]) -> int {
 
   std::string file_argument;
+  bool print_manifest = false;
 
   try {
     po::options_description desc{"Options"};
-    desc.add_options()("help,h", "Help screen")("file,f", po::value<std::string>(&file_argument)->required(), "file path to apk");
+    desc.add_options()
+      ("help,h", "Help screen")
+      ("manifest,pm", po::bool_switch(&print_manifest), "print manifest")
+      ("file,f", po::value<std::string>(&file_argument)->required(), "file path to apk");
 
     po::variables_map vm;
     po::store(parse_command_line(argc, argv, desc), vm);
@@ -112,6 +117,11 @@ auto main(int argc, char *argv[]) -> int {
   if (fs::is_directory(file_path)) {
     std::cerr << "file path is a directory; please check path" << std::endl;
     return -3;
+  }
+
+  if (print_manifest) {
+    auto const apk = ai::Apk(file_argument);
+    std::cout << apk.getAndroidManifest() << std::endl;
   }
 }
 

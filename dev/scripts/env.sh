@@ -39,8 +39,15 @@ ai_setup_vscode()
 
     pushd ${ROOT_DIR}/web_app/app/.vscode
 
-    ln -s $(realpath --relative-to=${ROOT_DIR}/web_app/app/.vscode ${ROOT_DIR}/dev/vscode)/launch.json launch.json
+    ln -s $(realpath --relative-to=${ROOT_DIR}/web_app/app/.vscode ${ROOT_DIR}/dev/vscode)/launch_app.json launch.json
 
+    popd
+
+    mkdir -p ${ROOT_DIR}/web_app/wasm/.vscode
+
+    pushd ${ROOT_DIR}/web_app/wasm/.vscode
+
+    ln -s $(realpath --relative-to=${ROOT_DIR}/web_app/wasm/.vscode ${ROOT_DIR}/dev/vscode)/launch_wasm.json launch.json
     popd
 }
 
