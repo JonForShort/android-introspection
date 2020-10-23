@@ -46,7 +46,7 @@ ai_setup_vscode_webapp()
 
     pushd ${ROOT_DIR}/web_app/app/.vscode
 
-    ln -s $(realpath --relative-to=${ROOT_DIR}/web_app/app/.vscode ${ROOT_DIR}/dev/vscode)/launch_app.json launch.json
+    ln -s $(realpath --relative-to=${ROOT_DIR}/web_app/app/.vscode ${ROOT_DIR}/dev/vscode/app)/launch.json launch.json
 
     popd
 }
@@ -57,9 +57,9 @@ ai_setup_vscode_wasm()
 
     pushd ${ROOT_DIR}/web_app/wasm/.vscode
 
-    ln -s $(realpath --relative-to=${ROOT_DIR}/web_app/wasm/.vscode ${ROOT_DIR}/dev/vscode)/launch.json launch.json
+    ln -s $(realpath --relative-to=${ROOT_DIR}/web_app/wasm/.vscode ${ROOT_DIR}/dev/vscode/wasm)/launch.json launch.json
 
-    ln -s $(realpath --relative-to=${ROOT_DIR}/web_app/wasm/.vscode ${ROOT_DIR}/dev/vscode)/tasks.json tasks.json
+    ln -s $(realpath --relative-to=${ROOT_DIR}/web_app/wasm/.vscode ${ROOT_DIR}/dev/vscode/wasm)/tasks.json tasks.json
 
     popd
 }
