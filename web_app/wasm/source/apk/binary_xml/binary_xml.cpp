@@ -342,7 +342,7 @@ auto BinaryXml::traverseXml(BinaryXmlVisitor &visitor) const -> void {
     auto const headerSize = contentStream.read<uint16_t>();
     auto const chunkSize = contentStream.read<uint32_t>();
 
-    LOGV("traverseElements: tag = [{:d}], headerSize = [{:d}], chunkSize = [{:d}]", tag, headerSize, chunkSize);
+    LOGV("traverseXml: tag = [{:d}], headerSize = [{:d}], chunkSize = [{:d}]", tag, headerSize, chunkSize);
 
     utils::ignore(headerSize);
 
@@ -368,7 +368,7 @@ auto BinaryXml::traverseXml(BinaryXmlVisitor &visitor) const -> void {
       break;
     }
     default: {
-      LOGW("skipping unknown tag [{}]", tag);
+      LOGW("traverseXml: skipping unknown tag [{}]", tag);
     }
     }
   }

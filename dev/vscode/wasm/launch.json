@@ -2,11 +2,16 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug WASM Host",
+            "name": "Build And Debug WASM Host",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/out/host/wasm/bin/wasm",
-            "args": [],
+            "args": [
+                "--manifest",
+                "--file",
+                "${workspaceFolder}/test/resources/apks/test_release.apk"
+            ],
+            "preLaunchTask": "build_wasm_host",
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

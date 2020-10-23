@@ -35,6 +35,13 @@ ai_setup_environment()
 
 ai_setup_vscode()
 {
+    ai_setup_vscode_wasm
+
+    ai_setup_vscode_webapp
+}
+
+ai_setup_vscode_webapp()
+{
     mkdir -p ${ROOT_DIR}/web_app/app/.vscode
 
     pushd ${ROOT_DIR}/web_app/app/.vscode
@@ -42,12 +49,18 @@ ai_setup_vscode()
     ln -s $(realpath --relative-to=${ROOT_DIR}/web_app/app/.vscode ${ROOT_DIR}/dev/vscode)/launch_app.json launch.json
 
     popd
+}
 
+ai_setup_vscode_wasm()
+{
     mkdir -p ${ROOT_DIR}/web_app/wasm/.vscode
 
     pushd ${ROOT_DIR}/web_app/wasm/.vscode
 
-    ln -s $(realpath --relative-to=${ROOT_DIR}/web_app/wasm/.vscode ${ROOT_DIR}/dev/vscode)/launch_wasm.json launch.json
+    ln -s $(realpath --relative-to=${ROOT_DIR}/web_app/wasm/.vscode ${ROOT_DIR}/dev/vscode)/launch.json launch.json
+
+    ln -s $(realpath --relative-to=${ROOT_DIR}/web_app/wasm/.vscode ${ROOT_DIR}/dev/vscode)/tasks.json tasks.json
+
     popd
 }
 
