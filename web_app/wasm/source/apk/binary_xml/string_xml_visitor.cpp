@@ -33,20 +33,20 @@ StringXmlVisitor::StringXmlVisitor(std::string &xml, bool const isStringsUtf8Enc
 auto StringXmlVisitor::visit(StartXmlTagElement const &element) -> void {
   xml_ += "<";
   xml_ += element.tag();
-  xml_ += " ";
   for (auto const &[attributeName, attributeValue] : element.attributes()) {
+    xml_ += " ";
     xml_ += attributeName;
     xml_ += "=";
-    xml_ += "\"" + attributeValue + "\" ";
+    xml_ += "\"" + attributeValue + "\"";
   }
   xml_ += ">";
   depth_++;
 }
 
 auto StringXmlVisitor::visit(EndXmlTagElement const &element) -> void {
-  xml_ += "</ ";
+  xml_ += "</";
   xml_ += element.tag();
-  xml_ += " >";
+  xml_ += ">";
   depth_--;
 }
 
