@@ -31,12 +31,22 @@ StringXmlVisitor::StringXmlVisitor(std::string &xml, bool const isStringsUtf8Enc
 }
 
 auto StringXmlVisitor::visit(StartXmlTagElement const &element) -> void {
-  utils::ignore(element);
+  xml_ += "<";
+  xml_ += element.tag();
+  xml_ += " ";
+  for (auto const &[attributeName, attributeValue] : element.attributes()) {
+    xml_ += attributeName;
+    xml_ += "=";
+    xml_ += "\"" + attributeValue + "\" ";
+  }
+  xml_ += ">";
   depth_++;
 }
 
 auto StringXmlVisitor::visit(EndXmlTagElement const &element) -> void {
-  utils::ignore(element);
+  xml_ += "</ ";
+  xml_ += element.tag();
+  xml_ += " >";
   depth_--;
 }
 
