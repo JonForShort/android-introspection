@@ -338,7 +338,7 @@ auto BinaryXml::traverseXml(BinaryXmlVisitor &visitor) const -> void {
   auto &contentStream = context.contentStream();
   contentStream.skip(static_cast<uint32_t>(xmlChunkOffset));
 
-  for (auto const tag = contentStream.read<uint16_t>(); tag != RES_XML_END_NAMESPACE_TYPE;) {
+  for (auto tag = contentStream.read<uint16_t>(); tag != RES_XML_END_NAMESPACE_TYPE; tag = contentStream.read<uint16_t>()) {
     auto const headerSize = contentStream.read<uint16_t>();
     auto const chunkSize = contentStream.read<uint32_t>();
 
