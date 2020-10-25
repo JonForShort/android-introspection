@@ -52,6 +52,12 @@ auto getFiles(std::string const pathToApk) {
   return apk.getFiles();
 }
 
+auto getFileContent(std::string const pathToApk, std::string const pathToFile) {
+  LOGV("wasm::apk::getFileContent pathToApk [{}] pathToFile [{}]", pathToApk, pathToFile);
+  auto const apk = ai::Apk(pathToApk);
+  auto const fileContent = apk.getFileContent(pathToFile);
+}
+
 auto getProperties(std::string const pathToApk) {
   LOGV("wasm::apk::getProperties pathToApk [{}]", pathToApk);
   auto const apk = ai::Apk(pathToApk);
@@ -69,6 +75,8 @@ EMSCRIPTEN_BINDINGS(ApkModule) {
   function("isValid", &apk::isValid);
 
   function("getFiles", &apk::getFiles);
+
+  function("getFileContent", &apk::getFileContent);
 
   function("getProperties", &apk::getProperties);
 
@@ -95,10 +103,8 @@ auto main(int argc, char *argv[]) -> int {
 
   try {
     po::options_description desc{"Options"};
-    desc.add_options()
-      ("help,h", "Help screen")
-      ("manifest,pm", po::bool_switch(&print_manifest), "print manifest")
-      ("file,f", po::value<std::string>(&file_argument)->required(), "file path to apk");
+    desc.add_options()("help,h", "Help screen")("manifest,pm", po::bool_switch(&print_manifest),
+                                                "print manifest")("file,f", po::value<std::string>(&file_argument)->required(), "file path to apk");
 
     po::variables_map vm;
     po::store(parse_command_line(argc, argv, desc), vm);

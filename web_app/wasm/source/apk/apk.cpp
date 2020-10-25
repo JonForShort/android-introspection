@@ -110,10 +110,16 @@ public:
     return apkParser.getFiles();
   }
 
+  auto getFileContent(std::string_view filePath) const -> std::vector<std::byte> {
+    auto const apkParser = ai::ApkParser(apkPath_);
+    return apkParser.getFileContents(filePath);
+  }
+
   auto getProperties() const -> std::map<std::string, std::string> {
     auto properties = std::map<std::string, std::string>();
     properties.insert({"valid", isValid() ? "true" : "false"});
     properties.insert({"debuggable", isDebuggable() ? "true" : "false"});
+    properties.insert({"manifest", getAndroidManifest()});
     return properties;
   }
 
@@ -141,6 +147,8 @@ auto Apk::isDebuggable() const -> bool { return pimpl_->isDebuggable(); }
 auto Apk::getAndroidManifest() const -> std::string { return pimpl_->getAndroidManifest(); }
 
 auto Apk::getFiles() const -> std::vector<std::string> { return pimpl_->getFiles(); }
+
+auto Apk::getFileContent(std::string_view filePath) const -> std::vector<std::byte> { return pimpl_->getFileContent(filePath); }
 
 auto Apk::getProperties() const -> std::map<std::string, std::string> { return pimpl_->getProperties(); }
 

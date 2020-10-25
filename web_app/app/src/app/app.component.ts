@@ -20,7 +20,7 @@ export interface PropertyElement {
 })
 export class AppComponent {
 
-  isApkValid = '';
+  isApkValid: boolean = false;
 
   contents: ContentElement[] = [];
 
@@ -29,6 +29,8 @@ export class AppComponent {
   properties: PropertyElement[] = [];
 
   propertiesDisplayedColumns: string[] = ['key', 'value'];
+
+  androidManifest: string = "";
 
   @ViewChild(MatTable) table: MatTable<Element>;
 
@@ -68,6 +70,10 @@ export class AppComponent {
                   const key = propertiesKeys.get(i)
                   const value = properties.get(key)
                   this.properties.push({ key: key, value: value })
+
+                  if (key === "manifest") {
+                    this.androidManifest = value
+                  }
                 }
                 this.table.renderRows
               })

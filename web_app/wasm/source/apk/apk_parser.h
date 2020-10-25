@@ -36,9 +36,9 @@ public:
 
   auto getFiles() const -> std::vector<std::string>;
 
-  auto getFileContents(char const *szFileInArchive) const -> std::vector<std::byte>;
+  auto getFileContents(std::string_view fileInArchive) const -> std::vector<std::byte>;
 
-  auto setFileContents(char const *szFileInArchive, std::vector<std::byte> const &content) const -> void;
+  auto setFileContents(std::string_view fileInArchive, std::vector<std::byte> const &content) const -> void;
 
 private:
   std::string const pathToApk_;

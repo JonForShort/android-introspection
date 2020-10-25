@@ -53,24 +53,18 @@ auto ApkParser::getFiles() const -> std::vector<std::string> {
   return ai::ZipArchiver(pathToApk_).files();
 }
 
-auto ApkParser::getFileContents(char const *szFileInArchive) const -> std::vector<std::byte> {
-  LOGD("getFileContents, szFileInArchive [{}]", szFileInArchive);
-  if (szFileInArchive == nullptr) {
-    throw std::invalid_argument("file is null");
-  }
-  return ai::ZipArchiver(pathToApk_).extract(szFileInArchive);
+auto ApkParser::getFileContents(std::string_view fileInArchive) const -> std::vector<std::byte> {
+  LOGD("getFileContents, fileInArchive [{}]", fileInArchive);
+  return ai::ZipArchiver(pathToApk_).extract(fileInArchive);
 }
 
-auto ApkParser::setFileContents(char const *szFileInArchive, std::vector<std::byte> const &contents) const -> void {
-  LOGD("setFileContents, szFileInArchive [{}] contents [{}]", szFileInArchive, contents.size());
-  if (szFileInArchive == nullptr) {
-    throw std::invalid_argument("file is null");
-  }
+auto ApkParser::setFileContents(std::string_view fileInArchive, std::vector<std::byte> const &contents) const -> void {
+  LOGD("setFileContents, fileInArchive [{}] contents [{}]", fileInArchive, contents.size());
   if (contents.empty()) {
     throw std::invalid_argument("contents are empty");
   }
   auto pathToContents = writeToTempFile(contents);
   auto zipArchiver = ai::ZipArchiver(pathToApk_);
   auto inputFile = std::ifstream(pathToContents);
-  zipArchiver.add(inputFile, szFileInArchive);
+  zipArchiver.add(inputFile, fileInArchive);
 }

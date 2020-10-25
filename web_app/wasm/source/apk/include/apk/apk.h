@@ -24,6 +24,7 @@
 #ifndef ANDROID_INTROSPECTION_APK_APK_H_
 #define ANDROID_INTROSPECTION_APK_APK_H_
 
+#include <cstddef>
 #include <map>
 #include <memory>
 #include <string>
@@ -48,6 +49,8 @@ public:
   auto getAndroidManifest() const -> std::string;
 
   auto getFiles() const -> std::vector<std::string>;
+
+  auto getFileContent(std::string_view filePath) const -> std::vector<std::byte>;
 
   auto getProperties() const -> std::map<std::string, std::string>;
 

@@ -25,7 +25,7 @@ export class WasmService {
     )
   }
 
-  public isApkValid(filePath: String): Observable<string> {
+  public isApkValid(filePath: String): Observable<boolean> {
     return this.wasmReady
       .pipe(filter(value => value === true))
       .pipe(map(() => {
