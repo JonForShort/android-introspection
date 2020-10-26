@@ -1,78 +1,78 @@
 #header {
-	height: 100px;
-	width: 100%;
+  height: 100px;
+  width: 100%;
 }
 
 #headerLeft {
-	float: left;
-	height: 100%;
-	width: 320px;
+  float: left;
+  height: 100%;
+  width: 320px;
 }
 
 #headerMiddle {
-	height: 100%;
-	margin-left: 320px;
-	margin-right: 100px;
+  height: 100%;
+  margin-left: 320px;
+  margin-right: 100px;
 }
 
 #headerRight {
-	float: right;
-	height: 100%;
-	width: 100px;
+  float: right;
+  height: 100%;
+  width: 100px;
 }
 
 #headerButtons {
-	padding: 25px;
+  padding: 25px;
 }
 
 .headerButton {
-	margin: 10px;
-	color: white;
-	width: 300px;
-	height: 50px;
-	border-radius: 22px;
-	background-color: #78c557;
-	padding: 10px 20px;
+  margin: 10px;
+  color: white;
+  width: 300px;
+  height: 50px;
+  border-radius: 22px;
+  background-color: #78c557;
+  padding: 10px 20px;
 }
 
 #headerLogo {
-	float: left;
-	height: 80px;
-	margin: 0px 15px 15px 0px;
+  float: left;
+  height: 80px;
+  margin: 0px 15px 15px 0px;
 }
 
 #githubLogo {
-	float: right;
-	height: 32px;
-	padding: 15px;
+  float: right;
+  height: 32px;
+  padding: 15px;
 }
 
 #titleTextAndroid {
-	padding-top: 5px;
-	margin-left: 10px;
-	margin-right: 10px;
-	font-size: xx-large;
-	font-weight: bolder;
-	color: #1c1c1c;
+  padding-top: 5px;
+  margin-left: 10px;
+  margin-right: 10px;
+  font-size: xx-large;
+  font-weight: bolder;
+  color: #1c1c1c;
 }
 
 #titleTextIntrospection {
-	padding-top: 5px;
-	margin-left: 10px;
-	margin-right: 10px;
-	font-size: xx-large;
-	font-weight: bolder;
-	color: #78c557;
+  padding-top: 5px;
+  margin-left: 10px;
+  margin-right: 10px;
+  font-size: xx-large;
+  font-weight: bolder;
+  color: #78c557;
 }
 
 #inputFileButton {
-	opacity: 0;
-	position: absolute;
-	width: 100px;
-	height: 30px;
+  opacity: 0;
+  position: absolute;
+  width: 100px;
+  height: 30px;
 }
 
 hr {
-	border: none;
-	border-top: 1px dotted darkgray;
+  border: none;
+  border-top: 1px dotted darkgray;
 }
