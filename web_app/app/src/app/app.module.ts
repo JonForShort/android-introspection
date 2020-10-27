@@ -1,3 +1,4 @@
+import { AndroidManifestViewComponent } from './android-manifest-view/android-manifest-view.component';
 import { AppComponent } from './app.component';
 import { AppMaterialModule } from './app-material/app-material.module'
 import { AppRoutingModule } from './app-routing.module';
@@ -10,6 +11,7 @@ import { NgModule } from '@angular/core';
 @NgModule({
   declarations: [
     AppComponent,
+    AndroidManifestViewComponent,
     DragAndDropFileDirective,
     HeaderButtonHoverDirective
   ],

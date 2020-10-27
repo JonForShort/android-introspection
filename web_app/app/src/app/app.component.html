@@ -16,7 +16,8 @@
 
     <div id="headerMiddle">
         <div id="headerButtons">
-            <input id="inputFileButton" type="file" accept="application/vnd.android.package-archive" (change)="onInputChanged($event)" />
+            <input id="inputFileButton" type="file" accept="application/vnd.android.package-archive"
+                (change)="onInputChanged($event)" />
             <label headerButtonHover class="headerButton">Load APK</label>
             <label headerButtonHover class="headerButton">Decompile</label>
             <label headerButtonHover class="headerButton">Analyze</label>
@@ -56,9 +57,9 @@
 
         </mat-tab>
 
-        <mat-tab label="Manifest">
+        <mat-tab label="Android Manifest">
 
-            {{androidManifest}}
+            <app-android-manifest-view [androidManifest]=androidManifest></app-android-manifest-view>
 
         </mat-tab>
 
