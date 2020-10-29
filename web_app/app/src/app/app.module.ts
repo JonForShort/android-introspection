@@ -7,6 +7,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { DragAndDropFileDirective } from "./directives/drag-and-drop-file-directive"
 import { HeaderButtonHoverDirective } from "./directives/header-button-hover-directive"
 import { NgModule } from '@angular/core';
+import { TelemetryModule } from './telemetry/telemetry.module'
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { NgModule } from '@angular/core';
     AppRoutingModule,
     AppMaterialModule,
     BrowserAnimationsModule,
-    BrowserModule
+    BrowserModule,
+    TelemetryModule
   ],
   providers: [],
   bootstrap: [AppComponent]
