@@ -62,6 +62,42 @@ auto getAndroidManifestAsBinaryXml(std::string const apkPath) -> BinaryXml {
   return BinaryXml(contents);
 }
 
+auto getPackageName(std::string const &apkPath) -> std::string {
+  auto const apkParser = ai::ApkParser(apkPath);
+  auto const androidManifestContents = apkParser.getFileContents(ANDROID_MANIFEST);
+  auto const elementAttributes = BinaryXml(androidManifestContents).getElementAttributes(std::vector<std::string>{"manifest"});
+  auto const packageName = elementAttributes.find("package");
+  if (packageName != elementAttributes.end()) {
+    return packageName->second;
+  } else {
+    return std::string();
+  }
+}
+
+auto getVersionName(std::string const &apkPath) -> std::string {
+  auto const apkParser = ai::ApkParser(apkPath);
+  auto const androidManifestContents = apkParser.getFileContents(ANDROID_MANIFEST);
+  auto const elementAttributes = BinaryXml(androidManifestContents).getElementAttributes(std::vector<std::string>{"manifest"});
+  auto const packageName = elementAttributes.find("versionName");
+  if (packageName != elementAttributes.end()) {
+    return packageName->second;
+  } else {
+    return std::string();
+  }
+}
+
+auto getVersionCode(std::string const &apkPath) -> std::string {
+  auto const apkParser = ai::ApkParser(apkPath);
+  auto const androidManifestContents = apkParser.getFileContents(ANDROID_MANIFEST);
+  auto const elementAttributes = BinaryXml(androidManifestContents).getElementAttributes(std::vector<std::string>{"manifest"});
+  auto const packageName = elementAttributes.find("versionCode");
+  if (packageName != elementAttributes.end()) {
+    return packageName->second;
+  } else {
+    return std::string();
+  }
+}
+
 } // namespace
 
 class Apk::ApkImpl final {
@@ -116,10 +152,17 @@ public:
   }
 
   auto getProperties() const -> std::map<std::string, std::string> {
-    auto properties = std::map<std::string, std::string>();
-    properties.insert({"valid", isValid() ? "true" : "false"});
-    properties.insert({"debuggable", isDebuggable() ? "true" : "false"});
-    properties.insert({"manifest", getAndroidManifest()});
+    auto const isApkValid = isValid();
+    auto properties = std::map<std::string, std::string>{{"valid", isApkValid ? "true" : "false"}};
+
+    if (isValid()) {
+      properties.insert({"debuggable", isDebuggable() ? "true" : "false"});
+      properties.insert({"manifest", getAndroidManifest()});
+      properties.insert({"packageName", getPackageName(apkPath_)});
+      properties.insert({"versionCode", getVersionCode(apkPath_)});
+      properties.insert({"versionName", getVersionName(apkPath_)});
+    }
+
     return properties;
   }
 

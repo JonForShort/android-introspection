@@ -24,6 +24,7 @@
 #include "attributes_setter_visitor.h"
 #include "utils/macros.h"
 
+#include <string>
 #include <string_view>
 #include <vector>
 

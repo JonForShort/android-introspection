@@ -24,6 +24,10 @@
 #ifndef ANDROID_INTROSPECTION_APK_ATTRIBUTES_SETTER_VISITOR_H_
 #define ANDROID_INTROSPECTION_APK_ATTRIBUTES_SETTER_VISITOR_H_
 
+#include <string>
+#include <string_view>
+#include <vector>
+
 #include "binary_xml_visitor.h"
 
 namespace ai {
