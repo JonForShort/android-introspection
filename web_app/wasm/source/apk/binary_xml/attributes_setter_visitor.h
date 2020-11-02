@@ -31,7 +31,7 @@ namespace ai {
 class AttributesSetterVisitor : public BinaryXmlVisitor {
 
 public:
-  AttributesSetterVisitor();
+  AttributesSetterVisitor(std::vector<std::string> const &elementPath, std::string_view attributeName, std::string_view attributeValue);
 
   ~AttributesSetterVisitor() override = default;
 

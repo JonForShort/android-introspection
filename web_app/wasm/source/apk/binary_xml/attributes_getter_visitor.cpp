@@ -26,7 +26,10 @@
 
 using namespace ai;
 
-AttributesGetterVisitor::AttributesGetterVisitor() {}
+AttributesGetterVisitor::AttributesGetterVisitor(std::vector<std::string> const &elementPath, BinaryXml::ElementAttributes &elementAttributes) {
+  utils::ignore(elementPath);
+  utils::ignore(elementAttributes);
+}
 
 auto AttributesGetterVisitor::visit(StartXmlTagElement const &element) -> void { utils::ignore(element); }
 

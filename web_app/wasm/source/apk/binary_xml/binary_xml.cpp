@@ -24,6 +24,8 @@
 #include <codecvt>
 #include <locale>
 
+#include "attributes_getter_visitor.h"
+#include "attributes_setter_visitor.h"
 #include "binary_xml.h"
 #include "binary_xml_visitor.h"
 #include "resource_types.h"
@@ -243,14 +245,15 @@ auto BinaryXml::hasElement(std::string_view elementTag) const -> bool {
 }
 
 auto BinaryXml::getElementAttributes(std::vector<std::string> elementPath) const -> ElementAttributes {
-  utils::ignore(elementPath);
-  return ElementAttributes();
+  ElementAttributes elementAttributes;
+  auto visitor = AttributesGetterVisitor(elementPath, elementAttributes);
+  traverseXml(visitor);
+  return elementAttributes;
 }
 
 auto BinaryXml::setElementAttribute(std::vector<std::string> elementPath, std::string_view attributeName, std::string_view attributeValue) const -> void {
-  utils::ignore(elementPath);
-  utils::ignore(attributeName);
-  utils::ignore(attributeValue);
+  auto visitor = AttributesSetterVisitor(elementPath, attributeName, attributeValue);
+  traverseXml(visitor);
 }
 
 auto BinaryXml::toStringXml() const -> std::string {

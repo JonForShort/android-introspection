@@ -24,9 +24,16 @@
 #include "attributes_setter_visitor.h"
 #include "utils/macros.h"
 
+#include <string_view>
+#include <vector>
+
 using namespace ai;
 
-AttributesSetterVisitor::AttributesSetterVisitor() {}
+AttributesSetterVisitor::AttributesSetterVisitor(std::vector<std::string> const &elementPath, std::string_view attributeName, std::string_view attributeValue) {
+  utils::ignore(elementPath);
+  utils::ignore(attributeName);
+  utils::ignore(attributeValue);
+}
 
 auto AttributesSetterVisitor::visit(StartXmlTagElement const &element) -> void { utils::ignore(element); }
 

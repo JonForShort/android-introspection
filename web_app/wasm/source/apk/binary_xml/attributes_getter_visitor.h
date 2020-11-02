@@ -24,6 +24,7 @@
 #ifndef ANDROID_INTROSPECTION_APK_ATTRIBUTES_GETTER_VISITOR_H_
 #define ANDROID_INTROSPECTION_APK_ATTRIBUTES_GETTER_VISITOR_H_
 
+#include "binary_xml.h"
 #include "binary_xml_visitor.h"
 
 namespace ai {
@@ -31,7 +32,7 @@ namespace ai {
 class AttributesGetterVisitor : public BinaryXmlVisitor {
 
 public:
-  AttributesGetterVisitor();
+  AttributesGetterVisitor(std::vector<std::string> const &elementPath, BinaryXml::ElementAttributes &elementAttributes);
 
   ~AttributesGetterVisitor() override = default;
 
