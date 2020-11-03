@@ -25,6 +25,7 @@
 #include <map>
 #include <string>
 
+#include "android_manifest_parser.h"
 #include "apk/apk.h"
 #include "apk_parser.h"
 #include "binary_xml/binary_xml.h"
@@ -40,64 +41,6 @@ namespace {
 
 static constexpr char const *const ANDROID_MANIFEST = "AndroidManifest.xml";
 
-static constexpr auto ANDROID_MANIFEST_TAG_APPLICATION = "application";
-
-static constexpr auto ANDROID_MANIFEST_ATTRIBUTE_DEBUGGABLE = "debuggable";
-
-auto getAndroidManifestAsBinaryXml(std::string const apkPath) -> BinaryXml {
-  auto const apkParser = ai::ApkParser(apkPath);
-  auto const files = apkParser.getFiles();
-  auto const hasAndroidManifest = std::find(files.cbegin(), files.cend(), ANDROID_MANIFEST) != files.end();
-  if (!hasAndroidManifest) {
-    LOGW("unable to find manifest in [{}]", apkPath);
-    throw MissingAndroidManifestException(apkPath);
-  }
-
-  auto const contents = apkParser.getFileContents(ANDROID_MANIFEST);
-  if (contents.empty()) {
-    LOGW("unable to read [{}]", apkPath);
-    throw MissingAndroidManifestException(apkPath);
-  }
-
-  return BinaryXml(contents);
-}
-
-auto getPackageName(std::string const &apkPath) -> std::string {
-  auto const apkParser = ai::ApkParser(apkPath);
-  auto const androidManifestContents = apkParser.getFileContents(ANDROID_MANIFEST);
-  auto const elementAttributes = BinaryXml(androidManifestContents).getElementAttributes(std::vector<std::string>{"manifest"});
-  auto const packageName = elementAttributes.find("package");
-  if (packageName != elementAttributes.end()) {
-    return packageName->second;
-  } else {
-    return std::string();
-  }
-}
-
-auto getVersionName(std::string const &apkPath) -> std::string {
-  auto const apkParser = ai::ApkParser(apkPath);
-  auto const androidManifestContents = apkParser.getFileContents(ANDROID_MANIFEST);
-  auto const elementAttributes = BinaryXml(androidManifestContents).getElementAttributes(std::vector<std::string>{"manifest"});
-  auto const packageName = elementAttributes.find("versionName");
-  if (packageName != elementAttributes.end()) {
-    return packageName->second;
-  } else {
-    return std::string();
-  }
-}
-
-auto getVersionCode(std::string const &apkPath) -> std::string {
-  auto const apkParser = ai::ApkParser(apkPath);
-  auto const androidManifestContents = apkParser.getFileContents(ANDROID_MANIFEST);
-  auto const elementAttributes = BinaryXml(androidManifestContents).getElementAttributes(std::vector<std::string>{"manifest"});
-  auto const packageName = elementAttributes.find("versionCode");
-  if (packageName != elementAttributes.end()) {
-    return packageName->second;
-  } else {
-    return std::string();
-  }
-}
-
 } // namespace
 
 class Apk::ApkImpl final {
@@ -105,40 +48,37 @@ public:
   ApkImpl(std::string_view apkPath) : apkPath_(apkPath) {}
 
   auto isValid() const -> bool {
-    try {
-      auto const androidManifest = getAndroidManifestAsBinaryXml(apkPath_);
-      return androidManifest.hasElement(ANDROID_MANIFEST_TAG_APPLICATION);
-    } catch (MissingAndroidManifestException const &e) {
-      LOGW("apk is not valid; missing application tag in android manifest");
+    auto const apkParser = ai::ApkParser(apkPath_);
+    auto const files = apkParser.getFiles();
+    auto const hasAndroidManifest = std::find(files.cbegin(), files.cend(), ANDROID_MANIFEST) != files.end();
+    if (!hasAndroidManifest) {
+      LOGW("unable to find manifest in [{}]", apkPath_);
       return false;
     }
+    auto const contents = apkParser.getFileContents(ANDROID_MANIFEST);
+    if (contents.empty()) {
+      LOGW("unable to read [{}]", apkPath_);
+      return false;
+    }
+    return AndroidManifestParser(contents).isValid();
   }
 
   auto makeDebuggable() const -> void {
-    auto const androidManifest = getAndroidManifestAsBinaryXml(apkPath_);
-    if (!androidManifest.hasElement(ANDROID_MANIFEST_TAG_APPLICATION)) {
-      LOGW("unable to find application tag in android manifest [{}]", apkPath_);
-      throw MalformedAndroidManifestException(apkPath_);
-    }
-    std::vector<std::string> const elementPath = {ANDROID_MANIFEST_TAG_APPLICATION};
-    androidManifest.setElementAttribute(elementPath, ANDROID_MANIFEST_ATTRIBUTE_DEBUGGABLE, "true");
+    auto const androidManifestContents = getFileContent(ANDROID_MANIFEST);
+    auto const androidManifestParser = AndroidManifestParser(androidManifestContents);
+    return androidManifestParser.setApplicationDebuggable(true);
   }
 
   auto isDebuggable() const -> bool {
-    auto const androidManifest = getAndroidManifestAsBinaryXml(apkPath_);
-    if (!androidManifest.hasElement(ANDROID_MANIFEST_TAG_APPLICATION)) {
-      LOGW("unable to find application tag in [{}]", apkPath_);
-      throw MalformedAndroidManifestException(apkPath_);
-    }
-    auto const elementPath = std::vector<std::string>{ANDROID_MANIFEST_TAG_APPLICATION};
-    auto const attributes = androidManifest.getElementAttributes(elementPath);
-    auto const debuggableAttribute = attributes.find(ANDROID_MANIFEST_ATTRIBUTE_DEBUGGABLE);
-    return debuggableAttribute != attributes.end() ? debuggableAttribute->second == "true" : false;
+    auto const androidManifestContents = getFileContent(ANDROID_MANIFEST);
+    auto const androidManifestParser = AndroidManifestParser(androidManifestContents);
+    return androidManifestParser.isApplicationDebuggable();
   }
 
   auto getAndroidManifest() const -> std::string {
-    auto const androidManifest = getAndroidManifestAsBinaryXml(apkPath_);
-    return androidManifest.toStringXml();
+    auto const androidManifestContents = getFileContent(ANDROID_MANIFEST);
+    auto const androidManifestParser = AndroidManifestParser(androidManifestContents);
+    return androidManifestParser.toStringXml();
   }
 
   auto getFiles() const -> std::vector<std::string> {
@@ -156,11 +96,14 @@ public:
     auto properties = std::map<std::string, std::string>{{"valid", isApkValid ? "true" : "false"}};
 
     if (isValid()) {
-      properties.insert({"debuggable", isDebuggable() ? "true" : "false"});
-      properties.insert({"manifest", getAndroidManifest()});
-      properties.insert({"packageName", getPackageName(apkPath_)});
-      properties.insert({"versionCode", getVersionCode(apkPath_)});
-      properties.insert({"versionName", getVersionName(apkPath_)});
+      auto const androidManifestContents = getFileContent(ANDROID_MANIFEST);
+      auto const androidManifestParser = AndroidManifestParser(androidManifestContents);
+
+      properties.insert({"debuggable", androidManifestParser.isApplicationDebuggable() ? "true" : "false"});
+      properties.insert({"manifest", androidManifestParser.toStringXml()});
+      properties.insert({"packageName", androidManifestParser.getPackageName()});
+      properties.insert({"versionCode", androidManifestParser.getVersionCode()});
+      properties.insert({"versionName", androidManifestParser.getVersionName()});
     }
 
     return properties;

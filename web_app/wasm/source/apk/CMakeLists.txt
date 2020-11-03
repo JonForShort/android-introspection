@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.10.2)
 
 set(source
+  android_manifest_parser.cpp
   apk.cpp
   apk_parser.cpp
   binary_xml/binary_xml.cpp
