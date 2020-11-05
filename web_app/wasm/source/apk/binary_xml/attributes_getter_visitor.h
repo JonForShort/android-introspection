@@ -24,12 +24,21 @@
 #ifndef ANDROID_INTROSPECTION_APK_ATTRIBUTES_GETTER_VISITOR_H_
 #define ANDROID_INTROSPECTION_APK_ATTRIBUTES_GETTER_VISITOR_H_
 
+#include <string>
+#include <vector>
+
 #include "binary_xml.h"
 #include "binary_xml_visitor.h"
 
 namespace ai {
 
 class AttributesGetterVisitor : public BinaryXmlVisitor {
+
+  std::vector<std::string> const elementPath_;
+
+  BinaryXml::ElementAttributes &elementAttributes_;
+
+  std::vector<std::string> currentElementPath_;
 
 public:
   AttributesGetterVisitor(std::vector<std::string> const &elementPath, BinaryXml::ElementAttributes &elementAttributes);

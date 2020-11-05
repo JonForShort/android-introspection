@@ -26,14 +26,20 @@
 
 using namespace ai;
 
-AttributesGetterVisitor::AttributesGetterVisitor(std::vector<std::string> const &elementPath, BinaryXml::ElementAttributes &elementAttributes) {
-  utils::ignore(elementPath);
-  utils::ignore(elementAttributes);
+AttributesGetterVisitor::AttributesGetterVisitor(std::vector<std::string> const &elementPath, BinaryXml::ElementAttributes &elementAttributes)
+    : elementPath_(elementPath), elementAttributes_(elementAttributes) {}
+
+auto AttributesGetterVisitor::visit(StartXmlTagElement const &element) -> void {
+  currentElementPath_.push_back(element.tag());
+  if (currentElementPath_ == elementPath_) {
+    elementAttributes_ = element.attributes();
+  }
 }
 
-auto AttributesGetterVisitor::visit(StartXmlTagElement const &element) -> void { utils::ignore(element); }
-
-auto AttributesGetterVisitor::visit(EndXmlTagElement const &element) -> void { utils::ignore(element); }
+auto AttributesGetterVisitor::visit(EndXmlTagElement const &element) -> void {
+  utils::ignore(element);
+  currentElementPath_.pop_back();
+}
 
 auto AttributesGetterVisitor::visit(InvalidXmlTagElement const &element) -> void { utils::ignore(element); }
 
