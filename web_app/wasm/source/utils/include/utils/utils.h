@@ -26,7 +26,9 @@
 
 #include <cstdint>
 #include <fstream>
+#include <iomanip>
 #include <memory>
+#include <sstream>
 #include <string>
 
 using namespace std;
@@ -41,6 +43,15 @@ inline auto fileExists(std::string_view path) -> bool {
 inline auto writeToFile(std::string const &path, std::string const &contents) {
   ofstream outfile(path.data());
   outfile << contents;
+}
+
+inline auto bytesToHexString(std::vector<std::byte> const &bytes) -> std::string {
+  std::ostringstream stream;
+  stream << std::hex << std::uppercase << std::setfill('0');
+  for (auto const b : bytes) {
+    stream << std::setw(2) << static_cast<char>(b);
+  }
+  return stream.str();
 }
 
 template <typename... Args> std::string formatString(const char *format, Args... args) {

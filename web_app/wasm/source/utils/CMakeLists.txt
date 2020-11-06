@@ -8,6 +8,7 @@ set(source
         include/utils/v8_wrapper.h
         include/utils/data_stream.h
         data_stream.cpp
+        sha.cpp
         test.cpp)
 
 add_library(utils STATIC ${source})

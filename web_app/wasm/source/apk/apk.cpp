@@ -31,6 +31,7 @@
 #include "binary_xml/binary_xml.h"
 #include "utils/log.h"
 #include "utils/macros.h"
+#include "utils/sha.h"
 #include "utils/utils.h"
 
 using namespace ai;
@@ -104,6 +105,7 @@ public:
       properties.insert({"packageName", androidManifestParser.getPackageName()});
       properties.insert({"versionCode", androidManifestParser.getVersionCode()});
       properties.insert({"versionName", androidManifestParser.getVersionName()});
+      properties.insert({"sha256", utils::sha::generateSha256ForFile(apkPath_)});
     }
 
     return properties;
