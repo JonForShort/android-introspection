@@ -46,3 +46,8 @@
 	path = external/boost/source
 	url = git@github.com:thejunkjon/external-boost.git
         ignore = dirty
+
+[submodule "external/botan/source"]
+	path = external/botan/source
+	url = git@github.com:thejunkjon/botan.git
+        ignore = dirty
