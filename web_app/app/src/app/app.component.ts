@@ -69,10 +69,11 @@ export class AppComponent {
                 for (var i = 0; i < propertiesKeys.size(); i++) {
                   const key = propertiesKeys.get(i)
                   const value = properties.get(key)
-                  this.properties.push({ key: key, value: value })
 
                   if (key === "manifest") {
                     this.androidManifest = value
+                  } else {
+                    this.properties.push({ key: key, value: value })
                   }
                 }
                 this.table.renderRows
