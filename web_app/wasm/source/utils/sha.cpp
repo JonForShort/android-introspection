@@ -21,15 +21,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
+#include <botan/hash.h>
+#include <botan/hex.h>
+#include <cstdint>
+#include <fstream>
 #include <string>
 #include <vector>
 
+#include "utils/log.h"
 #include "utils/macros.h"
 #include "utils/sha.h"
 
 using namespace ai;
 
+namespace {
+
+static constexpr size_t FILE_READ_BUFFER_SIZE = 16 * 1024;
+
+} // namespace
+
 auto utils::sha::generateSha256ForFile(std::string const &path) -> std::string {
-  utils::ignore(path);
-  return std::string();
+  std::ifstream file(path, std::ios::in | std::ios::binary);
+  if (!file.good()) {
+    LOGW("failed to open input file [{}]", path);
+    return std::string();
+  }
+
+  std::vector<uint8_t> buffer(FILE_READ_BUFFER_SIZE);
+  std::unique_ptr<Botan::HashFunction> hash(Botan::HashFunction::create("SHA-256"));
+  while (file.good()) {
+    file.read(reinterpret_cast<char *>(buffer.data()), buffer.size());
+    hash->update(buffer.data(), file.gcount());
+  }
+
+  return Botan::hex_encode(hash->final());
 }
