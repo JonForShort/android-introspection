@@ -22,11 +22,11 @@
         </activity>
 
         <activity
-            android:name="com.github.thejunkjon.androidintrospection.vpn.SimpleVpnClient"
+            android:name="com.github.thejunkjon.androidintrospection.vpn.LocalVpnActivity"
             android:configChanges="orientation|keyboardHidden" />
 
         <service
-            android:name="com.github.thejunkjon.androidintrospection.vpn.SimpleVpnService"
+            android:name="com.github.thejunkjon.androidintrospection.vpn.LocalVpnService"
             android:permission="android.permission.BIND_VPN_SERVICE">
             <intent-filter>
                 <action android:name="android.net.VpnService" />

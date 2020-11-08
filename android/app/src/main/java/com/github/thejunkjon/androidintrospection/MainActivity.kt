@@ -32,6 +32,7 @@ import android.view.ViewGroup.LayoutParams
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import com.github.thejunkjon.androidintrospection.vpn.LocalVpnActivity
 import com.github.thejunkjon.lib.ApkProcessor
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber.d
@@ -47,6 +48,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         updateInstalledApps()
+
+        findViewById<View>(R.id.launchVpnButton).setOnClickListener {
+            startActivity(Intent(this, LocalVpnActivity::class.java))
+        }
 
         installed_apps.adapter = AppsAdapter()
         installed_apps.setOnItemClickListener { _, _, position, _ ->
