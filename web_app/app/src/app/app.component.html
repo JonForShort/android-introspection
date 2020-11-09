@@ -30,21 +30,19 @@
 
 <div style="clear: both;"></div>
 
-<div [hidden]="!isApkValid">
+<div>
 
-    <mat-tab-group>
+    <mat-tab-group #ApkInformationTabGroup>
 
         <mat-tab label="Properties">
 
             <mat-table [dataSource]="properties" class="mat-elevation-z8">
 
-                <!-- Property Key Column -->
                 <ng-container matColumnDef="key">
                     <mat-header-cell *matHeaderCellDef>key</mat-header-cell>
                     <mat-cell *matCellDef="let element"> {{element.key}} </mat-cell>
                 </ng-container>
 
-                <!-- Property Value Column -->
                 <ng-container matColumnDef="value">
                     <mat-header-cell *matHeaderCellDef>value</mat-header-cell>
                     <mat-cell *matCellDef="let element"> {{element.value}} </mat-cell>
@@ -75,13 +73,11 @@
 
             <mat-table [dataSource]="contents" class="mat-elevation-z8">
 
-                <!-- File Path Column -->
                 <ng-container matColumnDef="path">
                     <mat-header-cell *matHeaderCellDef>path</mat-header-cell>
                     <mat-cell *matCellDef="let element"> {{element.path}} </mat-cell>
                 </ng-container>
 
-                <!-- File Type Column -->
                 <ng-container matColumnDef="type">
                     <mat-header-cell *matHeaderCellDef>type</mat-header-cell>
                     <mat-cell *matCellDef="let element"> {{element.type}} </mat-cell>
@@ -93,6 +89,7 @@
             </mat-table>
 
         </mat-tab>
+
     </mat-tab-group>
 
 </div>
