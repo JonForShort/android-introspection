@@ -10,19 +10,24 @@
         android:id="@+id/launchVpnButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:text="Vpn Client"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="-8dp" />
-
-    <GridView
-        android:id="@+id/installed_apps"
-        android:layout_width="410dp"
-        android:layout_height="682dp"
-        android:numColumns="auto_fit"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@id/launchVpnButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/launchIntrospectButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="App Introspection"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/launchVpnButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

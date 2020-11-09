@@ -31,6 +31,8 @@ import android.net.VpnService
 import android.os.Bundle
 import android.widget.ToggleButton
 import com.github.thejunkjon.androidintrospection.R
+import java.net.NetworkInterface
+
 
 class LocalVpnActivity : Activity() {
 
@@ -41,11 +43,22 @@ class LocalVpnActivity : Activity() {
         setContentView(R.layout.activity_local_vpn)
 
         enableLocalVpnButton = findViewById(R.id.enableVpnToggle)
+        enableLocalVpnButton.isChecked = isVpnRunning()
         enableLocalVpnButton.setOnClickListener {
             updateVpnState()
         }
 
         updateVpnState()
+    }
+
+    private fun isVpnRunning(): Boolean {
+        val networkInterfaces = NetworkInterface.getNetworkInterfaces()
+        for (networkInterface in networkInterfaces) {
+            if (networkInterface.displayName == "tun0" && networkInterface.isUp) {
+                return true
+            }
+        }
+        return false
     }
 
     private fun updateVpnState() {
@@ -67,7 +80,7 @@ class LocalVpnActivity : Activity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK && requestCode == LOCAL_VPN_REQUEST_CODE) {
+        if (requestCode == LOCAL_VPN_REQUEST_CODE && resultCode == RESULT_OK) {
             startVpn(applicationContext)
         }
     }

@@ -30,15 +30,21 @@ import android.net.VpnService
 import android.os.ParcelFileDescriptor
 import com.github.thejunkjon.androidintrospection.R
 import timber.log.Timber.d
+import timber.log.Timber.e
+import java.io.IOException
 
 fun startVpn(context: Context) {
-    val intent = Intent(context, LocalVpnService::class.java)
+    val intent = Intent(context, LocalVpnService::class.java).apply {
+        action = "START_VPN"
+    }
     context.startService(intent)
 }
 
 fun stopVpn(context: Context) {
-    val intent = Intent(context, LocalVpnService::class.java)
-    context.stopService(intent)
+    val intent = Intent(context, LocalVpnService::class.java).apply {
+        action = "STOP_VPN"
+    }
+    context.startService(intent)
 }
 
 class LocalVpnService : VpnService() {
@@ -52,7 +58,20 @@ class LocalVpnService : VpnService() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == "STOP_VPN") {
+            stopVpn()
+        }
         return START_STICKY
+    }
+
+    private fun stopVpn() {
+        try {
+            vpnInterface.close()
+        } catch (e: IOException) {
+            e(e, "unable to close parcel file descriptor")
+        }
+        stopForeground(true)
+        stopSelf()
     }
 
     override fun onCreate() {
@@ -81,7 +100,5 @@ class LocalVpnService : VpnService() {
     override fun onDestroy() {
         super.onDestroy()
         d("onDestroy called")
-
-        vpnInterface.close()
     }
 }

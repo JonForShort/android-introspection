@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.github.thejunkjon.androidintrospection">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".AndroidIntrospectionApp"
         android:allowBackup="false"
@@ -21,9 +24,9 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name="com.github.thejunkjon.androidintrospection.vpn.LocalVpnActivity"
-            android:configChanges="orientation|keyboardHidden" />
+        <activity android:name="com.github.thejunkjon.androidintrospection.introspection.IntrospectAppActivity" />
+
+        <activity android:name="com.github.thejunkjon.androidintrospection.vpn.LocalVpnActivity" />
 
         <service
             android:name="com.github.thejunkjon.androidintrospection.vpn.LocalVpnService"
