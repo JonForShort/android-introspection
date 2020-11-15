@@ -30,6 +30,7 @@ import android.content.Intent
 import android.net.VpnService
 import android.os.ParcelFileDescriptor
 import com.github.thejunkjon.androidintrospection.R
+import com.github.thejunkjon.vpn.NativeVpnService
 import timber.log.Timber.d
 import timber.log.Timber.e
 import java.io.IOException
@@ -90,6 +91,9 @@ class LocalVpnService : VpnService() {
         } catch (e: IOException) {
             e(e, "unable to close parcel file descriptor")
         }
+
+        NativeVpnService.stop()
+
         stopForeground(true)
         stopSelf()
     }
@@ -115,6 +119,8 @@ class LocalVpnService : VpnService() {
             .setSession(vpnName)
             .setConfigureIntent(configureIntent)
             .establish()!!
+
+        NativeVpnService.start(vpnInterface.fd)
     }
 
     override fun onDestroy() {

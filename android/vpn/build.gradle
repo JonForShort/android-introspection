@@ -1,0 +1,12 @@
+apply plugin: 'com.android.library'
+
+apply from: getScriptPathFor('androidCommon.gradle')
+
+android {
+    externalNativeBuild {
+        cmake {
+            version "3.10.2"
+            path "CMakeLists.txt"
+        }
+    }
+}
