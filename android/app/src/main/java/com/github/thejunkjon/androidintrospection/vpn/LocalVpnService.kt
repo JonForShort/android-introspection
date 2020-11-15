@@ -23,6 +23,7 @@
 //
 package com.github.thejunkjon.androidintrospection.vpn
 
+import android.app.ActivityManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -32,6 +33,7 @@ import com.github.thejunkjon.androidintrospection.R
 import timber.log.Timber.d
 import timber.log.Timber.e
 import java.io.IOException
+import java.net.NetworkInterface
 
 fun startVpn(context: Context) {
     val intent = Intent(context, LocalVpnService::class.java).apply {
@@ -45,6 +47,24 @@ fun stopVpn(context: Context) {
         action = "STOP_VPN"
     }
     context.startService(intent)
+}
+
+fun isVpnRunning(context: Context) = isVpnTunnelUp() && isVpnServiceRunning(context)
+
+@Suppress("DEPRECATION")
+private fun isVpnServiceRunning(context: Context) =
+    (context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
+        .getRunningServices(Integer.MAX_VALUE)
+        .any { it.service.className == LocalVpnService::class.java.name }
+
+private fun isVpnTunnelUp(): Boolean {
+    val networkInterfaces = NetworkInterface.getNetworkInterfaces()
+    for (networkInterface in networkInterfaces) {
+        if (networkInterface.displayName == "tun0" && networkInterface.isUp) {
+            return true
+        }
+    }
+    return false
 }
 
 class LocalVpnService : VpnService() {
