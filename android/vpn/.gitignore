@@ -2,3 +2,4 @@
 /.externalNativeBuild
 /build
 /.cxx
+/out
