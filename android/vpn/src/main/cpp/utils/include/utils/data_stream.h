@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright 2020
+// Copyright 2019-2020
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,18 +21,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#include <jni.h>
+#ifndef ANDROID_INTROSPECTION_UTILS_DATA_STREAM_H_
+#define ANDROID_INTROSPECTION_UTILS_DATA_STREAM_H_
 
-#include "utils/log.h"
-#include "VpnService.h"
+#include <cstdint>
+#include <vector>
 
-extern "C" JNIEXPORT void JNICALL
-Java_com_github_thejunkjon_vpn_NativeVpnService_start(JNIEnv *env, jobject thiz, jint fd) {
-    LOGI("NativeVpnService::start");
-}
+class DataStream final {
+public:
+  DataStream(std::vector<std::byte> const &data) : data_(data) {}
 
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_github_thejunkjon_vpn_NativeVpnService_stop(JNIEnv *env, jobject thiz) {
-    LOGI("NativeVpnService::stop");
-}
+  template <typename T> auto read() -> T {
+    static_assert(std::is_integral<T>::value, "type must be integral");
+    T value = {0};
+    memcpy(&value, &data_[index_], sizeof(value));
+    index_ += sizeof(value);
+    return value;
+  }
+
+  auto reset() -> void;
+
+  auto skip(uint32_t bytes) -> void;
+
+private:
+  std::size_t index_{0};
+
+  std::vector<std::byte> data_;
+};
+
+#endif // ANDROID_INTROSPECTION_UTILS_DATA_STREAM_H_

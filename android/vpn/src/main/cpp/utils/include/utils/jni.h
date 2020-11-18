@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright 2020
+// Copyright 2019
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,18 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#include <jni.h>
+#ifndef ANDROID_INTROSPECTION_UTILS_JNI_H_
+#define ANDROID_INTROSPECTION_UTILS_JNI_H_
 
-#include "utils/log.h"
-#include "VpnService.h"
-
-extern "C" JNIEXPORT void JNICALL
-Java_com_github_thejunkjon_vpn_NativeVpnService_start(JNIEnv *env, jobject thiz, jint fd) {
-    LOGI("NativeVpnService::start");
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_github_thejunkjon_vpn_NativeVpnService_stop(JNIEnv *env, jobject thiz) {
-    LOGI("NativeVpnService::stop");
-}
+#endif /* ANDROID_INTROSPECTION_UTILS_JNI_H_ */
