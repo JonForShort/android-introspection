@@ -23,15 +23,22 @@
 //
 #include <jni.h>
 
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/android_sink.h>
+
 #include "VpnService.h"
+
+namespace {
+    auto const gLogger = spdlog::android_logger_mt("android", "VpnServiceJni");
+}
 
 extern "C" JNIEXPORT void JNICALL
 Java_com_github_thejunkjon_vpn_NativeVpnService_start(JNIEnv *env, jobject thiz, jint fd) {
-
+    gLogger->info("NativeVpnService::star");
 }
 
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_github_thejunkjon_vpn_NativeVpnService_stop(JNIEnv *env, jobject thiz) {
-
+    gLogger->info("NativeVpnService::star");
 }
