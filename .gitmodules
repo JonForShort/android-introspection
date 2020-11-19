@@ -51,3 +51,8 @@
 	path = external/botan/source
 	url = git@github.com:thejunkjon/botan.git
         ignore = dirty
+
+[submodule "external/libpcap/source"]
+	path = external/libpcap/source
+	url = git@github.com:thejunkjon/libpcap.git
+        ignore = dirty
