@@ -56,3 +56,8 @@
 	path = external/libpcap/source
 	url = git@github.com:thejunkjon/libpcap.git
         ignore = dirty
+
+[submodule "external/pcapplusplus/source"]
+        path = external/pcapplusplus/source
+        url = git@github.com:thejunkjon/PcapPlusPlus.git
+        ignore = dirty

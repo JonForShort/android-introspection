@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10.2)
 
-set(EXTERNAL_PROJECTS android boost frida googletest minizip openssl botan spdlog pugixml libpcap)
+set(EXTERNAL_PROJECTS android boost frida googletest minizip openssl botan spdlog pugixml libpcap pcapplusplus)
 
 foreach (EXTERNAL_PROJECT ${EXTERNAL_PROJECTS})
 
