@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10.2)
 include (ExternalProject)
 
 set (PCAPPLUSPLUS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/source)
-set (PCAPPLUSPLUS_CONFIGURE_FLAGS --libpcap-include-dir ${CMAKE_CURRENT_SOURCE_DIR}/../libpcap/source
+set (PCAPPLUSPLUS_CONFIGURE_FLAGS --libpcap-include-dir ${DIR_ROOT_OUT}/external/libpcap/include
                                   --libpcap-lib-dir ${DIR_ROOT_OUT}/external/libpcap/lib
                                   --install-dir ${DIR_PROJECT_OUT})
 
@@ -23,4 +23,10 @@ ExternalProject_Add (
 	make VERBOSE=1 libs
 )
 
+add_custom_target (
+    pcapplusplus_apply_patches
+    COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/apply_patches.sh
+)
+
 add_dependencies (pcapplusplus pcap)
+add_dependencies (pcapplusplus pcapplusplus_apply_patches)
