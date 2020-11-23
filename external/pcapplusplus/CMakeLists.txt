@@ -23,4 +23,4 @@ ExternalProject_Add (
 	make VERBOSE=1 libs
 )
 
-add_dependencies (pcapplusplus pcap_static)
+add_dependencies (pcapplusplus pcap)
