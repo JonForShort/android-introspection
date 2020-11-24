@@ -1,0 +1,14 @@
+diff --git a/Packet++/Makefile b/Packet++/Makefile
+index 4a324fc..1700541 100644
+--- a/Packet++/Makefile
++++ b/Packet++/Makefile
+@@ -41,9 +41,6 @@ ifdef WIN32
+ INCLUDES += -I$(MINGW_HOME)/include/ddk \
+ 			-I$(PCAP_SDK_HOME)/Include
+ endif
+-ifdef LINUX
+-INCLUDES += -I/usr/include/netinet
+-endif
+ 
+ Obj/%.o: src/%.cpp
+ 	@echo Building file: $<

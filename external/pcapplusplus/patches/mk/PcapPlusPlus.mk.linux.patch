@@ -1,0 +1,13 @@
+diff --git a/mk/PcapPlusPlus.mk.linux b/mk/PcapPlusPlus.mk.linux
+index f4882b9..3d78d32 100644
+--- a/mk/PcapPlusPlus.mk.linux
++++ b/mk/PcapPlusPlus.mk.linux
+@@ -1,8 +1,5 @@
+ ### LINUX ###
+ 
+-# includes
+-PCAPPP_INCLUDES += -I/usr/include/netinet
+-
+ # libs
+ PCAPPP_LIBS += -lpcap -lpthread
+ 

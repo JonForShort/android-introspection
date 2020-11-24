@@ -1,17 +1,13 @@
 diff --git a/mk/platform.mk.linux b/mk/platform.mk.linux
-index 18f91ae..0d29a37 100644
+index 18f91ae..79fa004 100644
 --- a/mk/platform.mk.linux
 +++ b/mk/platform.mk.linux
-@@ -14,7 +14,13 @@ ifeq ($(origin CC),default)
+@@ -14,7 +14,9 @@ ifeq ($(origin CC),default)
  CC := gcc
  endif
  
 +ifeq ($(origin AR),default)
  AR := ar
-+endif
-+
-+ifeq ($(origin RANLIB),default)
-+RANLIB := ranlib
 +endif
  
  RM := rm
