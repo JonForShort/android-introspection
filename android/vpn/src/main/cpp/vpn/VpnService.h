@@ -24,8 +24,21 @@
 #ifndef ANDROID_INTROSPECTION_VPN_VPNSERVICE_H_
 #define ANDROID_INTROSPECTION_VPN_VPNSERVICE_H_
 
-class VpnService {
+namespace ai::vpn {
 
-};
+    class VpnService {
+
+        int const fd_;
+
+    public:
+        VpnService(int const fd) : fd_(fd) {}
+
+        ~VpnService();
+
+        auto start() const -> void;
+
+        auto stop() const -> void;
+    };
+}
 
 #endif

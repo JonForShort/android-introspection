@@ -21,4 +21,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
+#include <unistd.h>
+#include <cstddef>
+#include <pcapplusplus/Packet.h>
+#include <pcapplusplus/IPv4Layer.h>
+
 #include "VpnService.h"
+#include "utils/log.h"
+
+auto ai::vpn::VpnService::start() const -> void {
+    LOGI("VpnService::start");
+}
+
+auto ai::vpn::VpnService::stop() const -> void {
+    LOGI("VpnService::stop");
+}
+
+ai::vpn::VpnService::~VpnService() {
+    close(fd_);
+}

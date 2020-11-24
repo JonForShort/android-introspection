@@ -29,7 +29,11 @@ object NativeVpnService {
         System.loadLibrary("vpn")
     }
 
-    external fun start(fileDescriptor: Int)
+    external fun initialize(fileDescriptor: Int)
+
+    external fun start()
 
     external fun stop()
+
+    external fun uninitialize()
 }

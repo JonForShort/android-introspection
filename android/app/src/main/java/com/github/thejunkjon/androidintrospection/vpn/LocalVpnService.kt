@@ -93,6 +93,7 @@ class LocalVpnService : VpnService() {
         }
 
         NativeVpnService.stop()
+        NativeVpnService.uninitialize()
 
         stopForeground(true)
         stopSelf()
@@ -120,7 +121,8 @@ class LocalVpnService : VpnService() {
             .setConfigureIntent(configureIntent)
             .establish()!!
 
-        NativeVpnService.start(vpnInterface.fd)
+        NativeVpnService.initialize(vpnInterface.fd)
+        NativeVpnService.start()
     }
 
     override fun onDestroy() {

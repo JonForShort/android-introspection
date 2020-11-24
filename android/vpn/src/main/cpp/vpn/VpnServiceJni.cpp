@@ -22,17 +22,39 @@
 // SOFTWARE.
 //
 #include <jni.h>
+#include <memory>
 
 #include "utils/log.h"
 #include "VpnService.h"
 
-extern "C" JNIEXPORT void JNICALL
-Java_com_github_thejunkjon_vpn_NativeVpnService_start(JNIEnv *env, jobject thiz, jint fd) {
-    LOGI("NativeVpnService::start");
+namespace {
+    auto gVpnService = std::unique_ptr<ai::vpn::VpnService>();
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_github_thejunkjon_vpn_NativeVpnService_stop(JNIEnv *env, jobject thiz) {
-    LOGI("NativeVpnService::stop");
+Java_com_github_thejunkjon_vpn_NativeVpnService_initialize(JNIEnv *, jobject, jint fd) {
+    LOGI("VpnServiceJni::initialize");
+    gVpnService = std::make_unique<ai::vpn::VpnService>(fd);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_github_thejunkjon_vpn_NativeVpnService_start(JNIEnv *, jobject) {
+    LOGI("VpnServiceJni::start");
+    gVpnService->start();
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_github_thejunkjon_vpn_NativeVpnService_stop(JNIEnv *, jobject) {
+    LOGI("VpnServiceJni::stop");
+    gVpnService->stop();
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_github_thejunkjon_vpn_NativeVpnService_uninitialize(JNIEnv *, jobject) {
+    LOGI("VpnServiceJni::uninitialize");
+    gVpnService.reset();
+    gVpnService = nullptr;
 }
