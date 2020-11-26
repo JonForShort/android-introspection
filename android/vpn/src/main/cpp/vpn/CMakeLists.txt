@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.10.2)
 
 set(pcap-include ${DIR_ROOT_EXTERNAL}/libpcap/include)
-set(pcap-lib     ${DIR_ROOT_EXTERNAL}/libpcap/lib)
+set(pcap-lib ${DIR_ROOT_EXTERNAL}/libpcap/lib)
 
 set(pcapplusplus-include ${DIR_ROOT_EXTERNAL}/pcapplusplus/include)
-set(pcapplusplus-lib     ${DIR_ROOT_EXTERNAL}/pcapplusplus/lib)
+set(pcapplusplus-lib ${DIR_ROOT_EXTERNAL}/pcapplusplus/lib)
 
-set(sources VpnService.cpp VpnServiceJni.cpp)
+set(sources VpnService.cpp VpnServiceJni.cpp VpnConnection.cpp)
 
 add_library(vpn SHARED ${sources})
 

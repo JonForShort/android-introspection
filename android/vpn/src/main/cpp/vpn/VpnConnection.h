@@ -21,21 +21,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#include "VpnService.h"
-#include "utils/log.h"
+#ifndef ANDROID_INTROSPECTION_VPN_VPNCONNECTION_H_
+#define ANDROID_INTROSPECTION_VPN_VPNCONNECTION_H_
 
-ai::vpn::VpnService::VpnService(const int fd) {
-    connection_ = std::make_unique<VpnConnection>(fd);
+#include <thread>
+
+namespace ai::vpn {
+
+    class VpnConnection final {
+
+        int const fd_;
+
+        std::thread thread_;
+
+        std::atomic_bool isDisconnectRequested_;
+
+    public:
+        VpnConnection(int const fd);
+
+        ~VpnConnection();
+
+        auto connect() -> void;
+
+        auto disconnect() -> void;
+    };
 }
 
-auto ai::vpn::VpnService::start() -> void {
-    LOGI("VpnService::start");
-
-    connection_->connect();
-}
-
-auto ai::vpn::VpnService::stop() -> void {
-    LOGI("VpnService::stop");
-
-    connection_->disconnect();
-}
+#endif /* ANDROID_INTROSPECTION_VPN_VPNCONNECTION_H_ */

@@ -121,7 +121,7 @@ class LocalVpnService : VpnService() {
             .setConfigureIntent(configureIntent)
             .establish()!!
 
-        NativeVpnService.initialize(vpnInterface.fd)
+        NativeVpnService.initialize(vpnInterface.detachFd())
         NativeVpnService.start()
     }
 
