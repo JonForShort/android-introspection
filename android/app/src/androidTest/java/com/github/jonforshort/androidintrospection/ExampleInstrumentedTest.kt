@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright 2019
+// Copyright 2019-2020
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,17 +21,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.github.thejunkjon.androidintrospection
+package com.github.jonforshort.androidintrospection
 
-import android.app.Application
-import android.content.Context
-import timber.log.Timber
-import timber.log.Timber.DebugTree
+import androidx.test.InstrumentationRegistry
+import androidx.test.runner.AndroidJUnit4
+import org.junit.Assert.assertEquals
+import org.junit.Test
+import org.junit.runner.RunWith
 
-class AndroidIntrospectionApp : Application() {
+@RunWith(AndroidJUnit4::class)
+class ExampleInstrumentedTest {
 
-    override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(base)
-        Timber.plant(DebugTree())
+    @Test
+    fun useAppContext() {
+        val appContext = InstrumentationRegistry.getTargetContext()
+
+        assertEquals("com.github.jonforshort.androidintrospection", appContext.packageName)
     }
 }

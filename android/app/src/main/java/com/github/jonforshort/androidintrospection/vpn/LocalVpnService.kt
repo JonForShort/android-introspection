@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.github.thejunkjon.androidintrospection.vpn
+package com.github.jonforshort.androidintrospection.vpn
 
 import android.app.ActivityManager
 import android.app.PendingIntent
@@ -29,8 +29,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import android.os.ParcelFileDescriptor
-import com.github.thejunkjon.androidintrospection.R
-import com.github.thejunkjon.vpn.NativeVpnService
+import com.github.jonforshort.androidintrospection.R
+import com.github.jonforshort.vpn.NativeVpnService
 import timber.log.Timber.d
 import timber.log.Timber.e
 import java.io.IOException

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.github.thejunkjon.androidintrospection">
+    package="com.github.jonforshort.androidintrospection">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -24,12 +24,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.github.thejunkjon.androidintrospection.introspection.IntrospectAppActivity" />
+        <activity android:name=".introspection.IntrospectAppActivity" />
 
-        <activity android:name="com.github.thejunkjon.androidintrospection.vpn.LocalVpnActivity" />
+        <activity android:name=".vpn.LocalVpnActivity" />
 
         <service
-            android:name="com.github.thejunkjon.androidintrospection.vpn.LocalVpnService"
+            android:name=".vpn.LocalVpnService"
             android:permission="android.permission.BIND_VPN_SERVICE">
             <intent-filter>
                 <action android:name="android.net.VpnService" />

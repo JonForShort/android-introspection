@@ -21,27 +21,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.github.thejunkjon.androidintrospection
+package com.github.jonforshort.lib;
 
-import android.content.Intent
-import android.os.Bundle
-import android.view.View
-import androidx.appcompat.app.AppCompatActivity
-import com.github.thejunkjon.androidintrospection.introspection.IntrospectAppActivity
-import com.github.thejunkjon.androidintrospection.vpn.LocalVpnActivity
+import android.content.Context;
 
-class MainActivity : AppCompatActivity() {
+import androidx.test.InstrumentationRegistry;
+import androidx.test.runner.AndroidJUnit4;
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-        findViewById<View>(R.id.launchVpnButton).setOnClickListener {
-            startActivity(Intent(this, LocalVpnActivity::class.java))
-        }
+import static org.junit.Assert.assertEquals;
 
-        findViewById<View>(R.id.launchIntrospectButton).setOnClickListener {
-            startActivity(Intent(this, IntrospectAppActivity::class.java))
-        }
+@RunWith(AndroidJUnit4.class)
+public class ExampleInstrumentedTest {
+    @Test
+    public void useAppContext() {
+
+        Context appContext = InstrumentationRegistry.getTargetContext();
+
+        assertEquals("com.github.jonforshort.lib.test", appContext.getPackageName());
     }
 }

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright 2020
+// Copyright 2019-2020
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,40 +21,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#include <jni.h>
-#include <memory>
+package com.github.jonforshort.lib
 
-#include "utils/log.h"
-#include "VpnService.h"
+import java.io.File
 
-namespace {
-    auto gVpnService = std::unique_ptr<ai::vpn::VpnService>();
-}
+class ApkProcessor(private val apkFile: File) {
 
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_github_jonforshort_vpn_NativeVpnService_initialize(JNIEnv *, jobject, jint fd) {
-    LOGI("VpnServiceJni::initialize");
-    gVpnService = std::make_unique<ai::vpn::VpnService>(fd);
-}
-
-extern "C" JNIEXPORT void JNICALL
-Java_com_github_jonforshort_vpn_NativeVpnService_start(JNIEnv *, jobject) {
-    LOGI("VpnServiceJni::start");
-    gVpnService->start();
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_github_jonforshort_vpn_NativeVpnService_stop(JNIEnv *, jobject) {
-    LOGI("VpnServiceJni::stop");
-    gVpnService->stop();
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_github_jonforshort_vpn_NativeVpnService_uninitialize(JNIEnv *, jobject) {
-    LOGI("VpnServiceJni::uninitialize");
-    gVpnService.reset();
-    gVpnService = nullptr;
+    fun process(modifiedApkFile: File, makeDebuggable: Boolean = true): Boolean {
+        return true
+    }
 }

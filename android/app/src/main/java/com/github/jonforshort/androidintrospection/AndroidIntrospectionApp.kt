@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright 2019
+// Copyright 2019-2020
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,13 +21,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.github.thejunkjon.lib
+package com.github.jonforshort.androidintrospection
 
-import java.io.File
+import android.app.Application
+import android.content.Context
+import timber.log.Timber
+import timber.log.Timber.DebugTree
 
-class ApkProcessor(private val apkFile: File) {
+class AndroidIntrospectionApp : Application() {
 
-    fun process(modifiedApkFile: File, makeDebuggable: Boolean = true): Boolean {
-        return true
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(base)
+        Timber.plant(DebugTree())
     }
 }

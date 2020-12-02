@@ -4,7 +4,7 @@ apply from: getScriptPathFor('androidCommon.gradle')
 
 android {
     defaultConfig {
-        applicationId "com.github.thejunkjon.androidintrospection"
+        applicationId "com.github.jonforshort.androidintrospection"
     }
 }
 

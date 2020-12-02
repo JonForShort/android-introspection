@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.github.thejunkjon.androidintrospection.vpn
+package com.github.jonforshort.androidintrospection.vpn
 
 import android.app.Activity
 import android.app.PendingIntent
@@ -30,7 +30,7 @@ import android.content.Intent
 import android.net.VpnService
 import android.os.Bundle
 import android.widget.ToggleButton
-import com.github.thejunkjon.androidintrospection.R
+import com.github.jonforshort.androidintrospection.R
 
 class LocalVpnActivity : Activity() {
 
