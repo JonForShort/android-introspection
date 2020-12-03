@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.github.jonforshort.androidintrospection.introspection
+package com.github.jonforshort.androidintrospection
 
 import android.content.Intent
 import android.content.pm.ResolveInfo
@@ -32,7 +32,6 @@ import android.view.ViewGroup.LayoutParams
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import com.github.jonforshort.androidintrospection.R
 import com.github.jonforshort.lib.ApkProcessor
 import kotlinx.android.synthetic.main.activity_introspect_app.*
 import timber.log.Timber.d

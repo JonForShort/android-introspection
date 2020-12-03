@@ -21,16 +21,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.github.jonforshort.androidintrospection.vpn
+package com.github.jonforshort.vpn
 
 import android.app.ActivityManager
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import android.os.ParcelFileDescriptor
-import com.github.jonforshort.androidintrospection.R
-import com.github.jonforshort.vpn.NativeVpnService
 import timber.log.Timber.d
 import timber.log.Timber.e
 import java.io.IOException
@@ -71,11 +68,14 @@ private fun isVpnTunnelUp(): Boolean {
 class LocalVpnService : VpnService() {
 
     private lateinit var vpnInterface: ParcelFileDescriptor
-    private lateinit var configureIntent: PendingIntent
 
     companion object {
         private const val VPN_ADDRESS = "10.0.0.2"
         private const val VPN_ROUTE = "0.0.0.0"
+
+        init {
+            System.loadLibrary("vpn")
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -92,8 +92,8 @@ class LocalVpnService : VpnService() {
             e(e, "unable to close parcel file descriptor")
         }
 
-        NativeVpnService.stop()
-        NativeVpnService.uninitialize()
+        stopVpnNative()
+        uninitializeVpnNative()
 
         stopForeground(true)
         stopSelf()
@@ -102,8 +102,6 @@ class LocalVpnService : VpnService() {
     override fun onCreate() {
         super.onCreate()
         d("onCreate called")
-
-        configureIntent = createConfigureIntent(this)
 
         createVpnInterface()
     }
@@ -115,18 +113,25 @@ class LocalVpnService : VpnService() {
         vpnServiceBuilder.addAddress(VPN_ADDRESS, 32)
         vpnServiceBuilder.addRoute(VPN_ROUTE, 0)
 
-        val vpnName = getString(R.string.app_name)
+        val vpnName = "LocalVpnService"
         vpnInterface = vpnServiceBuilder
             .setSession(vpnName)
-            .setConfigureIntent(configureIntent)
             .establish()!!
 
-        NativeVpnService.initialize(vpnInterface.detachFd())
-        NativeVpnService.start()
+        initializeVpnNative(vpnInterface.detachFd())
+        startVpnNative()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         d("onDestroy called")
     }
+
+    private external fun initializeVpnNative(fileDescriptor: Int)
+
+    private external fun startVpnNative()
+
+    private external fun stopVpnNative()
+
+    private external fun uninitializeVpnNative()
 }

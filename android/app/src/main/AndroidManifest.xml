@@ -24,12 +24,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".introspection.IntrospectAppActivity" />
+        <activity android:name=".IntrospectAppActivity" />
 
-        <activity android:name=".vpn.LocalVpnActivity" />
+        <activity android:name=".LocalVpnActivity" />
 
         <service
-            android:name=".vpn.LocalVpnService"
+            android:name="com.github.jonforshort.vpn.LocalVpnService"
             android:permission="android.permission.BIND_VPN_SERVICE">
             <intent-filter>
                 <action android:name="android.net.VpnService" />

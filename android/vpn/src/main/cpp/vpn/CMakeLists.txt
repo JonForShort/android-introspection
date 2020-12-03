@@ -6,9 +6,10 @@ set(pcap-lib ${DIR_ROOT_EXTERNAL}/libpcap/lib)
 set(pcapplusplus-include ${DIR_ROOT_EXTERNAL}/pcapplusplus/include)
 set(pcapplusplus-lib ${DIR_ROOT_EXTERNAL}/pcapplusplus/lib)
 
-set(sources VpnService.cpp VpnServiceJni.cpp VpnConnection.cpp)
+set(headers LocalVpnService.h VpnService.h VpnConnection.h)
+set(sources LocalVpnService.cpp VpnService.cpp VpnConnection.cpp)
 
-add_library(vpn SHARED ${sources})
+add_library(vpn SHARED ${sources} ${headers})
 
 target_include_directories(vpn PRIVATE util)
 target_include_directories(vpn PRIVATE ${pcap-include})

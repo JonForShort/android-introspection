@@ -21,40 +21,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#include <jni.h>
-#include <memory>
+#ifndef ANDROID_INTROSPECTION_VPN_LOCALVPNSERVICE_H_
+#define ANDROID_INTROSPECTION_VPN_LOCALVPNSERVICE_H_
 
-#include "utils/log.h"
-#include "VpnService.h"
+namespace ai::vpn {
 
-namespace {
-    auto gVpnService = std::unique_ptr<ai::vpn::VpnService>();
+    class LocalVpnService final {
+
+    };
 }
 
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_github_jonforshort_vpn_NativeVpnService_initialize(JNIEnv *, jobject, jint fd) {
-    LOGI("VpnServiceJni::initialize");
-    gVpnService = std::make_unique<ai::vpn::VpnService>(fd);
-}
-
-extern "C" JNIEXPORT void JNICALL
-Java_com_github_jonforshort_vpn_NativeVpnService_start(JNIEnv *, jobject) {
-    LOGI("VpnServiceJni::start");
-    gVpnService->start();
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_github_jonforshort_vpn_NativeVpnService_stop(JNIEnv *, jobject) {
-    LOGI("VpnServiceJni::stop");
-    gVpnService->stop();
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_github_jonforshort_vpn_NativeVpnService_uninitialize(JNIEnv *, jobject) {
-    LOGI("VpnServiceJni::uninitialize");
-    gVpnService.reset();
-    gVpnService = nullptr;
-}
+#endif /* ANDROID_INTROSPECTION_VPN_LOCALVPNSERVICE_H_ */

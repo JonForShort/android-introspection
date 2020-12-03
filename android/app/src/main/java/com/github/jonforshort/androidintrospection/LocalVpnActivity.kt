@@ -21,16 +21,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.github.jonforshort.androidintrospection.vpn
+package com.github.jonforshort.androidintrospection
 
 import android.app.Activity
-import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import android.os.Bundle
 import android.widget.ToggleButton
-import com.github.jonforshort.androidintrospection.R
+import com.github.jonforshort.vpn.isVpnRunning
+import com.github.jonforshort.vpn.startVpn
+import com.github.jonforshort.vpn.stopVpn
 
 class LocalVpnActivity : Activity() {
 
@@ -71,13 +71,5 @@ class LocalVpnActivity : Activity() {
         }
     }
 }
-
-internal fun createConfigureIntent(context: Context) =
-    PendingIntent.getActivity(
-        context,
-        LOCAL_VPN_REQUEST_CODE,
-        Intent(context, LocalVpnActivity::class.java),
-        PendingIntent.FLAG_UPDATE_CURRENT
-    )
 
 private const val LOCAL_VPN_REQUEST_CODE = 1000

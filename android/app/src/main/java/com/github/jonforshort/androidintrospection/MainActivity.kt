@@ -27,8 +27,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.github.jonforshort.androidintrospection.introspection.IntrospectAppActivity
-import com.github.jonforshort.androidintrospection.vpn.LocalVpnActivity
 
 class MainActivity : AppCompatActivity() {
 

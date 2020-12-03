@@ -21,19 +21,40 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.github.jonforshort.vpn
+#include <jni.h>
+#include <memory>
 
-object NativeVpnService {
+#include "utils/log.h"
+#include "VpnService.h"
 
-    init {
-        System.loadLibrary("vpn")
-    }
+namespace {
+    auto gVpnService = std::unique_ptr<ai::vpn::VpnService>();
+}
 
-    external fun initialize(fileDescriptor: Int)
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_github_jonforshort_vpn_LocalVpnService_initializeVpnNative(JNIEnv *, jobject, jint fd) {
+    LOGI("LocalVpnService::initialize");
+    gVpnService = std::make_unique<ai::vpn::VpnService>(fd);
+}
 
-    external fun start()
+extern "C" JNIEXPORT void JNICALL
+Java_com_github_jonforshort_vpn_LocalVpnService_startVpnNative(JNIEnv *, jobject) {
+    LOGI("LocalVpnService::start");
+    gVpnService->start();
+}
 
-    external fun stop()
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_github_jonforshort_vpn_LocalVpnService_stopVpnNative(JNIEnv *, jobject) {
+    LOGI("LocalVpnService::stop");
+    gVpnService->stop();
+}
 
-    external fun uninitialize()
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_github_jonforshort_vpn_LocalVpnService_uninitializeVpnNative(JNIEnv *, jobject) {
+    LOGI("LocalVpnService::uninitialize");
+    gVpnService.reset();
+    gVpnService = nullptr;
 }
