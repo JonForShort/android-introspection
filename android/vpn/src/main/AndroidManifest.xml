@@ -1,1 +1,14 @@
-<manifest package="com.github.jonforshort.vpn"/>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.github.jonforshort.vpn">
+
+    <application>
+        <service
+            android:name="com.github.jonforshort.vpn.LocalVpnService"
+            android:permission="android.permission.BIND_VPN_SERVICE"
+            android:process="LocalVpn">
+            <intent-filter>
+                <action android:name="android.net.VpnService" />
+            </intent-filter>
+        </service>
+    </application>
+</manifest>
