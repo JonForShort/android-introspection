@@ -1,12 +1,10 @@
 package com.github.jonforshort.vpn;
 
+import android.os.ParcelFileDescriptor;
+
 interface IVpnService {
 
-    void initialize();
-
-    void start();
+    void start(in ParcelFileDescriptor fd);
 
     void stop();
-
-    void uninitialize();
 }

@@ -14,9 +14,13 @@ static binder_status_t _aidl_onTransact(AIBinder* _aidl_binder, transaction_code
   binder_status_t _aidl_ret_status = STATUS_UNKNOWN_TRANSACTION;
   std::shared_ptr<BnVpnService> _aidl_impl = std::static_pointer_cast<BnVpnService>(::ndk::ICInterface::asInterface(_aidl_binder));
   switch (_aidl_code) {
-    case (FIRST_CALL_TRANSACTION + 0 /*initialize*/): {
+    case (FIRST_CALL_TRANSACTION + 0 /*start*/): {
+      ::ndk::ScopedFileDescriptor in_fd;
 
-      ::ndk::ScopedAStatus _aidl_status = _aidl_impl->initialize();
+      _aidl_ret_status = ::ndk::AParcel_readRequiredParcelFileDescriptor(_aidl_in, &in_fd);
+      if (_aidl_ret_status != STATUS_OK) break;
+
+      ::ndk::ScopedAStatus _aidl_status = _aidl_impl->start(in_fd);
       _aidl_ret_status = AParcel_writeStatusHeader(_aidl_out, _aidl_status.get());
       if (_aidl_ret_status != STATUS_OK) break;
 
@@ -24,29 +28,9 @@ static binder_status_t _aidl_onTransact(AIBinder* _aidl_binder, transaction_code
 
       break;
     }
-    case (FIRST_CALL_TRANSACTION + 1 /*start*/): {
-
-      ::ndk::ScopedAStatus _aidl_status = _aidl_impl->start();
-      _aidl_ret_status = AParcel_writeStatusHeader(_aidl_out, _aidl_status.get());
-      if (_aidl_ret_status != STATUS_OK) break;
-
-      if (!AStatus_isOk(_aidl_status.get())) break;
-
-      break;
-    }
-    case (FIRST_CALL_TRANSACTION + 2 /*stop*/): {
+    case (FIRST_CALL_TRANSACTION + 1 /*stop*/): {
 
       ::ndk::ScopedAStatus _aidl_status = _aidl_impl->stop();
-      _aidl_ret_status = AParcel_writeStatusHeader(_aidl_out, _aidl_status.get());
-      if (_aidl_ret_status != STATUS_OK) break;
-
-      if (!AStatus_isOk(_aidl_status.get())) break;
-
-      break;
-    }
-    case (FIRST_CALL_TRANSACTION + 3 /*uninitialize*/): {
-
-      ::ndk::ScopedAStatus _aidl_status = _aidl_impl->uninitialize();
       _aidl_ret_status = AParcel_writeStatusHeader(_aidl_out, _aidl_status.get());
       if (_aidl_ret_status != STATUS_OK) break;
 
@@ -63,7 +47,7 @@ static AIBinder_Class* _g_aidl_clazz = ::ndk::ICInterface::defineClass(IVpnServi
 BpVpnService::BpVpnService(const ::ndk::SpAIBinder& binder) : BpCInterface(binder) {}
 BpVpnService::~BpVpnService() {}
 
-::ndk::ScopedAStatus BpVpnService::initialize() {
+::ndk::ScopedAStatus BpVpnService::start(const ::ndk::ScopedFileDescriptor& in_fd) {
   binder_status_t _aidl_ret_status = STATUS_OK;
   ::ndk::ScopedAStatus _aidl_status;
   ::ndk::ScopedAParcel _aidl_in;
@@ -72,9 +56,12 @@ BpVpnService::~BpVpnService() {}
   _aidl_ret_status = AIBinder_prepareTransaction(asBinder().get(), _aidl_in.getR());
   if (_aidl_ret_status != STATUS_OK) goto _aidl_error;
 
+  _aidl_ret_status = ::ndk::AParcel_writeRequiredParcelFileDescriptor(_aidl_in.get(), in_fd);
+  if (_aidl_ret_status != STATUS_OK) goto _aidl_error;
+
   _aidl_ret_status = AIBinder_transact(
     asBinder().get(),
-    (FIRST_CALL_TRANSACTION + 0 /*initialize*/),
+    (FIRST_CALL_TRANSACTION + 0 /*start*/),
     _aidl_in.getR(),
     _aidl_out.getR(),
     0
@@ -83,40 +70,7 @@ BpVpnService::~BpVpnService() {}
     #endif  // BINDER_STABILITY_SUPPORT
     );
   if (_aidl_ret_status == STATUS_UNKNOWN_TRANSACTION && IVpnService::getDefaultImpl()) {
-    return IVpnService::getDefaultImpl()->initialize();
-  }
-  if (_aidl_ret_status != STATUS_OK) goto _aidl_error;
-
-  _aidl_ret_status = AParcel_readStatusHeader(_aidl_out.get(), _aidl_status.getR());
-  if (_aidl_ret_status != STATUS_OK) goto _aidl_error;
-
-  if (!AStatus_isOk(_aidl_status.get())) return _aidl_status;
-
-  _aidl_error:
-  _aidl_status.set(AStatus_fromStatus(_aidl_ret_status));
-  return _aidl_status;
-}
-::ndk::ScopedAStatus BpVpnService::start() {
-  binder_status_t _aidl_ret_status = STATUS_OK;
-  ::ndk::ScopedAStatus _aidl_status;
-  ::ndk::ScopedAParcel _aidl_in;
-  ::ndk::ScopedAParcel _aidl_out;
-
-  _aidl_ret_status = AIBinder_prepareTransaction(asBinder().get(), _aidl_in.getR());
-  if (_aidl_ret_status != STATUS_OK) goto _aidl_error;
-
-  _aidl_ret_status = AIBinder_transact(
-    asBinder().get(),
-    (FIRST_CALL_TRANSACTION + 1 /*start*/),
-    _aidl_in.getR(),
-    _aidl_out.getR(),
-    0
-    #ifdef BINDER_STABILITY_SUPPORT
-    | FLAG_PRIVATE_LOCAL
-    #endif  // BINDER_STABILITY_SUPPORT
-    );
-  if (_aidl_ret_status == STATUS_UNKNOWN_TRANSACTION && IVpnService::getDefaultImpl()) {
-    return IVpnService::getDefaultImpl()->start();
+    return IVpnService::getDefaultImpl()->start(in_fd);
   }
   if (_aidl_ret_status != STATUS_OK) goto _aidl_error;
 
@@ -140,7 +94,7 @@ BpVpnService::~BpVpnService() {}
 
   _aidl_ret_status = AIBinder_transact(
     asBinder().get(),
-    (FIRST_CALL_TRANSACTION + 2 /*stop*/),
+    (FIRST_CALL_TRANSACTION + 1 /*stop*/),
     _aidl_in.getR(),
     _aidl_out.getR(),
     0
@@ -150,39 +104,6 @@ BpVpnService::~BpVpnService() {}
     );
   if (_aidl_ret_status == STATUS_UNKNOWN_TRANSACTION && IVpnService::getDefaultImpl()) {
     return IVpnService::getDefaultImpl()->stop();
-  }
-  if (_aidl_ret_status != STATUS_OK) goto _aidl_error;
-
-  _aidl_ret_status = AParcel_readStatusHeader(_aidl_out.get(), _aidl_status.getR());
-  if (_aidl_ret_status != STATUS_OK) goto _aidl_error;
-
-  if (!AStatus_isOk(_aidl_status.get())) return _aidl_status;
-
-  _aidl_error:
-  _aidl_status.set(AStatus_fromStatus(_aidl_ret_status));
-  return _aidl_status;
-}
-::ndk::ScopedAStatus BpVpnService::uninitialize() {
-  binder_status_t _aidl_ret_status = STATUS_OK;
-  ::ndk::ScopedAStatus _aidl_status;
-  ::ndk::ScopedAParcel _aidl_in;
-  ::ndk::ScopedAParcel _aidl_out;
-
-  _aidl_ret_status = AIBinder_prepareTransaction(asBinder().get(), _aidl_in.getR());
-  if (_aidl_ret_status != STATUS_OK) goto _aidl_error;
-
-  _aidl_ret_status = AIBinder_transact(
-    asBinder().get(),
-    (FIRST_CALL_TRANSACTION + 3 /*uninitialize*/),
-    _aidl_in.getR(),
-    _aidl_out.getR(),
-    0
-    #ifdef BINDER_STABILITY_SUPPORT
-    | FLAG_PRIVATE_LOCAL
-    #endif  // BINDER_STABILITY_SUPPORT
-    );
-  if (_aidl_ret_status == STATUS_UNKNOWN_TRANSACTION && IVpnService::getDefaultImpl()) {
-    return IVpnService::getDefaultImpl()->uninitialize();
   }
   if (_aidl_ret_status != STATUS_OK) goto _aidl_error;
 
@@ -245,22 +166,12 @@ const std::shared_ptr<IVpnService>& IVpnService::getDefaultImpl() {
   return IVpnService::default_impl;
 }
 std::shared_ptr<IVpnService> IVpnService::default_impl = nullptr;
-::ndk::ScopedAStatus IVpnServiceDefault::initialize() {
-  ::ndk::ScopedAStatus _aidl_status;
-  _aidl_status.set(AStatus_fromStatus(STATUS_UNKNOWN_TRANSACTION));
-  return _aidl_status;
-}
-::ndk::ScopedAStatus IVpnServiceDefault::start() {
+::ndk::ScopedAStatus IVpnServiceDefault::start(const ::ndk::ScopedFileDescriptor& /*in_fd*/) {
   ::ndk::ScopedAStatus _aidl_status;
   _aidl_status.set(AStatus_fromStatus(STATUS_UNKNOWN_TRANSACTION));
   return _aidl_status;
 }
 ::ndk::ScopedAStatus IVpnServiceDefault::stop() {
-  ::ndk::ScopedAStatus _aidl_status;
-  _aidl_status.set(AStatus_fromStatus(STATUS_UNKNOWN_TRANSACTION));
-  return _aidl_status;
-}
-::ndk::ScopedAStatus IVpnServiceDefault::uninitialize() {
   ::ndk::ScopedAStatus _aidl_status;
   _aidl_status.set(AStatus_fromStatus(STATUS_UNKNOWN_TRANSACTION));
   return _aidl_status;

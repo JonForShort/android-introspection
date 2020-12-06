@@ -21,6 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
+#include <android/binder_ibinder_jni.h>
 #include <jni.h>
 #include <memory>
 
@@ -28,27 +29,15 @@
 #include "VpnService.h"
 
 namespace {
-    auto gVpnService = std::unique_ptr<ai::vpn::VpnService>();
+    std::unique_ptr<ai::vpn::VpnService> gVpnService;
 }
 
 extern "C"
-JNIEXPORT void JNICALL
-Java_com_github_jonforshort_vpn_LocalVpnService_initializeVpnNative(JNIEnv *, jobject, jint fd) {
+JNIEXPORT jobject JNICALL
+Java_com_github_jonforshort_vpn_LocalVpnService_initializeVpnNative(JNIEnv *jniEnv, jobject) {
     LOGI("LocalVpnService::initialize");
-    gVpnService = std::make_unique<ai::vpn::VpnService>(fd);
-}
-
-extern "C" JNIEXPORT void JNICALL
-Java_com_github_jonforshort_vpn_LocalVpnService_startVpnNative(JNIEnv *, jobject) {
-    LOGI("LocalVpnService::start");
-    gVpnService->start();
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_github_jonforshort_vpn_LocalVpnService_stopVpnNative(JNIEnv *, jobject) {
-    LOGI("LocalVpnService::stop");
-    gVpnService->stop();
+    gVpnService = std::make_unique<ai::vpn::VpnService>();
+    return AIBinder_toJavaBinder(jniEnv, gVpnService->asBinder().get());
 }
 
 extern "C"
@@ -56,5 +45,4 @@ JNIEXPORT void JNICALL
 Java_com_github_jonforshort_vpn_LocalVpnService_uninitializeVpnNative(JNIEnv *, jobject) {
     LOGI("LocalVpnService::uninitialize");
     gVpnService.reset();
-    gVpnService = nullptr;
 }

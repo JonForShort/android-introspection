@@ -26,18 +26,20 @@
 
 #include "VpnConnection.h"
 
+#include "aidl/com/github/jonforshort/vpn/BnVpnService.h"
+
 namespace ai::vpn {
 
-    class VpnService final {
-
-        std::unique_ptr<VpnConnection> connection_;
+    class VpnService : public aidl::com::github::jonforshort::vpn::BnVpnService {
 
     public:
-        VpnService(int const fd);
+        VpnService() = default;
 
-        auto start() -> void;
+        virtual ~VpnService() = default;
 
-        auto stop() -> void;
+        virtual ::ndk::ScopedAStatus start(const ::ndk::ScopedFileDescriptor &fd);
+
+        virtual ::ndk::ScopedAStatus stop();
     };
 }
 

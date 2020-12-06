@@ -24,18 +24,12 @@
 #include "VpnService.h"
 #include "utils/log.h"
 
-ai::vpn::VpnService::VpnService(const int fd) {
-    connection_ = std::make_unique<VpnConnection>(fd);
-}
-
-auto ai::vpn::VpnService::start() -> void {
+::ndk::ScopedAStatus ai::vpn::VpnService::start(const ndk::ScopedFileDescriptor &fd) {
     LOGI("VpnService::start");
-
-    connection_->connect();
+    return ::ndk::ScopedAStatus(AStatus_newOk());
 }
 
-auto ai::vpn::VpnService::stop() -> void {
+::ndk::ScopedAStatus ai::vpn::VpnService::stop() {
     LOGI("VpnService::stop");
-
-    connection_->disconnect();
+    return ::ndk::ScopedAStatus(AStatus_newOk());
 }

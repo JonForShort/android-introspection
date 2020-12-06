@@ -27,6 +27,7 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.net.VpnService
+import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import timber.log.Timber.d
 import timber.log.Timber.e
@@ -68,6 +69,7 @@ private fun isVpnTunnelUp(): Boolean {
 class LocalVpnService : VpnService() {
 
     private lateinit var vpnInterface: ParcelFileDescriptor
+    private lateinit var vpnService: IVpnService
 
     companion object {
         private const val VPN_ADDRESS = "10.0.0.2"
@@ -92,7 +94,7 @@ class LocalVpnService : VpnService() {
             e(e, "unable to close parcel file descriptor")
         }
 
-        stopVpnNative()
+        vpnService.stop()
         uninitializeVpnNative()
 
         stopForeground(true)
@@ -118,8 +120,8 @@ class LocalVpnService : VpnService() {
             .setSession(vpnName)
             .establish()!!
 
-        initializeVpnNative(vpnInterface.detachFd())
-        startVpnNative()
+        vpnService = IVpnService.Stub.asInterface(initializeVpnNative())
+        vpnService.start(vpnInterface)
     }
 
     override fun onDestroy() {
@@ -127,11 +129,7 @@ class LocalVpnService : VpnService() {
         d("onDestroy called")
     }
 
-    private external fun initializeVpnNative(fileDescriptor: Int)
-
-    private external fun startVpnNative()
-
-    private external fun stopVpnNative()
+    private external fun initializeVpnNative(): IBinder
 
     private external fun uninitializeVpnNative()
 }
