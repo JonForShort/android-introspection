@@ -14,7 +14,7 @@ public:
   BpVpnService(const ::ndk::SpAIBinder& binder);
   virtual ~BpVpnService();
 
-  ::ndk::ScopedAStatus start(const ::ndk::ScopedFileDescriptor& in_fd) override;
+  ::ndk::ScopedAStatus start(const ::ndk::SpAIBinder& in_listener, const ::ndk::ScopedFileDescriptor& in_fd) override;
   ::ndk::ScopedAStatus stop() override;
 };
 }  // namespace vpn

@@ -70,6 +70,7 @@ class LocalVpnService : VpnService() {
 
     private lateinit var vpnInterface: ParcelFileDescriptor
     private lateinit var vpnService: IVpnService
+    private lateinit var vpnServiceListener: IVpnServiceListener
 
     companion object {
         private const val VPN_ADDRESS = "10.0.0.2"
@@ -120,8 +121,9 @@ class LocalVpnService : VpnService() {
             .setSession(vpnName)
             .establish()!!
 
+        vpnServiceListener = VpnServiceListener(this)
         vpnService = IVpnService.Stub.asInterface(initializeVpnNative())
-        vpnService.start(vpnInterface)
+        vpnService.start(vpnServiceListener.asBinder(), vpnInterface)
     }
 
     override fun onDestroy() {
@@ -132,4 +134,16 @@ class LocalVpnService : VpnService() {
     private external fun initializeVpnNative(): IBinder
 
     private external fun uninitializeVpnNative()
+}
+
+private class VpnServiceListener(val vpnService: VpnService) : IVpnServiceListener.Stub() {
+
+    override fun onSessionCreated(socket: Int) {
+        d("onSessionCreated : socket [$socket]")
+        vpnService.protect(socket)
+    }
+
+    override fun onSessionDestroyed(socket: Int) {
+        d("onSessionDestroyed : socket [$socket]")
+    }
 }

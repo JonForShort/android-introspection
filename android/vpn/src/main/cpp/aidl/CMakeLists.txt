@@ -4,10 +4,14 @@ set(headers
     include/aidl/com/github/jonforshort/vpn/IVpnService.h
     include/aidl/com/github/jonforshort/vpn/BpVpnService.h
     include/aidl/com/github/jonforshort/vpn/BnVpnService.h
+    include/aidl/com/github/jonforshort/vpn/IVpnServiceListener.h
+    include/aidl/com/github/jonforshort/vpn/BpVpnServiceListener.h
+    include/aidl/com/github/jonforshort/vpn/BnVpnServiceListener.h
 )
 
 set(sources
     com/github/jonforshort/vpn/IVpnService.cpp
+    com/github/jonforshort/vpn/IVpnServiceListener.cpp
 )
 
 add_library(aidl STATIC ${sources} ${headers})

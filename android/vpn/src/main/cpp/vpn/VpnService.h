@@ -27,6 +27,7 @@
 #include "VpnConnection.h"
 
 #include "aidl/com/github/jonforshort/vpn/BnVpnService.h"
+#include "aidl/com/github/jonforshort/vpn/BnVpnServiceListener.h"
 
 namespace ai::vpn {
 
@@ -37,7 +38,7 @@ namespace ai::vpn {
 
         virtual ~VpnService() = default;
 
-        virtual ::ndk::ScopedAStatus start(const ::ndk::ScopedFileDescriptor &fd);
+        virtual ::ndk::ScopedAStatus start(::ndk::SpAIBinder const &listener, ::ndk::ScopedFileDescriptor const &vpnSocket);
 
         virtual ::ndk::ScopedAStatus stop();
     };

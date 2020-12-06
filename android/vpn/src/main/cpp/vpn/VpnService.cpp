@@ -23,8 +23,9 @@
 //
 #include "VpnService.h"
 #include "utils/log.h"
+#include "aidl/com/github/jonforshort/vpn/BnVpnServiceListener.h"
 
-::ndk::ScopedAStatus ai::vpn::VpnService::start(const ndk::ScopedFileDescriptor &fd) {
+::ndk::ScopedAStatus ai::vpn::VpnService::start(ndk::SpAIBinder const &listener, ndk::ScopedFileDescriptor const &vpnSocket) {
     LOGI("VpnService::start");
     return ::ndk::ScopedAStatus(AStatus_newOk());
 }

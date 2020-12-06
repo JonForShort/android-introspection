@@ -29,14 +29,14 @@ public:
   static binder_status_t readFromParcel(const AParcel* parcel, std::shared_ptr<IVpnService>* instance);
   static bool setDefaultImpl(std::shared_ptr<IVpnService> impl);
   static const std::shared_ptr<IVpnService>& getDefaultImpl();
-  virtual ::ndk::ScopedAStatus start(const ::ndk::ScopedFileDescriptor& in_fd) = 0;
+  virtual ::ndk::ScopedAStatus start(const ::ndk::SpAIBinder& in_listener, const ::ndk::ScopedFileDescriptor& in_fd) = 0;
   virtual ::ndk::ScopedAStatus stop() = 0;
 private:
   static std::shared_ptr<IVpnService> default_impl;
 };
 class IVpnServiceDefault : public IVpnService {
 public:
-  ::ndk::ScopedAStatus start(const ::ndk::ScopedFileDescriptor& in_fd) override;
+  ::ndk::ScopedAStatus start(const ::ndk::SpAIBinder& in_listener, const ::ndk::ScopedFileDescriptor& in_fd) override;
   ::ndk::ScopedAStatus stop() override;
   ::ndk::SpAIBinder asBinder() override;
   bool isRemote() override;
