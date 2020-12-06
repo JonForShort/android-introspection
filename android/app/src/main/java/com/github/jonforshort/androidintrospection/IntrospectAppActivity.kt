@@ -32,24 +32,27 @@ import android.view.ViewGroup.LayoutParams
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import com.github.jonforshort.androidintrospection.databinding.ActivityIntrospectAppBinding
 import com.github.jonforshort.lib.ApkProcessor
-import kotlinx.android.synthetic.main.activity_introspect_app.*
 import timber.log.Timber.d
 import java.io.File
 
 class IntrospectAppActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityIntrospectAppBinding
     private lateinit var installedApps: List<ResolveInfo>
     private var appIconSize: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_introspect_app)
+        binding = ActivityIntrospectAppBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
         updateInstalledApps()
 
-        installed_apps.adapter = AppsAdapter()
-        installed_apps.setOnItemClickListener { _, _, position, _ ->
+        binding.installedApps.adapter = AppsAdapter()
+        binding.installedApps.setOnItemClickListener { _, _, position, _ ->
             val clickedItem = installedApps[position]
             d("item clicked : position [$position] item [$clickedItem]")
             val modifiedApkFile = File.createTempFile("makeDebuggable", ".apk")

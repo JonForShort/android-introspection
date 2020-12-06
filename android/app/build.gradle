@@ -2,11 +2,7 @@ apply plugin: 'com.android.application'
 
 apply from: getScriptPathFor('androidCommon.gradle')
 
-android {
-    defaultConfig {
-        applicationId "com.github.jonforshort.androidintrospection"
-    }
-}
+android.defaultConfig.applicationId "com.github.jonforshort.androidintrospection"
 
 dependencies {
     implementation project(':lib')

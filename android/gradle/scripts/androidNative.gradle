@@ -1,0 +1,12 @@
+android {
+
+    ndkVersion configuration.ndkVersion
+
+    externalNativeBuild {
+
+        cmake {
+            version "3.10.2"
+            path "CMakeLists.txt"
+        }
+    }
+}

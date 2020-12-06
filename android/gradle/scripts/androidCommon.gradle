@@ -1,9 +1,9 @@
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 android {
 
     compileSdkVersion configuration.compileSdkVersion
+    ndkVersion configuration.ndkVersion
 
     defaultConfig {
         minSdkVersion configuration.minSdkVersion
@@ -25,6 +25,10 @@ android {
             shrinkResources configuration.debug.shrinkResources
             testCoverageEnabled configuration.debug.testCoverageEnabled
         }
+    }
+
+    buildFeatures {
+        viewBinding true
     }
 }
 

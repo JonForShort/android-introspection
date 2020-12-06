@@ -4,7 +4,8 @@ buildscript {
         configuration = [
                 compileSdkVersion        : 30,
                 targetSdkVersion         : 30,
-                minSdkVersion            : 26,
+                minSdkVersion            : 29,
+                ndkVersion               : "22.0.6917172",
                 defaultVersionCode       : 1,
                 defaultVersionName       : "1.0.0",
                 testInstrumentationRunner: "androidx.test.runner.AndroidJUnitRunner",
