@@ -4,7 +4,11 @@ import android.os.ParcelFileDescriptor;
 
 interface IVpnService {
 
-    void start(in IBinder listener, in ParcelFileDescriptor vpnSocket);
+    void initialize(in IBinder listener, in ParcelFileDescriptor vpnSocket);
+
+    void start();
 
     void stop();
+
+    void uninitialize();
 }

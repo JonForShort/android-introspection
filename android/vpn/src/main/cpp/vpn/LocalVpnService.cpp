@@ -34,15 +34,17 @@ namespace {
 
 extern "C"
 JNIEXPORT jobject JNICALL
-Java_com_github_jonforshort_vpn_LocalVpnService_initializeVpnNative(JNIEnv *jniEnv, jobject) {
-    LOGI("LocalVpnService::initialize");
-    gVpnService = std::make_unique<ai::vpn::VpnService>();
+Java_com_github_jonforshort_vpn_LocalVpnService_createNativeVpnService(JNIEnv *jniEnv, jobject) {
+    LOGI("LocalVpnService::createNativeVpnService");
+    if (gVpnService == nullptr) {
+        gVpnService = std::make_unique<ai::vpn::VpnService>();
+    }
     return AIBinder_toJavaBinder(jniEnv, gVpnService->asBinder().get());
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_github_jonforshort_vpn_LocalVpnService_uninitializeVpnNative(JNIEnv *, jobject) {
-    LOGI("LocalVpnService::uninitialize");
+Java_com_github_jonforshort_vpn_LocalVpnService_destroyNativeVpnService(JNIEnv *, jobject) {
+    LOGI("LocalVpnService::destroyNativeVpnService");
     gVpnService.reset();
 }

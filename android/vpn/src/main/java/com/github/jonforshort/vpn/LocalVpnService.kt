@@ -96,7 +96,8 @@ class LocalVpnService : VpnService() {
         }
 
         vpnService.stop()
-        uninitializeVpnNative()
+        vpnService.uninitialize()
+        destroyNativeVpnService()
 
         stopForeground(true)
         stopSelf()
@@ -122,8 +123,8 @@ class LocalVpnService : VpnService() {
             .establish()!!
 
         vpnServiceListener = VpnServiceListener(this)
-        vpnService = IVpnService.Stub.asInterface(initializeVpnNative())
-        vpnService.start(vpnServiceListener.asBinder(), vpnInterface)
+        vpnService = IVpnService.Stub.asInterface(createNativeVpnService())
+        vpnService.initialize(vpnServiceListener.asBinder(), vpnInterface)
     }
 
     override fun onDestroy() {
@@ -131,9 +132,9 @@ class LocalVpnService : VpnService() {
         d("onDestroy called")
     }
 
-    private external fun initializeVpnNative(): IBinder
+    private external fun createNativeVpnService(): IBinder
 
-    private external fun uninitializeVpnNative()
+    private external fun destroyNativeVpnService()
 }
 
 private class VpnServiceListener(val vpnService: VpnService) : IVpnServiceListener.Stub() {

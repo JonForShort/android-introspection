@@ -25,12 +25,22 @@
 #include "utils/log.h"
 #include "aidl/com/github/jonforshort/vpn/BnVpnServiceListener.h"
 
-::ndk::ScopedAStatus ai::vpn::VpnService::start(ndk::SpAIBinder const &listener, ndk::ScopedFileDescriptor const &vpnSocket) {
+::ndk::ScopedAStatus ai::vpn::VpnService::initialize(const ndk::SpAIBinder &in_listener, const ndk::ScopedFileDescriptor &in_vpnSocket) {
+    LOGI("VpnService::initialize");
+    return ::ndk::ScopedAStatus(AStatus_newOk());
+}
+
+::ndk::ScopedAStatus ai::vpn::VpnService::start() {
     LOGI("VpnService::start");
     return ::ndk::ScopedAStatus(AStatus_newOk());
 }
 
 ::ndk::ScopedAStatus ai::vpn::VpnService::stop() {
     LOGI("VpnService::stop");
+    return ::ndk::ScopedAStatus(AStatus_newOk());
+}
+
+::ndk::ScopedAStatus ai::vpn::VpnService::uninitialize() {
+    LOGI("VpnService::uninitialize");
     return ::ndk::ScopedAStatus(AStatus_newOk());
 }

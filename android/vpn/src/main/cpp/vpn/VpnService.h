@@ -38,9 +38,13 @@ namespace ai::vpn {
 
         virtual ~VpnService() = default;
 
-        virtual ::ndk::ScopedAStatus start(::ndk::SpAIBinder const &listener, ::ndk::ScopedFileDescriptor const &vpnSocket);
+        virtual ::ndk::ScopedAStatus initialize(::ndk::SpAIBinder const&in_listener, const ::ndk::ScopedFileDescriptor const&in_vpnSocket);
+
+        virtual ::ndk::ScopedAStatus start();
 
         virtual ::ndk::ScopedAStatus stop();
+
+        virtual ::ndk::ScopedAStatus uninitialize();
     };
 }
 

@@ -29,15 +29,19 @@ public:
   static binder_status_t readFromParcel(const AParcel* parcel, std::shared_ptr<IVpnService>* instance);
   static bool setDefaultImpl(std::shared_ptr<IVpnService> impl);
   static const std::shared_ptr<IVpnService>& getDefaultImpl();
-  virtual ::ndk::ScopedAStatus start(const ::ndk::SpAIBinder& in_listener, const ::ndk::ScopedFileDescriptor& in_fd) = 0;
+  virtual ::ndk::ScopedAStatus initialize(const ::ndk::SpAIBinder& in_listener, const ::ndk::ScopedFileDescriptor& in_vpnSocket) = 0;
+  virtual ::ndk::ScopedAStatus start() = 0;
   virtual ::ndk::ScopedAStatus stop() = 0;
+  virtual ::ndk::ScopedAStatus uninitialize() = 0;
 private:
   static std::shared_ptr<IVpnService> default_impl;
 };
 class IVpnServiceDefault : public IVpnService {
 public:
-  ::ndk::ScopedAStatus start(const ::ndk::SpAIBinder& in_listener, const ::ndk::ScopedFileDescriptor& in_fd) override;
+  ::ndk::ScopedAStatus initialize(const ::ndk::SpAIBinder& in_listener, const ::ndk::ScopedFileDescriptor& in_vpnSocket) override;
+  ::ndk::ScopedAStatus start() override;
   ::ndk::ScopedAStatus stop() override;
+  ::ndk::ScopedAStatus uninitialize() override;
   ::ndk::SpAIBinder asBinder() override;
   bool isRemote() override;
 };
