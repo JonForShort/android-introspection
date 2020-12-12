@@ -21,7 +21,7 @@ if (NOT DEFINED PCAPPLUSPLUS_AR)
 endif ()
 
 ExternalProject_Add(
-        pcapplusplus
+        ai_pcapplusplus
         URL ${PCAPPLUSPLUS_SOURCE_DIR}
         CONFIGURE_COMMAND ${PCAPPLUSPLUS_SOURCE_DIR}/configure-linux.sh ${PCAPPLUSPLUS_CONFIGURE_FLAGS}
         BUILD_IN_SOURCE 1
@@ -29,9 +29,9 @@ ExternalProject_Add(
 )
 
 add_custom_target(
-        pcapplusplus_apply_patches
+        ai_pcapplusplus_apply_patches
         COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/apply_patches.sh
 )
 
-add_dependencies(pcapplusplus pcap)
-add_dependencies(pcapplusplus pcapplusplus_apply_patches)
+add_dependencies(ai_pcapplusplus ai_pcap)
+add_dependencies(ai_pcapplusplus ai_pcapplusplus_apply_patches)

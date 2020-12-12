@@ -3,4 +3,4 @@ apply plugin: 'com.android.library'
 apply from: getScriptPathFor('androidCommon.gradle')
 apply from: getScriptPathFor('androidNative.gradle')
 
-android.defaultConfig.externalNativeBuild.cmake.targets "pcapplusplus", "pcap"
+android.defaultConfig.externalNativeBuild.cmake.targets "ai_pcapplusplus", "ai_pcap"
