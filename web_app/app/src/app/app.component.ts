@@ -3,6 +3,7 @@ import { MatTable } from '@angular/material/table'
 import { MatTabGroup, MatTab } from '@angular/material/tabs';
 import { combineLatest } from 'rxjs';
 import { WasmService } from './wasm.service'
+import { LogService } from './log.service'
 
 export interface ContentElement {
   path: String,
@@ -38,7 +39,7 @@ export class AppComponent {
 
   @ViewChild("ApkInformationTabGroup", { static: false }) tabGroup: MatTabGroup;
 
-  constructor(private wasm: WasmService) { }
+  constructor(private wasm: WasmService, private logger: LogService) { }
 
   ngAfterViewInit() {
     this.updateTableState()
