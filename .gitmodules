@@ -4,12 +4,12 @@
 
 [submodule "external/zlib/source"]
 	path = external/zlib/source
-	url = https://github.com/thejunkjon/external-zlib.git
+	url = https://github.com/jonforshort/external-zlib.git
 	ignore = dirty
 
 [submodule "external/minizip/source"]
 	path = external/minizip/source
-	url = https://github.com/thejunkjon/minizip.git
+	url = https://github.com/jonforshort/minizip.git
 	ignore = dirty
 
 [submodule "external/wasm/emsdk"]
@@ -29,7 +29,7 @@
 
 [submodule "external/openssl/source"]
 	path = external/openssl/source
-	url = https://github.com/thejunkjon/openssl.git
+	url = https://github.com/jonforshort/openssl.git
 	ignore = dirty
 
 [submodule "external/spdlog/source"]
@@ -44,20 +44,20 @@
 
 [submodule "external/boost/source"]
 	path = external/boost/source
-	url = git@github.com:thejunkjon/external-boost.git
+	url = git@github.com:jonforshort/external-boost.git
         ignore = dirty
 
 [submodule "external/botan/source"]
 	path = external/botan/source
-	url = git@github.com:thejunkjon/botan.git
+	url = git@github.com:jonforshort/botan.git
         ignore = dirty
 
 [submodule "external/libpcap/source"]
 	path = external/libpcap/source
-	url = git@github.com:thejunkjon/libpcap.git
+	url = git@github.com:jonforshort/libpcap.git
         ignore = dirty
 
 [submodule "external/pcapplusplus/source"]
         path = external/pcapplusplus/source
-        url = git@github.com:thejunkjon/PcapPlusPlus.git
+        url = git@github.com:jonforshort/PcapPlusPlus.git
         ignore = dirty
