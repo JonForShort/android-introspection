@@ -6,6 +6,8 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 ROOT_DIR=${SCRIPT_DIR}/../..
 
+SOURCE_DIR=${ROOT_DIR}/source
+
 LOGS_DIR=${ROOT_DIR}/logs
 
 ai_root_dir()
@@ -27,7 +29,7 @@ ai_setup_environment()
 
     if [[ -z "${AI_TESTS_DIR}" ]]
     then
-        export AI_TESTS_DIR=${ROOT_DIR}/web_app/wasm/test
+        export AI_TESTS_DIR=${SOURCE_DIR}/web_app/wasm/test
     fi
 
     echo AI_UID=$(id -u $USER):$(id -g $USER) > ${ROOT_DIR}/.env
@@ -42,24 +44,24 @@ ai_setup_vscode()
 
 ai_setup_vscode_webapp()
 {
-    mkdir -p ${ROOT_DIR}/web_app/app/.vscode
+    mkdir -p ${SOURCE_DIR}/web_app/app/.vscode
 
-    pushd ${ROOT_DIR}/web_app/app/.vscode
+    pushd ${SOURCE_DIR}/web_app/app/.vscode
 
-    ln -s $(realpath --relative-to=${ROOT_DIR}/web_app/app/.vscode ${ROOT_DIR}/dev/vscode/app)/launch.json launch.json
+    ln -s $(realpath --relative-to=${SOURCE_DIR}/web_app/app/.vscode ${ROOT_DIR}/dev/vscode/app)/launch.json launch.json
 
     popd
 }
 
 ai_setup_vscode_wasm()
 {
-    mkdir -p ${ROOT_DIR}/web_app/wasm/.vscode
+    mkdir -p ${SOURCE_DIR}/web_app/wasm/.vscode
 
-    pushd ${ROOT_DIR}/web_app/wasm/.vscode
+    pushd ${SOURCE_DIR}/web_app/wasm/.vscode
 
-    ln -s $(realpath --relative-to=${ROOT_DIR}/web_app/wasm/.vscode ${ROOT_DIR}/dev/vscode/wasm)/launch.json launch.json
+    ln -s $(realpath --relative-to=${SOURCE_DIR}/web_app/wasm/.vscode ${ROOT_DIR}/dev/vscode/wasm)/launch.json launch.json
 
-    ln -s $(realpath --relative-to=${ROOT_DIR}/web_app/wasm/.vscode ${ROOT_DIR}/dev/vscode/wasm)/tasks.json tasks.json
+    ln -s $(realpath --relative-to=${SOURCE_DIR}/web_app/wasm/.vscode ${ROOT_DIR}/dev/vscode/wasm)/tasks.json tasks.json
 
     popd
 }
@@ -74,14 +76,12 @@ ai_build()
 
     ENV_SCRIPT=./dev/scripts/env.sh
 
-    docker-compose build                                                     &> ${LOGS_DIR}/build.txt           && \
-    docker-compose run android ${ENV_SCRIPT} ai_build_android                &> ${LOGS_DIR}/build_android.txt   && \
-    docker-compose run web_app ${ENV_SCRIPT} ai_build_wasm                   &> ${LOGS_DIR}/build_wasm_pre.txt  && \
-    docker-compose run web_app rm -rf web_app/wasm/out/wasm/external/minizip &> ${LOGS_DIR}/build_wasm_rm.txt   && \
-    docker-compose run web_app ${ENV_SCRIPT} ai_build_wasm                   &> ${LOGS_DIR}/build_wasm_post.txt && \
-    docker-compose run web_app ${ENV_SCRIPT} ai_build_wasm_host              &> ${LOGS_DIR}/build_wasm_host.txt && \
-    docker-compose run web_app ${ENV_SCRIPT} ai_dist_wasm                    &> ${LOGS_DIR}/dist_wasm.txt       && \
-    docker-compose run web_app ${ENV_SCRIPT} ai_build_webapp                 &> ${LOGS_DIR}/build_webapp.txt
+    docker-compose build                                        &> ${LOGS_DIR}/build.txt           && \
+    docker-compose run android ${ENV_SCRIPT} ai_build_android   &> ${LOGS_DIR}/build_android.txt   && \
+    docker-compose run web_app ${ENV_SCRIPT} ai_build_wasm      &> ${LOGS_DIR}/build_wasm.txt      && \
+    docker-compose run web_app ${ENV_SCRIPT} ai_build_wasm_host &> ${LOGS_DIR}/build_wasm_host.txt && \
+    docker-compose run web_app ${ENV_SCRIPT} ai_dist_wasm       &> ${LOGS_DIR}/dist_wasm.txt       && \
+    docker-compose run web_app ${ENV_SCRIPT} ai_build_webapp    &> ${LOGS_DIR}/build_webapp.txt
 
     rm -rf archive
 
@@ -96,7 +96,7 @@ ai_build()
 
 ai_build_android()
 {(
-    pushd ${ROOT_DIR}/android
+    pushd ${SOURCE_DIR}/android
 
     ./gradlew clean build
 
@@ -120,13 +120,13 @@ ai_build_wasm()
 
     popd
 
-    BUILD_DIR=${ROOT_DIR}/web_app/build/wasm
+    BUILD_DIR=${SOURCE_DIR}/web_app/build/wasm
 
     mkdir -p ${BUILD_DIR}
 
     pushd ${BUILD_DIR}
 
-    emcmake cmake -DWASM=True -DCMAKE_BUILD_TYPE=Debug --build ${ROOT_DIR}/web_app/wasm
+    emcmake cmake -DWASM=True -DCMAKE_BUILD_TYPE=Debug --build ${SOURCE_DIR}/web_app/wasm
 
     emmake make "$@"
 
@@ -135,13 +135,13 @@ ai_build_wasm()
 
 ai_build_wasm_host()
 {(
-    BUILD_DIR=${ROOT_DIR}/web_app/build/host
+    BUILD_DIR=${SOURCE_DIR}/web_app/build/host
 
     mkdir -p ${BUILD_DIR}
 
     pushd ${BUILD_DIR}
 
-    cmake -DWASM=False -DCMAKE_BUILD_TYPE=Debug --build ${ROOT_DIR}/web_app/wasm
+    cmake -DWASM=False -DCMAKE_BUILD_TYPE=Debug --build ${SOURCE_DIR}/web_app/wasm
 
     make "$@" && make test
 
@@ -150,7 +150,7 @@ ai_build_wasm_host()
 
 ai_build_webapp()
 {(
-    BUILD_DIR=${ROOT_DIR}/web_app/app
+    BUILD_DIR=${SOURCE_DIR}/web_app/app
 
     pushd ${BUILD_DIR}
 
@@ -163,11 +163,11 @@ ai_build_webapp()
 
 ai_dist_wasm()
 {(
-    DIST_DIR=${ROOT_DIR}/web_app/app/src/assets/js/wasm
+    DIST_DIR=${SOURCE_DIR}/web_app/app/src/assets/js/wasm
 
     mkdir -p ${DIST_DIR}
 
-    cp ${ROOT_DIR}/web_app/wasm/out/wasm/wasm/bin/* ${DIST_DIR}
+    cp ${SOURCE_DIR}/web_app/wasm/out/wasm/wasm/bin/* ${DIST_DIR}
 
     echo ""
     echo "copied successfuly; files can be found at the following path"
