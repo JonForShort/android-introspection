@@ -4,9 +4,9 @@ if (ANDROID)
 
     set(EXTERNAL_PROJECTS android spdlog libpcap pcapplusplus)
 
-elseif (WASM)
+elseif (WASM OR WASM_HOST)
 
-    set(EXTERNAL_PROJECTS boost frida googletest minizip botan spdlog pugixml)
+    set(EXTERNAL_PROJECTS boost frida googletest minizip botan spdlog pugixml zlib)
 
 endif ()
 

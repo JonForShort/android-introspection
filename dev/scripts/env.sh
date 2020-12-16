@@ -141,7 +141,7 @@ ai_build_wasm_host()
 
     pushd ${BUILD_DIR}
 
-    cmake -DWASM=False -DCMAKE_BUILD_TYPE=Debug --build ${SOURCE_DIR}/web_app/wasm
+    cmake -DWASM_HOST=True -DCMAKE_BUILD_TYPE=Debug --build ${SOURCE_DIR}/web_app/wasm
 
     make "$@" && make test
 
