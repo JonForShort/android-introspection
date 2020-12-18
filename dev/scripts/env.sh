@@ -88,8 +88,8 @@ ai_build()
     mkdir -p archive
 
     tar cvzf archive/logs.tar.gz ${LOGS_DIR}
-    tar cvzf archive/web_app.tar.gz web_app/app/dist
-    tar cvzf archive/android.tar.gz android/app/build/outputs
+    tar cvzf archive/web_app.tar.gz ${SOURCE_DIR}/web_app/app/dist
+    tar cvzf archive/android.tar.gz ${SOURCE_DIR}/android/app/build/outputs
 
     popd
 }
