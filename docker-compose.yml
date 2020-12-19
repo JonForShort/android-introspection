@@ -43,4 +43,4 @@ services:
     working_dir: '/ai'
     tty: true
     user: $AI_UID
-    command: npm --prefix=./web_app/app start
+    command: npm --prefix=./source/web_app/app start

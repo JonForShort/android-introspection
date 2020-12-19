@@ -3,7 +3,7 @@ import { MatTable } from '@angular/material/table'
 import { MatTabGroup, MatTab } from '@angular/material/tabs';
 import { combineLatest } from 'rxjs';
 import { WasmService } from './wasm.service'
-import { LogService } from './log.service'
+import { LogService } from './log/log.service'
 
 export interface ContentElement {
   path: String,
