@@ -7,14 +7,16 @@ import { BrowserModule } from '@angular/platform-browser';
 import { DragAndDropFileDirective } from "./directives/drag-and-drop-file-directive"
 import { HeaderButtonHoverDirective } from "./directives/header-button-hover-directive"
 import { NgModule } from '@angular/core';
-import { TelemetryModule } from './telemetry/telemetry.module'
+import { PermissionsViewComponent } from './permissions-view/permissions-view.component'
+import { TelemetryModule } from './telemetry/telemetry.module';
 
 @NgModule({
   declarations: [
     AppComponent,
     AndroidManifestViewComponent,
     DragAndDropFileDirective,
-    HeaderButtonHoverDirective
+    HeaderButtonHoverDirective,
+    PermissionsViewComponent
   ],
   imports: [
     AppRoutingModule,
