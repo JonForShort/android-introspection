@@ -126,6 +126,6 @@ export class AppComponent {
       }
       eventParams[key] = value
     }
-    this.telemetry.sendEvent("apk_loaded", eventParams)
+    this.telemetry.logEvent("apk_loaded", eventParams)
   }
 }
