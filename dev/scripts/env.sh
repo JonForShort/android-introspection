@@ -126,7 +126,7 @@ ai_build_wasm()
 
     pushd ${BUILD_DIR}
 
-    emcmake cmake -DWASM=True -DCMAKE_BUILD_TYPE=Debug --build ${SOURCE_DIR}/web_app/wasm
+    emcmake cmake -DWASM=True -DCMAKE_BUILD_TYPE=Release --build ${SOURCE_DIR}/web_app/wasm
 
     emmake make "$@"
 
@@ -141,7 +141,7 @@ ai_build_wasm_host()
 
     pushd ${BUILD_DIR}
 
-    cmake -DWASM_HOST=True -DCMAKE_BUILD_TYPE=Debug --build ${SOURCE_DIR}/web_app/wasm
+    cmake -DWASM_HOST=True -DCMAKE_BUILD_TYPE=Release --build ${SOURCE_DIR}/web_app/wasm
 
     make "$@" && make test
 
@@ -156,7 +156,7 @@ ai_build_webapp()
 
     NG_CLI_ANALYTICS=false npm install @angular/cli
 
-    ./node_modules/.bin/ng build
+    ./node_modules/.bin/ng build --prod
 
     popd
 )}
