@@ -1,10 +1,27 @@
 ![Build Master](https://github.com/jonforshort/android-introspection/workflows/Build%20Master/badge.svg)
 
-# android-introspection
+# Android Introspection
 
-Android Introspection is a web app that provides an easy to use solution for application introspection.
+Android Introspection is a web app that provides an easy to use solution for application introspection.  It is implemented using [web assembly](https://webassembly.org/), [Angular](https://angular.io/) and [Android SDK](https://developer.android.com).
 
-This project is still currently in development.
+Project is still currently in development phase.
 
-https://android-introspection.web.app/
+Please have a look here! https://android-introspection.web.app/
 
+## Feature List
+
+#### Inspect Android Manifest, Assets, DEX, etc
+
+View the app's manifest, assets, code, etc. directly in the browser.
+
+#### Decompile APK
+
+Ability to decompile an APK for offline analysis.
+
+#### Inject Reverse Engineering Tools Into APK
+
+Injecting popular reverse engineering tools (e.g. [Frida](https://frida.re)) into the APK to inspect the app's run-time behavior.
+
+## Development
+
+Please have a look at the wiki for details on how to build the project.
