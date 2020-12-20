@@ -4,6 +4,7 @@ import { MatTabGroup, MatTab } from '@angular/material/tabs';
 import { combineLatest } from 'rxjs';
 import { WasmService } from './wasm.service'
 import { LogService } from './log/log.service'
+import { TelemetryService } from './telemetry/telemetry.service'
 
 export interface ContentElement {
   path: String,
@@ -39,7 +40,7 @@ export class AppComponent {
 
   @ViewChild("ApkInformationTabGroup", { static: false }) tabGroup: MatTabGroup;
 
-  constructor(private wasm: WasmService, private logger: LogService) { }
+  constructor(private wasm: WasmService, private logger: LogService, private telemetry: TelemetryService) { }
 
   ngAfterViewInit() {
     this.updateTableState()
@@ -64,10 +65,15 @@ export class AppComponent {
   }
 
   private handleFileInput(file: File) {
+    this.logger.log(`handleFileInput: loading apk file [${file.name}]`)
+
     this.wasm.deleteDataFile(file.name).subscribe((isDeleted) => {
       this.wasm.readFile(file).subscribe((fileContent) => {
         this.wasm.createDataFile(file.name, fileContent).subscribe((filePath) => {
           this.wasm.isApkValid(filePath).subscribe((isApkValid) => {
+
+            this.logger.log(`handleFileInput: loaded apk file is valid [${isApkValid}]`)
+
             this.isApkValid = isApkValid
             if (this.isApkValid) {
               combineLatest([
@@ -77,6 +83,9 @@ export class AppComponent {
                 this.updateApkContents(filePaths);
                 this.updateApkProperties(properties);
                 this.updateTableState()
+                this.sendApkLoadedTelemetry(properties)
+
+                this.logger.log(`handleFileInput: completed loading apk file [${file.name}]`)
               })
             }
           })
@@ -104,5 +113,19 @@ export class AppComponent {
         this.properties.push({ key: key, value: value })
       }
     }
+  }
+
+  private sendApkLoadedTelemetry(properties) {
+    const eventParams = {}
+    const propertiesKeys = properties.keys()
+    for (var i = 0; i < propertiesKeys.size(); i++) {
+      const key = propertiesKeys.get(i)
+      const value = properties.get(key)
+      if (key === "manifest") {
+        continue
+      }
+      eventParams[key] = value
+    }
+    this.telemetry.sendEvent("apk_loaded", eventParams)
   }
 }
