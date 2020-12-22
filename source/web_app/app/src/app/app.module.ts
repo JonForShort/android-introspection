@@ -9,6 +9,7 @@ import { HeaderButtonHoverDirective } from "./directives/header-button-hover-dir
 import { NgModule } from '@angular/core';
 import { PermissionsViewComponent } from './permissions-view/permissions-view.component'
 import { TelemetryModule } from './telemetry/telemetry.module';
+import { ExportApkDialogComponent } from './export-apk-dialog/export-apk-dialog.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { TelemetryModule } from './telemetry/telemetry.module';
     AndroidManifestViewComponent,
     DragAndDropFileDirective,
     HeaderButtonHoverDirective,
-    PermissionsViewComponent
+    PermissionsViewComponent,
+    ExportApkDialogComponent
   ],
   imports: [
     AppRoutingModule,

@@ -1,10 +1,12 @@
 import { Component, ViewChild } from '@angular/core'
 import { MatTable } from '@angular/material/table'
 import { MatTabGroup, MatTab } from '@angular/material/tabs';
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { combineLatest } from 'rxjs';
 import { WasmService } from './wasm.service'
 import { LogService } from './log/log.service'
 import { TelemetryService } from './telemetry/telemetry.service'
+import { ExportApkDialogComponent } from './export-apk-dialog/export-apk-dialog.component';
 
 export interface ContentElement {
   path: String,
@@ -40,7 +42,12 @@ export class AppComponent {
 
   @ViewChild("ApkInformationTabGroup", { static: false }) tabGroup: MatTabGroup;
 
-  constructor(private wasm: WasmService, private logger: LogService, private telemetry: TelemetryService) { }
+  constructor(
+    private wasm: WasmService,
+    private logger: LogService,
+    private telemetry: TelemetryService,
+    private dialog: MatDialog
+  ) { }
 
   ngAfterViewInit() {
     this.updateTableState()
@@ -62,6 +69,18 @@ export class AppComponent {
     const inputElement = (<HTMLInputElement>event.target)
     const file = inputElement.files[0]
     this.handleFileInput(file)
+  }
+
+  onExportButtonClicked(event: Event) {
+    this.logger.log("onExportButtonClicked: button clicked")
+    this.openExportDialog()
+  }
+
+  private openExportDialog() {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = false;
+    dialogConfig.autoFocus = true;
+    this.dialog.open(ExportApkDialogComponent, dialogConfig);
   }
 
   private handleFileInput(file: File) {

@@ -19,8 +19,7 @@
             <input id="inputFileButton" type="file" accept="application/vnd.android.package-archive"
                 (change)="onInputChanged($event)" />
             <label headerButtonHover class="headerButton">Load APK</label>
-            <label headerButtonHover class="headerButton">Decompile</label>
-            <label headerButtonHover class="headerButton">Analyze</label>
+            <label headerButtonHover class="headerButton" (click)="onExportButtonClicked()">Export</label>
         </div>
     </div>
 
