@@ -71,14 +71,14 @@ export class AppComponent {
     this.handleFileInput(file)
   }
 
-  onExportButtonClicked(event: Event) {
+  onExportButtonClicked() {
     this.logger.log("onExportButtonClicked: button clicked")
     this.openExportDialog()
   }
 
   private openExportDialog() {
     const dialogConfig = new MatDialogConfig();
-    dialogConfig.disableClose = false;
+    dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
     this.dialog.open(ExportApkDialogComponent, dialogConfig);
   }
