@@ -7,6 +7,6 @@
 </mat-dialog-content>
 
 <mat-dialog-actions>
-    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-button [mat-dialog-close]="false">Cancel</button>
     <button mat-button [mat-dialog-close]="true" cdkFocusInitial>Export</button>
 </mat-dialog-actions>

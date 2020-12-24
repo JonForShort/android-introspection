@@ -8,5 +8,15 @@ import { MatDialogRef } from '@angular/material/dialog';
 })
 export class ExportApkDialogComponent {
 
-  constructor(private dialogRef: MatDialogRef<ExportApkDialogComponent>) { }
+  constructor(private dialogRef: MatDialogRef<ExportApkDialogComponent>) {
+    this.dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.onExportApk()
+      }
+    });
+  }
+
+  private onExportApk() {
+    console.log("export apk")
+  }
 }
