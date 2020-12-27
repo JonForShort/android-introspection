@@ -1,9 +1,14 @@
 <h2 mat-dialog-title>Export APK</h2>
+
 <mat-dialog-content class="mat-typography">
-    <h3>Select Options</h3>
-    <p>Option #1</p>
-    <p>Option #2</p>
-    <p>Option #3</p>
+    <section class="options-section">
+        <mat-checkbox class="export-options" [value]="isMakeDebuggableChecked">
+            Make Debuggable
+        </mat-checkbox>
+        <mat-checkbox class="export-options" [value]="isInjectFridaChecked">
+            Inject Frida
+        </mat-checkbox>
+    </section>
 </mat-dialog-content>
 
 <mat-dialog-actions>
