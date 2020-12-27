@@ -26,6 +26,8 @@ export interface PropertyElement {
 })
 export class AppComponent {
 
+  loadedApkFile: File
+
   isApkValid: boolean = false;
 
   contents: ContentElement[] = [];
@@ -80,6 +82,7 @@ export class AppComponent {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
+    dialogConfig.data = { file: this.loadedApkFile }
     this.dialog.open(ExportApkDialogComponent, dialogConfig);
   }
 
@@ -105,6 +108,8 @@ export class AppComponent {
                 this.sendApkLoadedTelemetry(properties)
 
                 this.logger.log(`handleFileInput: completed loading apk file [${file.name}]`)
+
+                this.loadedApkFile = file
               })
             }
           })
