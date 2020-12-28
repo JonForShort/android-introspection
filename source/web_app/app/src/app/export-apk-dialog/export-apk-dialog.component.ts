@@ -11,7 +11,7 @@ import { WasmService } from '../wasm.service';
 })
 export class ExportApkDialogComponent {
 
-  isMakeDebuggableChecked = true
+  isMakeDebuggableChecked = false
 
   isInjectFridaChecked = false
 
@@ -29,7 +29,15 @@ export class ExportApkDialogComponent {
   }
 
   private onExportApk(file: File) {
-    this.logger.log("onExportApk: file [${file.name}]")
+    this.logger.log(`onExportApk: file [${file.name}]`)
+
+    if (this.isMakeDebuggableChecked) {
+      this.logger.log(`onExportApk: making file [${file.name}] debuggable`)
+    }
+
+    if (this.isInjectFridaChecked) {
+      this.logger.log(`onExportApk: injecting friday into file [${file.name}]`)
+    }
 
     this.wasm.readFile(file).subscribe((fileContent) => {
       const blob = new window.Blob([fileContent], { type: file.type });

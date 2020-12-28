@@ -75,6 +75,12 @@ export class AppComponent {
 
   onExportButtonClicked() {
     this.logger.log("onExportButtonClicked: button clicked")
+
+    if (this.loadedApkFile === undefined) {
+      this.logger.log("onExportButtonClicked: apk is not loaded; skipping export")
+      return
+    }
+
     this.openExportDialog()
   }
 
