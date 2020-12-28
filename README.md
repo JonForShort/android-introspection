@@ -2,11 +2,13 @@
 
 # Android Introspection
 
-Android Introspection is a web app that provides an easy to use solution for application introspection.  It is implemented using [web assembly](https://webassembly.org/), [Angular](https://angular.io/) and [Android SDK](https://developer.android.com).
+Android Introspection is a web app that provides an easy to use solution for application introspection.  It is implemented using [Web Assembly](https://webassembly.org/), [Angular](https://angular.io/) and [Android](https://developer.android.com).
 
 Project is still currently in development phase.
 
-Please have a look here! https://android-introspection.web.app/
+Please have a look here!
+
+https://android-introspection.web.app/
 
 ## Feature List
 
@@ -22,6 +24,3 @@ Ability to decompile an APK for offline analysis.
 
 Injecting popular reverse engineering tools (e.g. [Frida](https://frida.re)) into the APK to inspect the app's run-time behavior.
 
-## Development
-
-Please have a look at the wiki for details on how to build the project.
