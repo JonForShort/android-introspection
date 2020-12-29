@@ -143,6 +143,8 @@ ai_build_wasm_host()
 
     cmake -DWASM_HOST=True -DCMAKE_BUILD_TYPE=Release --build ${SOURCE_DIR}/web_app/wasm
 
+    export CTEST_OUTPUT_ON_FAILURE=1
+
     make "$@" && make test
 
     popd
