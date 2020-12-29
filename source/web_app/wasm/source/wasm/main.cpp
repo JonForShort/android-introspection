@@ -99,12 +99,18 @@ namespace po = boost::program_options;
 auto main(int argc, char *argv[]) -> int {
 
   std::string file_argument;
-  bool print_manifest = false;
+  bool print_manifest;
+  bool print_properties;
+  bool print_files;
 
   try {
     po::options_description desc{"Options"};
-    desc.add_options()("help,h", "Help screen")("manifest,pm", po::bool_switch(&print_manifest),
-                                                "print manifest")("file,f", po::value<std::string>(&file_argument)->required(), "file path to apk");
+    desc.add_options()
+      ("help,h", "Help screen")
+      ("manifest,pm", po::bool_switch(&print_manifest), "Print manifest in apk")
+      ("properties,pp", po::bool_switch(&print_properties), "Print properties in apk")
+      ("files,pf", po::bool_switch(&print_files), "Print files in apk")
+      ("file,f", po::value<std::string>(&file_argument)->required(), "file path to apk");
 
     po::variables_map vm;
     po::store(parse_command_line(argc, argv, desc), vm);
@@ -125,9 +131,27 @@ auto main(int argc, char *argv[]) -> int {
     return -3;
   }
 
+  auto const apk = ai::Apk(file_argument);
+
   if (print_manifest) {
-    auto const apk = ai::Apk(file_argument);
-    std::cout << apk.getAndroidManifest() << std::endl;
+    std::cout << std::endl << std::endl << "Manifest: " << std::endl;
+    std::cout << std::endl << apk.getAndroidManifest() << std::endl;
+  }
+
+  if (print_properties) {
+    std::cout << std::endl << std::endl << "Properties: " << std::endl;
+    for (auto const &[key, value] : apk.getProperties()) {
+      std::cout << "    " << key << "    " << value << std::endl;
+    }
+    std::cout << std::endl;
+  }
+
+  if (print_files) {
+    std::cout << std::endl << std::endl << "Files: " << std::endl;
+    for (auto const file : apk.getFiles()) {
+      std::cout << "    " << file << std::endl;
+    }
+    std::cout << std::endl;
   }
 }
 
