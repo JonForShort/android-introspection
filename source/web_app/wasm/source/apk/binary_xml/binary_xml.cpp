@@ -263,6 +263,10 @@ auto BinaryXml::toStringXml() const -> std::string {
   return xml;
 }
 
+auto BinaryXml::toBinaryXml() const -> std::vector<std::byte> {
+  return content_->bytes;
+}
+
 auto BinaryXml::getXmlHeader() const -> BinaryXmlHeader const * {
   auto xmlHeader = reinterpret_cast<BinaryXmlHeader const *>(content_->bytes.data());
   if (xmlHeader->magicNumber != XML_IDENTIFIER) {

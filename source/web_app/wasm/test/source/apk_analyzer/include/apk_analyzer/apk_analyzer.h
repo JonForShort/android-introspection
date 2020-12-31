@@ -24,6 +24,8 @@
 #ifndef ANDROID_INTROSPECTION_TEST_APK_ANALYZER_APK_ANALYZER_H_
 #define ANDROID_INTROSPECTION_TEST_APK_ANALYZER_APK_ANALYZER_H_
 
+#include <string>
+
 namespace ai {
 
 class ApkAnalyzer {
@@ -31,6 +33,8 @@ public:
   ApkAnalyzer(char const *pathToApkAnalyzer) : pathToApkAnalyzer_(pathToApkAnalyzer) {}
 
   auto isApkDebuggable(char const *pathToApk) const -> bool;
+
+  auto getAndroidManifest(char const *pathToApk) const -> std::string;
 
 private:
   char const *pathToApkAnalyzer_;

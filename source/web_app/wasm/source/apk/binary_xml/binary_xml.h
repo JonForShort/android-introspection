@@ -48,6 +48,8 @@ public:
 
   auto toStringXml() const -> std::string;
 
+  auto toBinaryXml() const -> std::vector<std::byte>;
+
 private:
   struct BinaryXmlHeader {
 
@@ -102,4 +104,4 @@ private:
 
 } // namespace ai
 
-#endif /* ANDROID_INTROSPECTION_APK_APK_PARSER_H_ */
+#endif /* ANDROID_INTROSPECTION_APK_BINARY_XML_H_ */
