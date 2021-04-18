@@ -62,3 +62,6 @@
         path = external/pcapplusplus/source
         url = git@github.com:jonforshort/PcapPlusPlus.git
         ignore = dirty
+[submodule "external/lwip/source"]
+	path = external/lwip/source
+	url = git://git.savannah.gnu.org/lwip.git
