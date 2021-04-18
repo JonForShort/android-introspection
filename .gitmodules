@@ -1,45 +1,46 @@
 [submodule "external/frida/frida-java"]
 	path = external/frida/frida-java
-	url = https://github.com/frida/frida-java.git
+	url = git@github.com:frida/frida-java.git
+        ignore = dirty
 
 [submodule "external/zlib/source"]
 	path = external/zlib/source
-	url = https://github.com/jonforshort/external-zlib.git
+	url = git@github.com:jonforshort/external-zlib.git
 	ignore = dirty
 
 [submodule "external/minizip/source"]
 	path = external/minizip/source
-	url = https://github.com/jonforshort/minizip.git
+	url = git@github.com:jonforshort/minizip.git
 	ignore = dirty
 
 [submodule "external/wasm/emsdk"]
 	path = external/wasm/emsdk
-	url = https://github.com/emscripten-core/emsdk.git
+	url = git@github.com:emscripten-core/emsdk.git
 	ignore = dirty
 
 [submodule "external/wasm/emscripten"]
 	path = external/wasm/emscripten
-	url = https://github.com/emscripten-core/emscripten.git
+	url = git@github.com:emscripten-core/emscripten.git
 	ignore = dirty
 
 [submodule "external/googletest/source"]
 	path = external/googletest/source
-	url = https://github.com/google/googletest.git
+	url = git@github.com:google/googletest.git
 	ignore = dirty
 
 [submodule "external/openssl/source"]
 	path = external/openssl/source
-	url = https://github.com/jonforshort/openssl.git
+	url = git@github.com:jonforshort/openssl.git
 	ignore = dirty
 
 [submodule "external/spdlog/source"]
 	path = external/spdlog/source
-	url = https://github.com/gabime/spdlog.git
+	url = git@github.com:gabime/spdlog.git
 	ignore = dirty
 
 [submodule "external/pugixml/source"]
 	path = external/pugixml/source
-	url = https://github.com/zeux/pugixml.git
+	url = git@github.com:zeux/pugixml.git
         ignore = dirty
 
 [submodule "external/boost/source"]
