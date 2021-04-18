@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10.2)
 
 if (ANDROID)
 
-    set(EXTERNAL_PROJECTS android spdlog libpcap pcapplusplus)
+    set(EXTERNAL_PROJECTS android spdlog libpcap pcapplusplus lwip)
 
 elseif (WASM OR WASM_HOST)
 

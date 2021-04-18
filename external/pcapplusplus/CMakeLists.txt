@@ -4,9 +4,9 @@ include(ExternalProject)
 
 set(PCAPPLUSPLUS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/source)
 set(PCAPPLUSPLUS_CONFIGURE_FLAGS
-        --libpcap-include-dir ${DIR_ROOT_OUT}/external/libpcap/include
-        --libpcap-lib-dir ${DIR_ROOT_OUT}/external/libpcap/lib
-        --install-dir ${DIR_PROJECT_OUT})
+    --libpcap-include-dir ${DIR_ROOT_OUT}/external/libpcap/include
+    --libpcap-lib-dir ${DIR_ROOT_OUT}/external/libpcap/lib
+    --install-dir ${DIR_PROJECT_OUT})
 
 if (NOT DEFINED PCAPPLUSPLUS_CXX)
     set(PCAPPLUSPLUS_CXX "g++")
@@ -21,17 +21,12 @@ if (NOT DEFINED PCAPPLUSPLUS_AR)
 endif ()
 
 ExternalProject_Add(
-        ai_pcapplusplus
-        URL ${PCAPPLUSPLUS_SOURCE_DIR}
-        CONFIGURE_COMMAND ${PCAPPLUSPLUS_SOURCE_DIR}/configure-linux.sh ${PCAPPLUSPLUS_CONFIGURE_FLAGS}
-        BUILD_IN_SOURCE 1
-        BUILD_COMMAND make CXX=${PCAPPLUSPLUS_CXX} CC=${PCAPPLUSPLUS_CC} AR=${PCAPPLUSPLUS_AR} libs
-)
-
-add_custom_target(
-        ai_pcapplusplus_apply_patches
-        COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/apply_patches.sh
+    ai_pcapplusplus
+    URL ${PCAPPLUSPLUS_SOURCE_DIR}
+    CONFIGURE_COMMAND ${PCAPPLUSPLUS_SOURCE_DIR}/configure-linux.sh ${PCAPPLUSPLUS_CONFIGURE_FLAGS}
+    BUILD_IN_SOURCE 1
+    BUILD_COMMAND make CXX=${PCAPPLUSPLUS_CXX} CC=${PCAPPLUSPLUS_CC} AR=${PCAPPLUSPLUS_AR} libs
 )
 
 add_dependencies(ai_pcapplusplus ai_pcap)
-add_dependencies(ai_pcapplusplus ai_pcapplusplus_apply_patches)
+
