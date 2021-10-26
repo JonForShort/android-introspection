@@ -10,7 +10,7 @@ Please have a look here!
 
 https://android-introspection.web.app/
 
-## Feature List
+## Planned Feature List
 
 #### Inspect Android Manifest, Assets, DEX, etc
 
@@ -24,3 +24,6 @@ Ability to decompile an APK for offline analysis.
 
 Injecting popular reverse engineering tools (e.g. [Frida](https://frida.re)) into the APK to inspect the app's run-time behavior.
 
+#### Proguard Keep Rule Debugger
+
+Visualizing proguard keep rules to help debug proguard-related issues.
