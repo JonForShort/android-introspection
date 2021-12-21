@@ -68,7 +68,3 @@
 	url = git://git.savannah.gnu.org/lwip.git
         ignore = dirty
 
-[submodule "external/smoltcp"]
-	path = external/smoltcp
-	url = git@github.com:smoltcp-rs/smoltcp.git
-        ignore = dirty
