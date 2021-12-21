@@ -62,6 +62,13 @@
         path = external/pcapplusplus/source
         url = git@github.com:jonforshort/PcapPlusPlus.git
         ignore = dirty
+
 [submodule "external/lwip/source"]
 	path = external/lwip/source
 	url = git://git.savannah.gnu.org/lwip.git
+        ignore = dirty
+
+[submodule "external/smoltcp"]
+	path = external/smoltcp
+	url = git@github.com:smoltcp-rs/smoltcp.git
+        ignore = dirty
