@@ -1,9 +1,9 @@
-FROM ubuntu:20.10
+FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
-    apt-get install -y build-essential openjdk-8-jdk wget unzip python git pkg-config sudo emacs-nox bison flex && \
+    apt-get install -y build-essential openjdk-8-jdk wget unzip python3 git pkg-config sudo emacs-nox bison flex && \
     apt -y autoclean && apt -y autoremove && apt clean
 
 ENV ANDROID_SDK_ROOT /opt/android-sdk

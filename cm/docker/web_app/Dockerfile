@@ -1,9 +1,9 @@
-FROM ubuntu:20.10
+FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
-    apt-get install -y build-essential gcc-10 gdb python cmake git pkg-config nodejs npm wget xvfb sudo
+    apt-get install -y build-essential gcc-10 gdb python3 cmake git pkg-config nodejs npm wget xvfb sudo
 
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
     echo "deb http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list && \
